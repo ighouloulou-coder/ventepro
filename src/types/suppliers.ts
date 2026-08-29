@@ -1,4 +1,4 @@
-import { Currency, Incoterm } from './index';
+import { Currency } from './index';
 
 // ============================================
 // 🏭 Types Fournisseurs
@@ -83,7 +83,6 @@ export interface Supplier {
   currency: Currency;
   paymentTerms: number; // jours
   creditLimit: number; // Crédit autorisé
-  incoterm: Incoterm;
   products: string[]; // IDs des produits fournis
   documents: SupplierDocument[];
   ratings: SupplierRating[];
@@ -130,7 +129,6 @@ export interface SupplierOrder {
   expectedDeliveryDate: string;
   actualDeliveryDate?: string;
   deliveryAddress: string;
-  incoterm: Incoterm;
   paymentStatus: 'non_payé' | 'acompte' | 'payé' | 'en_retard';
   paidAmount: number;
   notes: string;

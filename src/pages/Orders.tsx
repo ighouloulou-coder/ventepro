@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { orderStorage, clientStorage, productStorage, priceTierStorage } from '../services/storage';
-import { Order, OrderItem, Client, Product, Currency, Incoterm, INCOTERM_LABELS } from '../types';
+import { Order, OrderItem, Client, Product, Currency } from '../types';
 import { formatCurrencyAmount } from '../services/storage';
 import { sanitizeAmount, sanitizeQuantity, sanitizeInput } from '../services/sanitize';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,7 +20,6 @@ const Orders: React.FC = () => {
     currency: 'MAD' as Currency,
     deliveryDate: '',
     deliveryAddress: '',
-    incoterm: 'EXW' as Incoterm,
     notes: '',
   });
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
@@ -53,7 +52,6 @@ const Orders: React.FC = () => {
       currency: quote.currency,
       deliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       deliveryAddress: client?.deliveryAddresses?.[0]?.address || '',
-      incoterm: 'EXW',
       notes: `Converti depuis devis #${quote.id.slice(0, 8)}`,
     });
     setOrderItems(quote.items.map((item: any) => ({
@@ -70,7 +68,6 @@ const Orders: React.FC = () => {
       currency: 'MAD',
       deliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       deliveryAddress: '',
-      incoterm: 'EXW',
       notes: '',
     });
     setOrderItems([]);
@@ -151,7 +148,6 @@ const Orders: React.FC = () => {
       status: 'en_attente',
       deliveryDate: formData.deliveryDate,
       deliveryAddress: formData.deliveryAddress,
-      incoterm: formData.incoterm,
       notes: formData.notes,
       createdAt: new Date().toISOString(),
     };
@@ -197,7 +193,7 @@ const Orders: React.FC = () => {
 
       <table className="data-table">
         <thead>
-          <tr><th>Commande</th><th>Client</th><th>Total</th><th>Devise</th><th>Incoterm</th><th>Statut</th><th>Livraison</th><th>Actions</th></tr>
+          <tr><th>Commande</th><th>Client</th><th>Total</th><th>Devise</th><th>Statut</th><th>Livraison</th><th>Actions</th></tr>
         </thead>
         <tbody>
           {filteredOrders.length === 0 ? (
@@ -209,7 +205,6 @@ const Orders: React.FC = () => {
                 <td>{order.clientName}</td>
                 <td><strong>{formatCurrencyAmount(order.total, order.currency)}</strong></td>
                 <td>{order.currency}</td>
-                <td><span className="category-tag">{INCOTERM_LABELS[order.incoterm] || order.incoterm}</span></td>
                 <td><span className={`status-badge ${getStatusColor(order.status)}`}>{order.status.replace('_', ' ')}</span></td>
                 <td>{new Date(order.deliveryDate).toLocaleDateString('fr-FR')}</td>
                 <td className="actions">
@@ -260,19 +255,9 @@ const Orders: React.FC = () => {
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Incoterm *</label>
-                  <select value={formData.incoterm} onChange={e => setFormData({ ...formData, incoterm: e.target.value as Incoterm })}>
-                    {Object.entries(INCOTERM_LABELS).map(([key, label]) => (
-                      <option key={key} value={key}>{key} - {label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Date de livraison prévue</label>
-                  <input type="date" value={formData.deliveryDate} onChange={e => setFormData({ ...formData, deliveryDate: e.target.value })} />
-                </div>
+              <div className="form-group">
+                <label>Date de livraison prévue</label>
+                <input type="date" value={formData.deliveryDate} onChange={e => setFormData({ ...formData, deliveryDate: e.target.value })} />
               </div>
 
               <div className="form-group">
@@ -350,7 +335,6 @@ const Orders: React.FC = () => {
             </div>
             <div className="invoice-detail">
               <div className="detail-row"><span>Client:</span><strong>{selectedOrder.clientName}</strong></div>
-              <div className="detail-row"><span>Incoterm:</span><strong>{INCOTERM_LABELS[selectedOrder.incoterm]}</strong></div>
               <div className="detail-row"><span>Adresse livraison:</span><strong>{selectedOrder.deliveryAddress || 'Non renseignée'}</strong></div>
               <div className="detail-row"><span>Date livraison prévue:</span><strong>{new Date(selectedOrder.deliveryDate).toLocaleDateString('fr-FR')}</strong></div>
               <div className="detail-row"><span>Devise:</span><strong>{selectedOrder.currency}</strong></div>

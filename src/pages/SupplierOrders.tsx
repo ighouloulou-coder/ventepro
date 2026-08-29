@@ -4,9 +4,7 @@ import {
   SupplierOrderStatus,
   SupplierOrderItem,
   Currency,
-  Incoterm,
   SUPPLIER_ORDER_STATUS_LABELS,
-  INCOTERM_LABELS,
   Product,
 } from '../types';
 import { supplierOrderStorage, supplierStorage, formatCurrencyAmount } from '../services/supplierStorage';
@@ -98,7 +96,6 @@ const SupplierOrders: React.FC = () => {
         status: 'brouillon',
         expectedDeliveryDate: formData.expectedDeliveryDate || '',
         deliveryAddress: formData.deliveryAddress || '',
-        incoterm: formData.incoterm || 'EXW',
         paymentStatus: 'non_payé',
         paidAmount: 0,
         notes: formData.notes || '',
@@ -351,18 +348,6 @@ const SupplierOrders: React.FC = () => {
                     value={formData.expectedDeliveryDate || ''}
                     onChange={(e) => setFormData({ ...formData, expectedDeliveryDate: e.target.value })}
                   />
-                </div>
-                <div className="form-group">
-                  <label>Incoterm</label>
-                  <select
-                    className="form-input"
-                    value={formData.incoterm || 'EXW'}
-                    onChange={(e) => setFormData({ ...formData, incoterm: e.target.value as Incoterm })}
-                  >
-                    {Object.entries(INCOTERM_LABELS).map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
                 </div>
                 <div className="form-group">
                   <label>Adresse de livraison</label>

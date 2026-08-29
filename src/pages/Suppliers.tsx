@@ -7,10 +7,8 @@ import {
   SupplierStatus,
   SupplierCategory,
   Currency,
-  Incoterm,
   SUPPLIER_STATUS_LABELS,
   SUPPLIER_CATEGORY_LABELS,
-  INCOTERM_LABELS,
 } from '../types';
 import { supplierStorage, formatCurrencyAmount } from '../services/supplierStorage';
 
@@ -26,7 +24,6 @@ const emptySupplier: Partial<Supplier> = {
   currency: 'MAD',
   paymentTerms: 30,
   creditLimit: 0,
-  incoterm: 'EXW',
   products: [],
   documents: [],
   ratings: [],
@@ -137,7 +134,6 @@ const Suppliers: React.FC = () => {
         currency: formData.currency || 'MAD',
         paymentTerms: formData.paymentTerms || 30,
         creditLimit: formData.creditLimit || 0,
-        incoterm: formData.incoterm || 'EXW',
         products: formData.products || [],
         documents: formData.documents || [],
         ratings: formData.ratings || [],
@@ -529,18 +525,6 @@ const Suppliers: React.FC = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Incoterm par défaut</label>
-                  <select
-                    className="form-input"
-                    value={formData.incoterm || 'EXW'}
-                    onChange={(e) => setFormData({ ...formData, incoterm: e.target.value as Incoterm })}
-                  >
-                    {Object.entries(INCOTERM_LABELS).map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
                   <label>Site web</label>
                   <input
                     type="url"
@@ -783,10 +767,6 @@ const Suppliers: React.FC = () => {
                 <div>
                   <strong>Crédit:</strong>
                   <div>{formatCurrencyAmount(selectedSupplier.creditLimit, selectedSupplier.currency)}</div>
-                </div>
-                <div>
-                  <strong>Incoterm:</strong>
-                  <div>{INCOTERM_LABELS[selectedSupplier.incoterm as keyof typeof INCOTERM_LABELS]}</div>
                 </div>
               </div>
 

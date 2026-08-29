@@ -126,44 +126,9 @@ export interface Order {
   status: 'en_attente' | 'confirmée' | 'en_cours' | 'expédiée' | 'livrée' | 'annulée';
   deliveryDate: string; // Date prévue de livraison
   deliveryAddress: string;
-  incoterm: Incoterm;
   notes: string;
   createdAt: string;
 }
-
-// ============================================
-// 🚚 Types Incoterms
-// ============================================
-export type Incoterm =
-  | 'EXW' // Ex Works - Usine
-  | 'FCA' // Free Carrier
-  | 'FAS' // Free Alongside Ship
-  | 'FOB' // Free On Board
-  | 'CFR' // Cost and Freight
-  | 'CIF' // Cost, Insurance and Freight
-  | 'CPT' // Carriage Paid To
-  | 'CIP' // Carriage and Insurance Paid To
-  | 'DAP' // Delivered at Place
-  | 'DPU' // Delivered at Place Unloaded
-  | 'DDP' // Delivered Duty Paid
-  | 'DPU_FRANCHE' // Zone franche spécifique
-  | 'LIVRAISON_USINE'; // Livraison à l'usine
-
-export const INCOTERM_LABELS: Record<Incoterm, string> = {
-  EXW: 'Ex Works (Usine)',
-  FCA: 'Free Carrier',
-  FAS: 'Free Alongside Ship',
-  FOB: 'Free On Board',
-  CFR: 'Cost and Freight',
-  CIF: 'Cost, Insurance and Freight',
-  CPT: 'Carriage Paid To',
-  CIP: 'Carriage and Insurance Paid To',
-  DAP: 'Delivered at Place',
-  DPU: 'Delivered at Place Unloaded',
-  DDP: 'Delivered Duty Paid',
-  DPU_FRANCHE: 'Zone Franche',
-  LIVRAISON_USINE: 'Livraison Usine',
-};
 
 // ============================================
 // 📦 Types Bon de Livraison (Delivery)
