@@ -84,6 +84,8 @@ const Products: React.FC = () => {
       price: sanitizeAmount(formData.price),
       stock: sanitizeQuantity(formData.stock),
       category: sanitizeInput(finalCategory),
+      unit: 'pièce',
+      sku: '',
       createdAt: editingProduct?.createdAt || new Date().toISOString(),
     };
 

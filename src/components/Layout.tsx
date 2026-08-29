@@ -19,6 +19,20 @@ const Layout: React.FC = () => {
           <NavLink to="/clients" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             👥 Clients
           </NavLink>
+          <div style={{ borderTop: '1px solid #374151', margin: '8px 12px' }} />
+          <NavLink to="/quotes" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            📄 Devis
+          </NavLink>
+          <NavLink to="/orders" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            📋 Commandes
+          </NavLink>
+          <NavLink to="/deliveries" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            🚚 Livraisons
+          </NavLink>
+          <NavLink to="/pricing" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            💲 Tarifs
+          </NavLink>
+          <div style={{ borderTop: '1px solid #374151', margin: '8px 12px' }} />
           <NavLink to="/invoices" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             🧾 Factures
           </NavLink>

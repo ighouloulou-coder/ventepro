@@ -60,6 +60,7 @@ const Invoices: React.FC = () => {
         quantity: 1,
         unitPrice: 0,
         total: 0,
+        unit: 'pièce',
       },
     ]);
   };
@@ -120,7 +121,10 @@ const Invoices: React.FC = () => {
       taxRate: parseFloat(formData.taxRate),
       tax,
       total,
+      currency: 'MAD',
       status: 'brouillon',
+      paymentTerms: 30,
+      notes: '',
       createdAt: new Date().toISOString(),
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
     };

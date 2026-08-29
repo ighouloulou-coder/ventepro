@@ -69,6 +69,9 @@ const Clients: React.FC = () => {
       phone: sanitizePhone(formData.phone),
       address: sanitizeInput(formData.address),
       notes: sanitizeInput(formData.notes),
+      deliveryAddresses: editingClient?.deliveryAddresses || [],
+      paymentTerms: editingClient?.paymentTerms || 30,
+      currency: editingClient?.currency || 'MAD',
       createdAt: editingClient?.createdAt || new Date().toISOString(),
     };
 

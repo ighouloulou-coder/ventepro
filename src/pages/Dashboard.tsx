@@ -192,20 +192,34 @@ const Dashboard: React.FC = () => {
         <div className="stat-card">
           <div className="stat-icon">⏳</div>
           <div className="stat-info">
-            <h3>En Attente</h3>
+            <h3>Factures En Attente</h3>
             <p className="stat-value">{stats.pendingInvoices}</p>
           </div>
         </div>
 
         <div className="stat-card">
-          <div className="stat-icon">📊</div>
+          <div className="stat-icon">📄</div>
           <div className="stat-info">
-            <h3>Panier Moyen</h3>
-            <p className="stat-value">
-              {stats.totalClients > 0
-                ? formatCurrency(stats.totalSales / stats.totalClients)
-                : formatCurrency(0)}
-            </p>
+            <h3>Devis En Cours</h3>
+            <p className="stat-value">{stats.pendingQuotes}</p>
+            <p className="stat-trend">{formatCurrency(stats.totalQuotesAmount)} acceptés</p>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon">📋</div>
+          <div className="stat-info">
+            <h3>Commandes Actives</h3>
+            <p className="stat-value">{stats.pendingOrders}</p>
+            <p className="stat-trend">{formatCurrency(stats.totalOrdersAmount)} total</p>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon">🚚</div>
+          <div className="stat-info">
+            <h3>Livraisons En Cours</h3>
+            <p className="stat-value">{stats.pendingDeliveries}</p>
           </div>
         </div>
       </div>
