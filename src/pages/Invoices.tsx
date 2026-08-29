@@ -3,6 +3,7 @@ import { invoiceStorage, clientStorage, productStorage } from '../services/stora
 import { Invoice, InvoiceItem, Client, Product } from '../types';
 import { exportInvoiceToPDF, exportAllInvoicesToPDF } from '../services/pdfExport';
 import { v4 as uuidv4 } from 'uuid';
+import { sanitizeAmount, sanitizeQuantity } from '../services/sanitize';
 
 const Invoices: React.FC = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -76,10 +77,10 @@ const Invoices: React.FC = () => {
         item.total = item.unitPrice * item.quantity;
       }
     } else if (field === 'quantity') {
-      item.quantity = value as number;
+      item.quantity = sanitizeQuantity(value);
       item.total = item.unitPrice * item.quantity;
     } else if (field === 'unitPrice') {
-      item.unitPrice = value as number;
+      item.unitPrice = sanitizeAmount(value);
       item.total = item.unitPrice * item.quantity;
     }
 

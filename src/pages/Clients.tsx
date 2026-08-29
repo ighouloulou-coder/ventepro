@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { clientStorage } from '../services/storage';
 import { Client } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { sanitizeInput, sanitizeEmail, sanitizePhone, isValidString } from '../services/sanitize';
 
 const Clients: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -49,10 +50,25 @@ const Clients: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    // Validation et sanitization
+    if (!isValidString(formData.name, 1)) {
+      alert('Le nom du client est requis');
+      return;
+    }
+
+    if (formData.email && !sanitizeEmail(formData.email)) {
+      alert('Adresse email invalide');
+      return;
+    }
+
     const clientData: Client = {
       id: editingClient?.id || uuidv4(),
-      ...formData,
+      name: sanitizeInput(formData.name),
+      email: formData.email ? sanitizeEmail(formData.email) : '',
+      phone: sanitizePhone(formData.phone),
+      address: sanitizeInput(formData.address),
+      notes: sanitizeInput(formData.notes),
       createdAt: editingClient?.createdAt || new Date().toISOString(),
     };
 

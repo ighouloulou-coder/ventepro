@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { productStorage } from '../services/storage';
 import { Product } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { sanitizeInput, sanitizeAmount, sanitizeQuantity, isValidString } from '../services/sanitize';
 
 const PRESET_CATEGORIES = [
   '📦 Produit',
@@ -68,15 +69,21 @@ const Products: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validation et sanitization
+    if (!isValidString(formData.name, 1)) {
+      alert('Le nom du produit est requis');
+      return;
+    }
+
     const finalCategory = customCategory || formData.category;
 
     const productData: Product = {
       id: editingProduct?.id || uuidv4(),
-      name: formData.name,
-      description: formData.description,
-      price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
-      category: finalCategory,
+      name: sanitizeInput(formData.name),
+      description: sanitizeInput(formData.description),
+      price: sanitizeAmount(formData.price),
+      stock: sanitizeQuantity(formData.stock),
+      category: sanitizeInput(finalCategory),
       createdAt: editingProduct?.createdAt || new Date().toISOString(),
     };
 

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-  PieChart, Pie, Cell, LineChart, Line, Area, AreaChart
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Area, AreaChart
 } from 'recharts';
-import { getDashboardStats, invoiceStorage, productStorage, clientStorage } from '../services/storage';
+import { getDashboardStats, invoiceStorage, productStorage } from '../services/storage';
 import { DashboardStats, Invoice, Product } from '../types';
 
 const COLORS = ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#8b5cf6', '#ec4899'];
