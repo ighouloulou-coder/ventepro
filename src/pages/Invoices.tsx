@@ -25,6 +25,25 @@ const Invoices: React.FC = () => {
 
   useEffect(() => {
     loadData();
+    // Vérifier si on convertit un devis en facture
+    const convertData = localStorage.getItem('convertQuoteInvoice');
+    if (convertData) {
+      const quote = JSON.parse(convertData);
+      setFormData({
+        clientId: quote.clientId,
+        taxRate: quote.taxRate.toString(),
+      });
+      setInvoiceItems(quote.items.map((item: any) => ({
+        productId: item.productId,
+        productName: item.productName,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        total: item.total,
+        unit: item.unit || 'pièce',
+      })));
+      setIsModalOpen(true);
+      localStorage.removeItem('convertQuoteInvoice');
+    }
   }, []);
 
   const loadData = () => {

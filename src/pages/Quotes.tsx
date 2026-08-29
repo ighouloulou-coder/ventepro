@@ -164,6 +164,12 @@ const Quotes: React.FC = () => {
     window.location.href = '/orders';
   };
 
+  const convertToInvoice = (quote: Quote) => {
+    // Rediriger vers la page factures avec les données pré-remplies
+    localStorage.setItem('convertQuoteInvoice', JSON.stringify(quote));
+    window.location.href = '/invoices';
+  };
+
   return (
     <div className="page">
       <div className="page-header">
@@ -238,7 +244,10 @@ const Quotes: React.FC = () => {
                     <button className="btn btn-small btn-success" onClick={() => updateStatus(quote.id, 'accepté')} title="Accepté">✅</button>
                   )}
                   {quote.status === 'accepté' && (
-                    <button className="btn btn-small btn-primary" onClick={() => convertToOrder(quote)} title="Convertir en commande">📋</button>
+                    <>
+                      <button className="btn btn-small btn-primary" onClick={() => convertToOrder(quote)} title="Convertir en commande">📋</button>
+                      <button className="btn btn-small btn-success" onClick={() => convertToInvoice(quote)} title="Convertir en facture">🧾</button>
+                    </>
                   )}
                   <button className="btn btn-small btn-danger" onClick={() => {
                     if (window.confirm('Supprimer ce devis ?')) { quoteStorage.delete(quote.id); loadData(); }
