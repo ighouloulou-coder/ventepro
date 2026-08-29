@@ -4,7 +4,7 @@
 
 export type Theme = 'light' | 'dark' | 'system';
 
-const THEME_KEY = 'ventepro_theme';
+const THEME_KEY = 'traidelink_theme';
 
 /**
  * Obtenir le thème sauvegardé

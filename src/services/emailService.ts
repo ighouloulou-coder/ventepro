@@ -18,8 +18,8 @@ interface EmailConfig {
 
 const getConfig = (): EmailConfig => ({
   apiKey: (import.meta as any).env?.VITE_SENDGRID_API_KEY || '',
-  fromEmail: (import.meta as any).env?.VITE_SENDGRID_FROM_EMAIL || 'noreply@ventepro.com',
-  fromName: (import.meta as any).env?.VITE_SENDGRID_FROM_NAME || 'VentePro',
+  fromEmail: (import.meta as any).env?.VITE_SENDGRID_FROM_EMAIL || 'noreply@traidelink.com',
+  fromName: (import.meta as any).env?.VITE_SENDGRID_FROM_NAME || 'TRADE LINK INTERNATIONALE',
   apiEndpoint: (import.meta as any).env?.VITE_EMAIL_API_ENDPOINT || '/api/send-email',
 });
 
@@ -88,7 +88,7 @@ const generateInvoiceReminderHTML = (invoice: Invoice, client: Client): string =
           </div>
         </div>
         <div style="background: #f9fafb; padding: 20px; text-align: center; color: #9ca3af; font-size: 12px;">
-          <p style="margin: 0;">Généré par <strong>VentePro</strong> - Application de Gestion des Ventes</p>
+          <p style="margin: 0;">Généré par <strong>TRADE LINK INTERNATIONALE</strong> - Application de Gestion des Ventes</p>
         </div>
       </div>
     </body>
@@ -126,7 +126,7 @@ const generatePaymentConfirmationHTML = (invoice: Invoice): string => {
           <p>Merci pour votre confiance !</p>
         </div>
         <div style="background: #f9fafb; padding: 20px; text-align: center; color: #9ca3af; font-size: 12px;">
-          <p style="margin: 0;">VentePro</p>
+          <p style="margin: 0;">TRADE LINK INTERNATIONALE</p>
         </div>
       </div>
     </body>
@@ -176,7 +176,7 @@ const generateQuoteEmailHTML = (quote: Quote, client: Client): string => {
           </div>
         </div>
         <div style="background: #f9fafb; padding: 20px; text-align: center; color: #9ca3af; font-size: 12px;">
-          <p style="margin: 0;">VentePro</p>
+          <p style="margin: 0;">TRADE LINK INTERNATIONALE</p>
         </div>
       </div>
     </body>

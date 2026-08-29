@@ -27,13 +27,13 @@ export const generateReminderMessage = (invoice: Invoice, client: Client): strin
     return baseMessage +
       `⚠️ Retard : ${daysOverdue} jour${daysOverdue > 1 ? 's' : ''}\n\n` +
       `Merci de procéder au règlement dans les meilleurs délais.\n\n` +
-      `Cordialement,\nVentePro`;
+      `Cordialement,\nTRADE LINK INTERNATIONALE`;
   }
 
   return baseMessage +
     `📅 Échéance dans quelques jours.\n\n` +
     `Merci de votre attention.\n\n` +
-    `Cordialement,\nVentePro`;
+    `Cordialement,\nTRADE LINK INTERNATIONALE`;
 };
 
 /**
@@ -44,7 +44,7 @@ export const generatePaymentConfirmation = (invoice: Invoice): string => {
     `✅ Paiement confirmé pour la facture #${invoice.id.slice(0, 8)}.\n` +
     `Montant : ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)}\n\n` +
     `Merci pour votre confiance !\n\n` +
-    `VentePro`;
+    `TRADE LINK INTERNATIONALE`;
 };
 
 /**

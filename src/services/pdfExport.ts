@@ -120,7 +120,7 @@ export const exportInvoiceToPDF = (invoice: Invoice) => {
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(156, 163, 175);
   doc.text(
-    'Généré par VentePro - Application de Gestion des Ventes',
+    'Généré par TRADE LINK INTERNATIONALE - Application de Gestion des Ventes',
     pageWidth / 2,
     doc.internal.pageSize.getHeight() - 10,
     { align: 'center' }
@@ -190,7 +190,7 @@ export const exportAllInvoicesToPDF = (invoices: Invoice[]) => {
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(156, 163, 175);
   doc.text(
-    'Généré par VentePro - Application de Gestion des Ventes',
+    'Généré par TRADE LINK INTERNATIONALE - Application de Gestion des Ventes',
     pageWidth / 2,
     doc.internal.pageSize.getHeight() - 10,
     { align: 'center' }

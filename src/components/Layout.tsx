@@ -31,7 +31,7 @@ const Layout: React.FC = () => {
     <div className="app-layout">
       {/* Mobile Header */}
       <header className="mobile-header">
-        <h1>💰 VentePro</h1>
+        <h1>💰 TRADE LINK</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button
             className="theme-toggle"
@@ -63,7 +63,7 @@ const Layout: React.FC = () => {
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1>💰 VentePro</h1>
+            <h1>💰 TRADE LINK</h1>
             <p>Gestion des Ventes</p>
           </div>
           <button

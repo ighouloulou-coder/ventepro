@@ -1,6 +1,6 @@
 /**
  * Service de reconnaissance vocale (Web Speech API)
- * Permet de dicter des commandes à VentePro
+ * Permet de dicter des commandes à TRADE LINK INTERNATIONALE
  */
 
 export interface SpeechResult {
