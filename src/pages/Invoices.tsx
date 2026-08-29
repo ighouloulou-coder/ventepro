@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { invoiceStorage, clientStorage, productStorage } from '../services/storage';
 import { Invoice, InvoiceItem, Client, Product } from '../types';
 import { exportInvoiceToPDF, exportAllInvoicesToPDF } from '../services/pdfExport';
+import { exportInvoicesToExcel, exportSalesReport } from '../services/excelExport';
+import { sendInvoiceReminder, getInvoicesNeedingReminder, getReminderTypeLabel, saveReminder, type Reminder } from '../services/notifications';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeAmount, sanitizeQuantity } from '../services/sanitize';
+import { sendWhatsAppMessage } from '../services/notifications';
 
 const Invoices: React.FC = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -186,8 +189,14 @@ const Invoices: React.FC = () => {
       <div className="page-header">
         <h2>🧾 Gestion des Factures</h2>
         <div className="header-actions">
+          <button className="btn btn-secondary" onClick={() => exportInvoicesToExcel(filteredInvoices)}>
+            📊 Export Excel
+          </button>
+          <button className="btn btn-secondary" onClick={() => exportSalesReport(invoices)}>
+            📈 Rapport CA
+          </button>
           <button className="btn btn-secondary" onClick={handleExportAllPDF}>
-            📄 Exporter PDF
+            📄 Export PDF
           </button>
           <button className="btn btn-primary" onClick={openModal}>
             + Nouvelle Facture
@@ -233,6 +242,41 @@ const Invoices: React.FC = () => {
         <span>{filteredInvoices.length} facture{filteredInvoices.length > 1 ? 's' : ''}</span>
       </div>
 
+      {/* ⏰ Relances WhatsApp */}
+      {(() => {
+        const remindersNeeded = getInvoicesNeedingReminder(invoices, clients);
+        if (remindersNeeded.length === 0) return null;
+        return (
+          <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 12, padding: 20, marginBottom: 20 }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '1.1rem' }}>📱 Relances WhatsApp à envoyer ({remindersNeeded.length})</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              {remindersNeeded.slice(0, 5).map(({ invoice, client, type }, index) => (
+                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '10px 16px', borderRadius: 8 }}>
+                  <div>
+                    <strong>{getReminderTypeLabel(type)}</strong>
+                    <span style={{ marginLeft: 8, color: '#6b7280' }}>Facture #{invoice.id.slice(0, 8)} - {client.name}</span>
+                  </div>
+                  <button className="btn btn-small btn-success" onClick={() => {
+                    sendInvoiceReminder(invoice, client);
+                    saveReminder({
+                      id: Date.now().toString(),
+                      invoiceId: invoice.id,
+                      clientId: client.id,
+                      type,
+                      sentAt: new Date().toISOString(),
+                      status: 'sent',
+                    } as Reminder);
+                    loadData();
+                  }}>
+                    📱 Envoyer
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       <table className="data-table">
         <thead>
           <tr>
@@ -271,6 +315,16 @@ const Invoices: React.FC = () => {
                   </button>
                   <button className="btn btn-small" onClick={() => handleExportPDF(invoice)} title="Exporter PDF">
                     📄
+                  </button>
+                  <button className="btn btn-small" onClick={() => {
+                    const client = clients.find(c => c.id === invoice.clientId);
+                    if (client?.phone) {
+                      sendWhatsAppMessage(client.phone, `Facture #${invoice.id.slice(0, 8)} - Montant: ${formatCurrency(invoice.total)} - Échéance: ${formatDate(invoice.dueDate)}`);
+                    } else {
+                      alert('Pas de téléphone pour ce client');
+                    }
+                  }} title="WhatsApp">
+                    📱
                   </button>
                   {invoice.status === 'brouillon' && (
                     <button
