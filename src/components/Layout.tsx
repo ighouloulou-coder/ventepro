@@ -36,6 +36,9 @@ const Layout: React.FC = () => {
           <NavLink to="/invoices" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             🧾 Factures
           </NavLink>
+          <NavLink to="/overdue" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            🚨 Impayés
+          </NavLink>
         </nav>
       </aside>
       <main className="main-content">

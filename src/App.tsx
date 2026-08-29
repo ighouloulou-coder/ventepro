@@ -8,6 +8,7 @@ import Quotes from './pages/Quotes';
 import Orders from './pages/Orders';
 import Deliveries from './pages/Deliveries';
 import Pricing from './pages/Pricing';
+import OverdueDashboard from './pages/OverdueDashboard';
 import Invoices from './pages/Invoices';
 import './index.css';
 
@@ -23,6 +24,7 @@ const App: React.FC = () => {
           <Route path="orders" element={<Orders />} />
           <Route path="deliveries" element={<Deliveries />} />
           <Route path="pricing" element={<Pricing />} />
+          <Route path="overdue" element={<OverdueDashboard />} />
           <Route path="invoices" element={<Invoices />} />
         </Route>
       </Routes>

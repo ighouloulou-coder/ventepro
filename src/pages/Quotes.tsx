@@ -3,6 +3,7 @@ import { quoteStorage, clientStorage, productStorage, priceTierStorage } from '.
 import { Quote, QuoteItem, Client, Product, Currency } from '../types';
 import { formatCurrencyAmount } from '../services/storage';
 import { sanitizeAmount, sanitizeQuantity } from '../services/sanitize';
+import { generateQuotePDF, generateAllQuotesPDF } from '../services/pdfQuoteExport';
 import { v4 as uuidv4 } from 'uuid';
 
 const Quotes: React.FC = () => {
@@ -166,6 +167,9 @@ const Quotes: React.FC = () => {
       <div className="page-header">
         <h2>📄 Gestion des Devis</h2>
         <div className="header-actions">
+          <button className="btn btn-secondary" onClick={() => generateAllQuotesPDF(filteredQuotes)}>
+            📄 Export PDF
+          </button>
           <button className="btn btn-primary" onClick={openModal}>+ Nouveau Devis</button>
         </div>
       </div>
@@ -210,6 +214,7 @@ const Quotes: React.FC = () => {
                 <td>{new Date(quote.createdAt).toLocaleDateString('fr-FR')}</td>
                 <td className="actions">
                   <button className="btn btn-small" onClick={() => openDetail(quote)} title="Voir">👁️</button>
+                  <button className="btn btn-small" onClick={() => generateQuotePDF(quote, clients.find(c => c.id === quote.clientId))} title="Exporter PDF">📄</button>
                   {quote.status === 'brouillon' && (
                     <button className="btn btn-small" onClick={() => updateStatus(quote.id, 'envoyé')} title="Envoyer">📤</button>
                   )}
