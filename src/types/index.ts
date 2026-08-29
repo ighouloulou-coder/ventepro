@@ -12,6 +12,7 @@ export interface Product {
   category: string;
   unit: string; // kg, L, pièce, carton, palette...
   sku: string; // Code article / référence
+  photo: string; // Base64 de la photo ou URL
   createdAt: string;
 }
 

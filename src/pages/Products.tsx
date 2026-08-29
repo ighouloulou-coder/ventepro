@@ -3,6 +3,7 @@ import { productStorage } from '../services/storage';
 import { Product } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, sanitizeAmount, sanitizeQuantity, isValidString } from '../services/sanitize';
+import PhotoUpload from '../components/PhotoUpload';
 
 const PRESET_CATEGORIES = [
   '📦 Produit',
@@ -32,6 +33,7 @@ const Products: React.FC = () => {
     purchasePrice: '',
     stock: '',
     category: '',
+    photo: '',
   });
 
   useEffect(() => {
@@ -52,10 +54,11 @@ const Products: React.FC = () => {
         purchasePrice: product.purchasePrice?.toString() || '',
         stock: product.stock.toString(),
         category: product.category,
+        photo: product.photo || '',
       });
     } else {
       setEditingProduct(null);
-      setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '' });
+      setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '' });
     }
     setCustomCategory('');
     setIsModalOpen(true);
@@ -64,7 +67,7 @@ const Products: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '' });
+    setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '' });
     setCustomCategory('');
   };
 
@@ -94,6 +97,7 @@ const Products: React.FC = () => {
       category: sanitizeInput(finalCategory),
       unit: 'pièce',
       sku: '',
+      photo: formData.photo,
       createdAt: editingProduct?.createdAt || new Date().toISOString(),
     };
 
@@ -198,7 +202,25 @@ const Products: React.FC = () => {
           ) : (
             filteredProducts.map(product => (
               <tr key={product.id}>
-                <td><strong>{product.name}</strong></td>
+                <td>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    {product.photo ? (
+                      <img
+                        src={product.photo}
+                        alt={product.name}
+                        style={{ width: 40, height: 40, borderRadius: 8, objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 8,
+                        background: 'var(--bg-tertiary)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '1.2rem',
+                      }}>📦</div>
+                    )}
+                    <strong>{product.name}</strong>
+                  </div>
+                </td>
                 <td>{product.description}</td>
                 <td style={{ color: 'var(--gray-500)' }}>{formatCurrency(product.purchasePrice || 0)}</td>
                 <td><strong>{formatCurrency(product.price)}</strong></td>
@@ -246,6 +268,15 @@ const Products: React.FC = () => {
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h3>{editingProduct ? 'Modifier le Produit' : 'Ajouter un Produit'}</h3>
             <form onSubmit={handleSubmit}>
+              {/* Photo */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+                <PhotoUpload
+                  currentPhoto={formData.photo}
+                  onPhotoChange={(photo) => setFormData({ ...formData, photo })}
+                  size={140}
+                />
+              </div>
+
               <div className="form-group">
                 <label>Nom *</label>
                 <input
