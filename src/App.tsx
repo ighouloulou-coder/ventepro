@@ -9,6 +9,8 @@ import Orders from './pages/Orders';
 import Deliveries from './pages/Deliveries';
 import Pricing from './pages/Pricing';
 import OverdueDashboard from './pages/OverdueDashboard';
+import ClientPortal from './pages/ClientPortal';
+import SignaturePage from './pages/SignaturePage';
 import Invoices from './pages/Invoices';
 import './index.css';
 
@@ -25,6 +27,8 @@ const App: React.FC = () => {
           <Route path="deliveries" element={<Deliveries />} />
           <Route path="pricing" element={<Pricing />} />
           <Route path="overdue" element={<OverdueDashboard />} />
+          <Route path="portal" element={<ClientPortal />} />
+          <Route path="/sign" element={<SignaturePage />} />
           <Route path="invoices" element={<Invoices />} />
         </Route>
       </Routes>

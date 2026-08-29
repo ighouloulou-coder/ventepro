@@ -39,6 +39,9 @@ const Layout: React.FC = () => {
           <NavLink to="/overdue" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             🚨 Impayés
           </NavLink>
+          <NavLink to="/portal" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            👤 Portail Client
+          </NavLink>
         </nav>
       </aside>
       <main className="main-content">

@@ -4,6 +4,8 @@ import { Quote, QuoteItem, Client, Product, Currency } from '../types';
 import { formatCurrencyAmount } from '../services/storage';
 import { sanitizeAmount, sanitizeQuantity } from '../services/sanitize';
 import { generateQuotePDF, generateAllQuotesPDF } from '../services/pdfQuoteExport';
+import { sendQuoteByEmail, logEmail } from '../services/emailService';
+import { generateSignatureLink } from '../services/eSignature';
 import { v4 as uuidv4 } from 'uuid';
 
 const Quotes: React.FC = () => {
@@ -215,6 +217,20 @@ const Quotes: React.FC = () => {
                 <td className="actions">
                   <button className="btn btn-small" onClick={() => openDetail(quote)} title="Voir">👁️</button>
                   <button className="btn btn-small" onClick={() => generateQuotePDF(quote, clients.find(c => c.id === quote.clientId))} title="Exporter PDF">📄</button>
+                  <button className="btn btn-small" onClick={() => {
+                    const client = clients.find(c => c.id === quote.clientId);
+                    if (client?.email) {
+                      sendQuoteByEmail(quote, client).then(result => {
+                        logEmail({ to: client.email, subject: `Devis #${quote.id.slice(0, 8)}`, type: 'quote', quoteId: quote.id, status: result.success ? 'sent' : 'failed' });
+                        alert(result.success ? 'Email envoyé !' : `Erreur: ${result.error}`);
+                      });
+                    } else alert('Pas d\'email pour ce client');
+                  }} title="Envoyer par email">📧</button>
+                  <button className="btn btn-small" onClick={() => {
+                    const link = generateSignatureLink(quote.id);
+                    navigator.clipboard.writeText(link);
+                    alert('Lien de signature copié !\n' + link);
+                  }} title="Copier lien signature">✍️</button>
                   {quote.status === 'brouillon' && (
                     <button className="btn btn-small" onClick={() => updateStatus(quote.id, 'envoyé')} title="Envoyer">📤</button>
                   )}

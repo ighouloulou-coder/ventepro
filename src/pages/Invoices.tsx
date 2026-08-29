@@ -7,6 +7,7 @@ import { sendInvoiceReminder, getInvoicesNeedingReminder, getReminderTypeLabel, 
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeAmount, sanitizeQuantity } from '../services/sanitize';
 import { sendWhatsAppMessage } from '../services/notifications';
+import { sendInvoiceReminderEmail, logEmail } from '../services/emailService';
 
 const Invoices: React.FC = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -325,6 +326,17 @@ const Invoices: React.FC = () => {
                     }
                   }} title="WhatsApp">
                     📱
+                  </button>
+                  <button className="btn btn-small" onClick={() => {
+                    const client = clients.find(c => c.id === invoice.clientId);
+                    if (client?.email) {
+                      sendInvoiceReminderEmail(invoice, client).then(result => {
+                        logEmail({ to: client.email, subject: `Relance #${invoice.id.slice(0, 8)}`, type: 'reminder', invoiceId: invoice.id, status: result.success ? 'sent' : 'failed' });
+                        alert(result.success ? 'Email envoyé !' : `Erreur: ${result.error}`);
+                      });
+                    } else alert('Pas d\'email pour ce client');
+                  }} title="Email">
+                    📧
                   </button>
                   {invoice.status === 'brouillon' && (
                     <button
