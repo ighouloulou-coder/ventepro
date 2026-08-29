@@ -139,7 +139,7 @@ const SignaturePage: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f9fafb' }}>
         <div className="empty-state">
           <p style={{ fontSize: '1.2rem' }}>❌ Devis introuvable</p>
-          <p style={{ color: '#6b7280', marginTop: 8 }}>Lien invalide ou devis inexistant</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Lien invalide ou devis inexistant</p>
         </div>
       </div>
     );
@@ -150,10 +150,10 @@ const SignaturePage: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f0fdf4' }}>
         <div style={{ textAlign: 'center', background: 'white', padding: 40, borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
           <div style={{ fontSize: '4rem', marginBottom: 16 }}>✅</div>
-          <h2 style={{ color: '#16a34a', marginBottom: 8 }}>Devis Signé !</h2>
-          <p style={{ color: '#6b7280' }}>Merci {signerName}, votre signature a été enregistrée.</p>
-          <p style={{ color: '#6b7280', marginTop: 8 }}>Devis #{quote.id.slice(0, 8).toUpperCase()}</p>
-          <p style={{ color: '#6b7280', marginTop: 4 }}>{formatCurrencyAmount(quote.total, quote.currency)}</p>
+          <h2 style={{ color: 'var(--text-success)', marginBottom: 8 }}>Devis Signé !</h2>
+          <p style={{ color: 'var(--text-muted)' }}>Merci {signerName}, votre signature a été enregistrée.</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Devis #{quote.id.slice(0, 8).toUpperCase()}</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: 4 }}>{formatCurrencyAmount(quote.total, quote.currency)}</p>
         </div>
       </div>
     );
@@ -173,12 +173,12 @@ const SignaturePage: React.FC = () => {
           {/* Infos devis */}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
             <div>
-              <p style={{ color: '#6b7280', fontSize: '0.85rem' }}>Client</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Client</p>
               <p style={{ fontWeight: 600 }}>{quote.clientName}</p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ color: '#6b7280', fontSize: '0.85rem' }}>Total</p>
-              <p style={{ fontWeight: 700, fontSize: '1.3rem', color: '#2563eb' }}>{formatCurrencyAmount(quote.total, quote.currency)}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Total</p>
+              <p style={{ fontWeight: 700, fontSize: '1.3rem', color: 'var(--text-primary-brand)' }}>{formatCurrencyAmount(quote.total, quote.currency)}</p>
             </div>
           </div>
 
@@ -200,11 +200,11 @@ const SignaturePage: React.FC = () => {
             <tfoot>
               <tr><td colSpan={3} style={{ textAlign: 'right' }}>Sous-total</td><td style={{ textAlign: 'right' }}>{formatCurrencyAmount(quote.subtotal, quote.currency)}</td></tr>
               <tr><td colSpan={3} style={{ textAlign: 'right' }}>TVA ({quote.taxRate}%)</td><td style={{ textAlign: 'right' }}>{formatCurrencyAmount(quote.tax, quote.currency)}</td></tr>
-              <tr className="total-row"><td colSpan={3} style={{ textAlign: 'right', fontWeight: 700 }}>TOTAL</td><td style={{ textAlign: 'right', fontWeight: 700, color: '#2563eb' }}>{formatCurrencyAmount(quote.total, quote.currency)}</td></tr>
+              <tr className="total-row"><td colSpan={3} style={{ textAlign: 'right', fontWeight: 700 }}>TOTAL</td><td style={{ textAlign: 'right', fontWeight: 700, color: 'var(--text-primary-brand)' }}>{formatCurrencyAmount(quote.total, quote.currency)}</td></tr>
             </tfoot>
           </table>
 
-          <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: 30 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: 30 }}>
             Valide jusqu'au {new Date(quote.validUntil).toLocaleDateString('fr-FR')}
           </p>
 

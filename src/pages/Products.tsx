@@ -288,8 +288,8 @@ const Products: React.FC = () => {
 
               {formData.purchasePrice && formData.price && (
                 <div style={{
-                  background: '#eff6ff',
-                  border: '1px solid #bfdbfe',
+                  background: 'var(--bg-info)',
+                  border: '1px solid var(--border-info)',
                   borderRadius: 8,
                   padding: '10px 16px',
                   marginBottom: 16,
@@ -297,7 +297,7 @@ const Products: React.FC = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                 }}>
-                  <span style={{ fontSize: '0.85rem', color: '#1e40af' }}>Marge calculée :</span>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-info)' }}>Marge calculée :</span>
                   <span style={{
                     fontWeight: 700,
                     fontSize: '1rem',

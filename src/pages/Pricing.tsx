@@ -156,7 +156,7 @@ const Pricing: React.FC = () => {
       {tiers.length === 0 ? (
         <div className="empty-state" style={{ padding: '60px 20px' }}>
           <p style={{ fontSize: '1.2rem', marginBottom: 8 }}>💲 Aucun tarif configuré</p>
-          <p style={{ color: '#6b7280' }}>Ajoutez des tarifs spéciaux pour vos clients industriels</p>
+          <p style={{ color: 'var(--text-muted)' }}>Ajoutez des tarifs spéciaux pour vos clients industriels</p>
         </div>
       ) : (
         <table className="data-table">
@@ -180,7 +180,7 @@ const Pricing: React.FC = () => {
                   <td><strong>{getClientName(tier.clientId)}</strong></td>
                   <td>{getProductName(tier.productId)}</td>
                   <td>{formatCurrencyAmount(basePrice)}</td>
-                  <td><strong style={{ color: '#2563eb' }}>{formatCurrencyAmount(tier.price)}</strong></td>
+                  <td><strong style={{ color: 'var(--text-primary-brand)' }}>{formatCurrencyAmount(tier.price)}</strong></td>
                   <td>
                     <span style={{
                       padding: '2px 8px',

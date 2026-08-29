@@ -361,7 +361,7 @@ const Quotes: React.FC = () => {
                 <tr className="total-row"><td colSpan={3}><strong>Total</strong></td><td><strong>{formatCurrencyAmount(selectedQuote.total, selectedQuote.currency)}</strong></td></tr>
               </tfoot>
             </table>
-            {selectedQuote.notes && <p style={{ marginTop: 16, fontStyle: 'italic', color: '#6b7280' }}>📝 {selectedQuote.notes}</p>}
+            {selectedQuote.notes && <p style={{ marginTop: 16, fontStyle: 'italic', color: 'var(--text-muted)' }}>📝 {selectedQuote.notes}</p>}
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={closeDetail}>Fermer</button>
             </div>

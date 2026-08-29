@@ -255,7 +255,7 @@ const Invoices: React.FC = () => {
                 <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '10px 16px', borderRadius: 8 }}>
                   <div>
                     <strong>{getReminderTypeLabel(type)}</strong>
-                    <span style={{ marginLeft: 8, color: '#6b7280' }}>Facture #{invoice.id.slice(0, 8)} - {client.name}</span>
+                    <span style={{ marginLeft: 8, color: 'var(--text-muted)' }}>Facture #{invoice.id.slice(0, 8)} - {client.name}</span>
                   </div>
                   <button className="btn btn-small btn-success" onClick={() => {
                     sendInvoiceReminder(invoice, client);

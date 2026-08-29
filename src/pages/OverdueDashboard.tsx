@@ -128,7 +128,7 @@ const OverdueDashboard: React.FC = () => {
           <div className="stat-icon">💰</div>
           <div className="stat-info">
             <h3>Total Payé</h3>
-            <p className="stat-value" style={{ color: '#16a34a' }}>{formatCurrencyAmount(totalPaid)}</p>
+            <p className="stat-value" style={{ color: 'var(--text-success)' }}>{formatCurrencyAmount(totalPaid)}</p>
             <p className="stat-trend">{paidInvoices.length} factures</p>
           </div>
         </div>
@@ -137,7 +137,7 @@ const OverdueDashboard: React.FC = () => {
           <div className="stat-icon">⏳</div>
           <div className="stat-info">
             <h3>En Attente</h3>
-            <p className="stat-value" style={{ color: '#f59e0b' }}>{formatCurrencyAmount(totalUnpaid)}</p>
+            <p className="stat-value" style={{ color: 'var(--text-warning)' }}>{formatCurrencyAmount(totalUnpaid)}</p>
             <p className="stat-trend">{unpaidInvoices.length} factures</p>
           </div>
         </div>
@@ -146,7 +146,7 @@ const OverdueDashboard: React.FC = () => {
           <div className="stat-icon">🚨</div>
           <div className="stat-info">
             <h3>En Retard</h3>
-            <p className="stat-value" style={{ color: '#dc2626' }}>{formatCurrencyAmount(totalOverdue)}</p>
+            <p className="stat-value" style={{ color: 'var(--text-danger)' }}>{formatCurrencyAmount(totalOverdue)}</p>
             <p className="stat-trend">{overdueInvoices.length} factures</p>
           </div>
         </div>
@@ -155,7 +155,7 @@ const OverdueDashboard: React.FC = () => {
           <div className="stat-icon">📈</div>
           <div className="stat-info">
             <h3>Taux Recouvrement</h3>
-            <p className="stat-value" style={{ color: '#2563eb' }}>{recoveryRate}%</p>
+            <p className="stat-value" style={{ color: 'var(--text-primary-brand)' }}>{recoveryRate}%</p>
             <p className="stat-trend">du CA total</p>
           </div>
         </div>
@@ -234,9 +234,9 @@ const OverdueDashboard: React.FC = () => {
                 <div key={currency} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: '#f9fafb', borderRadius: 8 }}>
                   <div>
                     <strong>{currency}</strong>
-                    <span style={{ marginLeft: 8, color: '#6b7280' }}>{data.count} facture{data.count > 1 ? 's' : ''}</span>
+                    <span style={{ marginLeft: 8, color: 'var(--text-muted)' }}>{data.count} facture{data.count > 1 ? 's' : ''}</span>
                   </div>
-                  <span style={{ fontWeight: 700, color: '#dc2626' }}>{formatCurrencyAmount(data.total, currency as Currency)}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-danger)' }}>{formatCurrencyAmount(data.total, currency as Currency)}</span>
                 </div>
               ))}
             </div>
@@ -273,7 +273,7 @@ const OverdueDashboard: React.FC = () => {
                     <tr key={invoice.id}>
                       <td><strong>#{invoice.id.slice(0, 8)}</strong></td>
                       <td>{invoice.clientName}</td>
-                      <td><strong style={{ color: '#dc2626' }}>{formatCurrencyAmount(invoice.total, invoice.currency)}</strong></td>
+                      <td><strong style={{ color: 'var(--text-danger)' }}>{formatCurrencyAmount(invoice.total, invoice.currency)}</strong></td>
                       <td>{invoice.currency}</td>
                       <td>{new Date(invoice.dueDate).toLocaleDateString('fr-FR')}</td>
                       <td>
@@ -315,7 +315,7 @@ const OverdueDashboard: React.FC = () => {
       {unpaidInvoices.length === 0 && (
         <div className="empty-state" style={{ padding: 60 }}>
           <p style={{ fontSize: '1.2rem' }}>🎉 Aucun impayé !</p>
-          <p style={{ color: '#6b7280', marginTop: 8 }}>Toutes vos factures sont payées.</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Toutes vos factures sont payées.</p>
         </div>
       )}
     </div>

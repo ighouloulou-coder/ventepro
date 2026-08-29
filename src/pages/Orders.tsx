@@ -368,7 +368,7 @@ const Orders: React.FC = () => {
                 <tr className="total-row"><td colSpan={3}><strong>Total</strong></td><td><strong>{formatCurrencyAmount(selectedOrder.total, selectedOrder.currency)}</strong></td></tr>
               </tfoot>
             </table>
-            {selectedOrder.notes && <p style={{ marginTop: 16, fontStyle: 'italic', color: '#6b7280' }}>📝 {selectedOrder.notes}</p>}
+            {selectedOrder.notes && <p style={{ marginTop: 16, fontStyle: 'italic', color: 'var(--text-muted)' }}>📝 {selectedOrder.notes}</p>}
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={closeDetail}>Fermer</button>
             </div>

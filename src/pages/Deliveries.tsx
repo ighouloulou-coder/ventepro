@@ -159,7 +159,7 @@ const Deliveries: React.FC = () => {
                     <div style={{ flex: 1, background: '#e5e7eb', borderRadius: 4, height: 8 }}>
                       <div style={{ width: `${getCompletionRate(delivery)}%`, background: delivery.status === 'livré' ? '#16a34a' : '#2563eb', borderRadius: 4, height: 8 }} />
                     </div>
-                    <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{getCompletionRate(delivery)}%</span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{getCompletionRate(delivery)}%</span>
                   </div>
                 </td>
                 <td><span className={`status-badge ${getStatusColor(delivery.status)}`}>{delivery.status.replace('_', ' ')}</span></td>
@@ -276,7 +276,7 @@ const Deliveries: React.FC = () => {
                 ))}
               </tbody>
             </table>
-            {selectedDelivery.notes && <p style={{ marginTop: 16, fontStyle: 'italic', color: '#6b7280' }}>📝 {selectedDelivery.notes}</p>}
+            {selectedDelivery.notes && <p style={{ marginTop: 16, fontStyle: 'italic', color: 'var(--text-muted)' }}>📝 {selectedDelivery.notes}</p>}
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={closeDetail}>Fermer</button>
             </div>

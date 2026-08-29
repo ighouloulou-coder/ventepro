@@ -74,7 +74,7 @@ const ClientPortal: React.FC = () => {
               </div>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.3rem' }}>{selectedClient.name}</h3>
-                <p style={{ margin: 0, color: '#6b7280', fontSize: '0.9rem' }}>
+                <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
                   {selectedClient.email} | {selectedClient.phone}
                 </p>
               </div>
@@ -83,16 +83,16 @@ const ClientPortal: React.FC = () => {
             {/* Stats client */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
               <div style={{ textAlign: 'center', padding: 16, background: '#f0fdf4', borderRadius: 8 }}>
-                <p style={{ color: '#6b7280', fontSize: '0.8rem', margin: 0 }}>Total facturé payé</p>
-                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: '#16a34a', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalInvoiced, selectedClient.currency || 'MAD')}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>Total facturé payé</p>
+                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-success)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalInvoiced, selectedClient.currency || 'MAD')}</p>
               </div>
               <div style={{ textAlign: 'center', padding: 16, background: '#fef3c7', borderRadius: 8 }}>
-                <p style={{ color: '#6b7280', fontSize: '0.8rem', margin: 0 }}>En attente</p>
-                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: '#f59e0b', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalPending, selectedClient.currency || 'MAD')}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>En attente</p>
+                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-warning)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalPending, selectedClient.currency || 'MAD')}</p>
               </div>
-              <div style={{ textAlign: 'center', padding: 16, background: '#eff6ff', borderRadius: 8 }}>
-                <p style={{ color: '#6b7280', fontSize: '0.8rem', margin: 0 }}>Commandes totales</p>
-                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: '#2563eb', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalOrders, selectedClient.currency || 'MAD')}</p>
+              <div style={{ textAlign: 'center', padding: 16, background: 'var(--bg-info)', borderRadius: 8 }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>Commandes totales</p>
+                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary-brand)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalOrders, selectedClient.currency || 'MAD')}</p>
               </div>
             </div>
           </div>
@@ -216,7 +216,7 @@ const ClientPortal: React.FC = () => {
                               <div style={{ flex: 1, background: '#e5e7eb', borderRadius: 4, height: 8 }}>
                                 <div style={{ width: `${progress}%`, background: progress === 100 ? '#16a34a' : '#2563eb', borderRadius: 4, height: 8 }} />
                               </div>
-                              <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>{progress}%</span>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{progress}%</span>
                             </div>
                           </td>
                         </tr>
@@ -231,7 +231,7 @@ const ClientPortal: React.FC = () => {
       ) : (
         <div className="empty-state" style={{ padding: 60 }}>
           <p style={{ fontSize: '1.2rem' }}>👤 Sélectionnez un client</p>
-          <p style={{ color: '#6b7280', marginTop: 8 }}>Choisissez un client pour voir ses données</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Choisissez un client pour voir ses données</p>
         </div>
       )}
     </div>
