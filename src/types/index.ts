@@ -5,7 +5,9 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  price: number;
+  price: number; // Prix de vente
+  purchasePrice: number; // Prix d'achat
+  margin: number; // Marge en %
   stock: number;
   category: string;
   unit: string; // kg, L, pièce, carton, palette...

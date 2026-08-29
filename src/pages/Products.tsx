@@ -29,6 +29,7 @@ const Products: React.FC = () => {
     name: '',
     description: '',
     price: '',
+    purchasePrice: '',
     stock: '',
     category: '',
   });
@@ -48,12 +49,13 @@ const Products: React.FC = () => {
         name: product.name,
         description: product.description,
         price: product.price.toString(),
+        purchasePrice: product.purchasePrice?.toString() || '',
         stock: product.stock.toString(),
         category: product.category,
       });
     } else {
       setEditingProduct(null);
-      setFormData({ name: '', description: '', price: '', stock: '', category: '' });
+      setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '' });
     }
     setCustomCategory('');
     setIsModalOpen(true);
@@ -62,7 +64,7 @@ const Products: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', description: '', price: '', stock: '', category: '' });
+    setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '' });
     setCustomCategory('');
   };
 
@@ -77,11 +79,17 @@ const Products: React.FC = () => {
 
     const finalCategory = customCategory || formData.category;
 
+    const purchasePrice = sanitizeAmount(formData.purchasePrice);
+    const salePrice = sanitizeAmount(formData.price);
+    const margin = purchasePrice > 0 ? Math.round(((salePrice - purchasePrice) / purchasePrice) * 100) : 0;
+
     const productData: Product = {
       id: editingProduct?.id || uuidv4(),
       name: sanitizeInput(formData.name),
       description: sanitizeInput(formData.description),
-      price: sanitizeAmount(formData.price),
+      price: salePrice,
+      purchasePrice,
+      margin,
       stock: sanitizeQuantity(formData.stock),
       category: sanitizeInput(finalCategory),
       unit: 'pièce',
@@ -174,24 +182,42 @@ const Products: React.FC = () => {
           <tr>
             <th>Nom</th>
             <th>Description</th>
-            <th>Prix</th>
+            <th>Prix Achat</th>
+            <th>Prix Vente</th>
+            <th>Marge</th>
             <th>Stock</th>
             <th>Catégorie</th>
-            <th>Valorisation</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredProducts.length === 0 ? (
             <tr>
-              <td colSpan={7} className="empty-state">Aucun produit trouvé</td>
+              <td colSpan={8} className="empty-state">Aucun produit trouvé</td>
             </tr>
           ) : (
             filteredProducts.map(product => (
               <tr key={product.id}>
                 <td><strong>{product.name}</strong></td>
                 <td>{product.description}</td>
-                <td>{formatCurrency(product.price)}</td>
+                <td style={{ color: 'var(--gray-500)' }}>{formatCurrency(product.purchasePrice || 0)}</td>
+                <td><strong>{formatCurrency(product.price)}</strong></td>
+                <td>
+                  {product.purchasePrice > 0 ? (
+                    <span style={{
+                      padding: '2px 8px',
+                      borderRadius: 12,
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      background: product.margin >= 20 ? '#dcfce7' : product.margin >= 10 ? '#fef3c7' : '#fee2e2',
+                      color: product.margin >= 20 ? '#166534' : product.margin >= 10 ? '#92400e' : '#991b1b',
+                    }}>
+                      +{product.margin}%
+                    </span>
+                  ) : (
+                    <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
+                  )}
+                </td>
                 <td>
                   <span className={product.stock < 5 ? 'stock-low' : ''}>
                     {product.stock}
@@ -201,7 +227,6 @@ const Products: React.FC = () => {
                 <td>
                   <span className="category-tag">{product.category || 'Sans catégorie'}</span>
                 </td>
-                <td>{formatCurrency(product.price * product.stock)}</td>
                 <td className="actions">
                   <button className="btn btn-small" onClick={() => openModal(product)}>
                     ✏️
@@ -239,7 +264,17 @@ const Products: React.FC = () => {
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label>Prix (MAD) *</label>
+                  <label>Prix d'achat (MAD)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.purchasePrice}
+                    onChange={e => setFormData({ ...formData, purchasePrice: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Prix de vente (MAD) *</label>
                   <input
                     type="number"
                     step="0.01"
@@ -249,16 +284,39 @@ const Products: React.FC = () => {
                     required
                   />
                 </div>
-                <div className="form-group">
-                  <label>Stock *</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.stock}
-                    onChange={e => setFormData({ ...formData, stock: e.target.value })}
-                    required
-                  />
+              </div>
+
+              {formData.purchasePrice && formData.price && (
+                <div style={{
+                  background: '#eff6ff',
+                  border: '1px solid #bfdbfe',
+                  borderRadius: 8,
+                  padding: '10px 16px',
+                  marginBottom: 16,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}>
+                  <span style={{ fontSize: '0.85rem', color: '#1e40af' }}>Marge calculée :</span>
+                  <span style={{
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    color: (parseFloat(formData.price) - parseFloat(formData.purchasePrice)) / parseFloat(formData.purchasePrice) * 100 >= 20 ? '#16a34a' : '#f59e0b',
+                  }}>
+                    +{((parseFloat(formData.price) - parseFloat(formData.purchasePrice)) / parseFloat(formData.purchasePrice) * 100).toFixed(1)}%
+                  </span>
                 </div>
+              )}
+
+              <div className="form-group">
+                <label>Stock *</label>
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.stock}
+                  onChange={e => setFormData({ ...formData, stock: e.target.value })}
+                  required
+                />
               </div>
 
               {/* Sélection de catégorie */}
