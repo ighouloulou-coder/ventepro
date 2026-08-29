@@ -114,6 +114,18 @@ const Layout: React.FC = () => {
           <NavLink to="/portal" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
             👤 Portail Client
           </NavLink>
+
+          <div style={{ borderTop: '1px solid #374151', margin: '8px 12px' }} />
+
+          <NavLink to="/supplier-dashboard" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            🏭 Dashboard Fournisseurs
+          </NavLink>
+          <NavLink to="/suppliers" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            🏭 Fournisseurs
+          </NavLink>
+          <NavLink to="/supplier-orders" className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+            📋 Commandes Fournisseurs
+          </NavLink>
         </nav>
       </aside>
 

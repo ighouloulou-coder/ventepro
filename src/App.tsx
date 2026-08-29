@@ -12,6 +12,9 @@ import OverdueDashboard from './pages/OverdueDashboard';
 import ClientPortal from './pages/ClientPortal';
 import SignaturePage from './pages/SignaturePage';
 import Invoices from './pages/Invoices';
+import Suppliers from './pages/Suppliers';
+import SupplierOrders from './pages/SupplierOrders';
+import SupplierDashboard from './pages/SupplierDashboard';
 import './index.css';
 
 const App: React.FC = () => {
@@ -30,6 +33,9 @@ const App: React.FC = () => {
           <Route path="portal" element={<ClientPortal />} />
           <Route path="/sign" element={<SignaturePage />} />
           <Route path="invoices" element={<Invoices />} />
+          <Route path="suppliers" element={<Suppliers />} />
+          <Route path="supplier-orders" element={<SupplierOrders />} />
+          <Route path="supplier-dashboard" element={<SupplierDashboard />} />
         </Route>
       </Routes>
     </Router>

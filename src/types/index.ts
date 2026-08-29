@@ -241,3 +241,8 @@ export interface DashboardStats {
   totalOrdersAmount: number;
   currency: Currency;
 }
+
+// ============================================
+// 🏭 Réexport des types Fournisseurs
+// ============================================
+export * from './suppliers';
