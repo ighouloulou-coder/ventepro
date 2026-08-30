@@ -343,6 +343,12 @@ body {
   transition: transform 0.2s;
 }
 
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  border-left: 4px solid var(--primary);
+}
+
 .stat-card:active {
   transform: scale(0.98);
 }
@@ -387,6 +393,12 @@ body {
   border-radius: 12px;
   padding: 20px;
   box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .chart-card h3 {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Area, AreaChart
@@ -9,6 +10,7 @@ import { DashboardStats, Invoice, Product } from '../types';
 const COLORS = ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#8b5cf6', '#ec4899'];
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -154,7 +156,7 @@ const Dashboard: React.FC = () => {
 
       {/* Stats principales */}
       <div className="stats-grid">
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/invoices')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon">💰</div>
           <div className="stat-info">
             <h3>Ventes Totales</h3>
@@ -165,7 +167,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/invoices')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon">📅</div>
           <div className="stat-info">
             <h3>Ventes du Mois</h3>
@@ -173,7 +175,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/clients')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon">👥</div>
           <div className="stat-info">
             <h3>Clients</h3>
@@ -181,7 +183,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/products')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon">📦</div>
           <div className="stat-info">
             <h3>Produits</h3>
@@ -189,7 +191,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/invoices')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon">⏳</div>
           <div className="stat-info">
             <h3>Factures En Attente</h3>
@@ -197,7 +199,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/quotes')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon">📄</div>
           <div className="stat-info">
             <h3>Devis En Cours</h3>
@@ -206,7 +208,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/orders')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon">📋</div>
           <div className="stat-info">
             <h3>Commandes Actives</h3>
@@ -215,7 +217,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className="stat-card" onClick={() => navigate('/deliveries')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon">🚚</div>
           <div className="stat-info">
             <h3>Livraisons En Cours</h3>
@@ -227,7 +229,7 @@ const Dashboard: React.FC = () => {
       {/* Graphiques */}
       <div className="charts-grid">
         {/* Graphique ventes mensuelles */}
-        <div className="chart-card">
+        <div className="chart-card" onClick={() => navigate('/invoices')} style={{ cursor: 'pointer' }}>
           <h3>📈 Ventes des 6 derniers mois</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={monthlyData}>
@@ -244,7 +246,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Graphique statuts factures */}
-        <div className="chart-card">
+        <div className="chart-card" onClick={() => navigate('/invoices')} style={{ cursor: 'pointer' }}>
           <h3>🧾 Statut des factures</h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
@@ -267,7 +269,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Top produits */}
-        <div className="chart-card">
+        <div className="chart-card" onClick={() => navigate('/products')} style={{ cursor: 'pointer' }}>
           <h3>🏆 Top 5 Produits</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={topProducts} layout="vertical">
@@ -288,7 +290,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Top clients par revenu */}
-        <div className="chart-card">
+        <div className="chart-card" onClick={() => navigate('/clients')} style={{ cursor: 'pointer' }}>
           <h3>👥 Top Clients par Revenu</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={clientRevenue}>
@@ -305,7 +307,7 @@ const Dashboard: React.FC = () => {
         </div>
 
         {/* Stocks produits */}
-        <div className="chart-card chart-full">
+        <div className="chart-card chart-full" onClick={() => navigate('/products')} style={{ cursor: 'pointer' }}>
           <h3>📦 État des Stocks</h3>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={stockData}>
@@ -322,7 +324,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Factures récentes */}
-      <div className="recent-section">
+      <div className="recent-section" onClick={() => navigate('/invoices')} style={{ cursor: 'pointer' }}>
         <h3>📋 Factures Récentes</h3>
         {stats.recentInvoices.length === 0 ? (
           <p className="empty-state">Aucune facture pour le moment</p>
