@@ -7,6 +7,7 @@ import {
   SupplierDashboardStats,
   Currency,
 } from '../types';
+import { saveDocument, deleteDocument, COLLECTIONS } from './firebase';
 
 const STORAGE_KEYS = {
   SUPPLIERS: 'tradelink_suppliers',
@@ -26,6 +27,14 @@ function getFromStorage<T>(key: string): T[] {
 
 function saveToStorage<T>(key: string, data: T[]): void {
   localStorage.setItem(key, JSON.stringify(data));
+}
+
+async function syncSave<T extends { id: string }>(collectionName: string, data: T): Promise<void> {
+  try { await saveDocument(collectionName, data); } catch (e) { /* offline */ }
+}
+
+async function syncDelete(collectionName: string, id: string): Promise<void> {
+  try { await deleteDocument(collectionName, id); } catch (e) { /* offline */ }
 }
 
 // ============================================
@@ -64,6 +73,7 @@ export const supplierStorage = {
     const suppliers = getFromStorage<Supplier>(STORAGE_KEYS.SUPPLIERS);
     suppliers.push(supplier);
     saveToStorage(STORAGE_KEYS.SUPPLIERS, suppliers);
+    syncSave(COLLECTIONS.SUPPLIERS, supplier);
     return supplier;
   },
 
@@ -73,6 +83,7 @@ export const supplierStorage = {
     if (index === -1) return null;
     suppliers[index] = { ...suppliers[index], ...updates };
     saveToStorage(STORAGE_KEYS.SUPPLIERS, suppliers);
+    syncSave(COLLECTIONS.SUPPLIERS, suppliers[index]);
     return suppliers[index];
   },
 
@@ -81,6 +92,7 @@ export const supplierStorage = {
     const filtered = suppliers.filter(s => s.id !== id);
     if (filtered.length === suppliers.length) return false;
     saveToStorage(STORAGE_KEYS.SUPPLIERS, suppliers.filter(s => s.id !== id));
+    syncDelete(COLLECTIONS.SUPPLIERS, id);
     return true;
   },
 
@@ -90,6 +102,7 @@ export const supplierStorage = {
     if (index === -1) return null;
     suppliers[index].ratings.push(rating);
     saveToStorage(STORAGE_KEYS.SUPPLIERS, suppliers);
+    syncSave(COLLECTIONS.SUPPLIERS, suppliers[index]);
     return suppliers[index];
   },
 
@@ -128,6 +141,7 @@ export const supplierOrderStorage = {
     const orders = getFromStorage<SupplierOrder>(STORAGE_KEYS.SUPPLIER_ORDERS);
     orders.push(order);
     saveToStorage(STORAGE_KEYS.SUPPLIER_ORDERS, orders);
+    syncSave(COLLECTIONS.SUPPLIER_ORDERS, order);
     return order;
   },
 
@@ -137,6 +151,7 @@ export const supplierOrderStorage = {
     if (index === -1) return null;
     orders[index] = { ...orders[index], ...updates };
     saveToStorage(STORAGE_KEYS.SUPPLIER_ORDERS, orders);
+    syncSave(COLLECTIONS.SUPPLIER_ORDERS, orders[index]);
     return orders[index];
   },
 
@@ -145,6 +160,7 @@ export const supplierOrderStorage = {
     const filtered = orders.filter(o => o.id !== id);
     if (filtered.length === orders.length) return false;
     saveToStorage(STORAGE_KEYS.SUPPLIER_ORDERS, orders.filter(o => o.id !== id));
+    syncDelete(COLLECTIONS.SUPPLIER_ORDERS, id);
     return true;
   },
 };
@@ -174,6 +190,7 @@ export const supplierInvoiceStorage = {
     const invoices = getFromStorage<SupplierInvoice>(STORAGE_KEYS.SUPPLIER_INVOICES);
     invoices.push(invoice);
     saveToStorage(STORAGE_KEYS.SUPPLIER_INVOICES, invoices);
+    syncSave(COLLECTIONS.SUPPLIER_INVOICES, invoice);
     return invoice;
   },
 
@@ -183,6 +200,7 @@ export const supplierInvoiceStorage = {
     if (index === -1) return null;
     invoices[index] = { ...invoices[index], ...updates };
     saveToStorage(STORAGE_KEYS.SUPPLIER_INVOICES, invoices);
+    syncSave(COLLECTIONS.SUPPLIER_INVOICES, invoices[index]);
     return invoices[index];
   },
 
@@ -191,6 +209,7 @@ export const supplierInvoiceStorage = {
     const filtered = invoices.filter(i => i.id !== id);
     if (filtered.length === invoices.length) return false;
     saveToStorage(STORAGE_KEYS.SUPPLIER_INVOICES, invoices.filter(i => i.id !== id));
+    syncDelete(COLLECTIONS.SUPPLIER_INVOICES, id);
     return true;
   },
 };
@@ -225,6 +244,7 @@ export const supplierDeliveryStorage = {
     const deliveries = getFromStorage<SupplierDelivery>(STORAGE_KEYS.SUPPLIER_DELIVERIES);
     deliveries.push(delivery);
     saveToStorage(STORAGE_KEYS.SUPPLIER_DELIVERIES, deliveries);
+    syncSave(COLLECTIONS.SUPPLIER_DELIVERIES, delivery);
     return delivery;
   },
 
@@ -234,6 +254,7 @@ export const supplierDeliveryStorage = {
     if (index === -1) return null;
     deliveries[index] = { ...deliveries[index], ...updates };
     saveToStorage(STORAGE_KEYS.SUPPLIER_DELIVERIES, deliveries);
+    syncSave(COLLECTIONS.SUPPLIER_DELIVERIES, deliveries[index]);
     return deliveries[index];
   },
 
@@ -242,6 +263,7 @@ export const supplierDeliveryStorage = {
     const filtered = deliveries.filter(d => d.id !== id);
     if (filtered.length === deliveries.length) return false;
     saveToStorage(STORAGE_KEYS.SUPPLIER_DELIVERIES, deliveries.filter(d => d.id !== id));
+    syncDelete(COLLECTIONS.SUPPLIER_DELIVERIES, id);
     return true;
   },
 };

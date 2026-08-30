@@ -1,13 +1,14 @@
 import { Product, Client, Invoice, Quote, Order, DeliveryNote, PriceTier, DashboardStats, Currency } from '../types';
+import { saveDocument, deleteDocument, COLLECTIONS } from './firebase';
 
 const STORAGE_KEYS = {
-  PRODUCTS: 'sales_products',
-  CLIENTS: 'sales_clients',
-  INVOICES: 'sales_invoices',
-  QUOTES: 'sales_quotes',
-  ORDERS: 'sales_orders',
-  DELIVERIES: 'sales_deliveries',
-  PRICE_TIERS: 'sales_price_tiers',
+  PRODUCTS: 'tradelink_products',
+  CLIENTS: 'tradelink_clients',
+  INVOICES: 'tradelink_invoices',
+  QUOTES: 'tradelink_quotes',
+  ORDERS: 'tradelink_orders',
+  DELIVERIES: 'tradelink_deliveries',
+  PRICE_TIERS: 'tradelink_price_tiers',
 };
 
 // ============================================
@@ -23,6 +24,25 @@ function saveToStorage<T>(key: string, data: T[]): void {
 }
 
 // ============================================
+// 🔄 Sync helpers — sauvegarde locale + Firebase
+// ============================================
+async function syncSave<T extends { id: string }>(collectionName: string, data: T): Promise<void> {
+  try {
+    await saveDocument(collectionName, data);
+  } catch (e) {
+    // Offline: la donnée reste en localStorage, sync plus tard
+  }
+}
+
+async function syncDelete(collectionName: string, id: string): Promise<void> {
+  try {
+    await deleteDocument(collectionName, id);
+  } catch (e) {
+    // Offline: suppression locale suffit
+  }
+}
+
+// ============================================
 // 📦 Products
 // ============================================
 export const productStorage = {
@@ -35,6 +55,7 @@ export const productStorage = {
     const products = getFromStorage<Product>(STORAGE_KEYS.PRODUCTS);
     products.push(product);
     saveToStorage(STORAGE_KEYS.PRODUCTS, products);
+    syncSave(COLLECTIONS.PRODUCTS, product);
     return product;
   },
   update: (id: string, updates: Partial<Product>): Product | null => {
@@ -43,6 +64,7 @@ export const productStorage = {
     if (index === -1) return null;
     products[index] = { ...products[index], ...updates };
     saveToStorage(STORAGE_KEYS.PRODUCTS, products);
+    syncSave(COLLECTIONS.PRODUCTS, products[index]);
     return products[index];
   },
   delete: (id: string): boolean => {
@@ -50,6 +72,7 @@ export const productStorage = {
     const filtered = products.filter(p => p.id !== id);
     if (filtered.length === products.length) return false;
     saveToStorage(STORAGE_KEYS.PRODUCTS, filtered);
+    syncDelete(COLLECTIONS.PRODUCTS, id);
     return true;
   },
   updateStock: (id: string, quantityChange: number): Product | null => {
@@ -58,6 +81,7 @@ export const productStorage = {
     if (index === -1) return null;
     products[index].stock = Math.max(0, products[index].stock + quantityChange);
     saveToStorage(STORAGE_KEYS.PRODUCTS, products);
+    syncSave(COLLECTIONS.PRODUCTS, products[index]);
     return products[index];
   },
 };
@@ -75,6 +99,7 @@ export const clientStorage = {
     const clients = getFromStorage<Client>(STORAGE_KEYS.CLIENTS);
     clients.push(client);
     saveToStorage(STORAGE_KEYS.CLIENTS, clients);
+    syncSave(COLLECTIONS.CLIENTS, client);
     return client;
   },
   update: (id: string, updates: Partial<Client>): Client | null => {
@@ -83,13 +108,15 @@ export const clientStorage = {
     if (index === -1) return null;
     clients[index] = { ...clients[index], ...updates };
     saveToStorage(STORAGE_KEYS.CLIENTS, clients);
+    syncSave(COLLECTIONS.CLIENTS, clients[index]);
     return clients[index];
   },
   delete: (id: string): boolean => {
     const clients = getFromStorage<Client>(STORAGE_KEYS.CLIENTS);
     const filtered = clients.filter(c => c.id !== id);
     if (filtered.length === clients.length) return false;
-    saveToStorage(STORAGE_KEYS.CLIENTS, filtered);
+    saveToStorage(STORAGE_KEYS.CLIENTS, clients.filter(c => c.id !== id));
+    syncDelete(COLLECTIONS.CLIENTS, id);
     return true;
   },
 };
@@ -114,6 +141,7 @@ export const priceTierStorage = {
     const tiers = getFromStorage<PriceTier>(STORAGE_KEYS.PRICE_TIERS);
     tiers.push(tier);
     saveToStorage(STORAGE_KEYS.PRICE_TIERS, tiers);
+    syncSave(COLLECTIONS.PRICE_TIERS, tier);
     return tier;
   },
   update: (id: string, updates: Partial<PriceTier>): PriceTier | null => {
@@ -122,6 +150,7 @@ export const priceTierStorage = {
     if (index === -1) return null;
     tiers[index] = { ...tiers[index], ...updates };
     saveToStorage(STORAGE_KEYS.PRICE_TIERS, tiers);
+    syncSave(COLLECTIONS.PRICE_TIERS, tiers[index]);
     return tiers[index];
   },
   delete: (id: string): boolean => {
@@ -129,6 +158,7 @@ export const priceTierStorage = {
     const filtered = tiers.filter(t => t.id !== id);
     if (filtered.length === tiers.length) return false;
     saveToStorage(STORAGE_KEYS.PRICE_TIERS, filtered);
+    syncDelete(COLLECTIONS.PRICE_TIERS, id);
     return true;
   },
 };
@@ -146,6 +176,7 @@ export const quoteStorage = {
     const quotes = getFromStorage<Quote>(STORAGE_KEYS.QUOTES);
     quotes.push(quote);
     saveToStorage(STORAGE_KEYS.QUOTES, quotes);
+    syncSave(COLLECTIONS.QUOTES, quote);
     return quote;
   },
   update: (id: string, updates: Partial<Quote>): Quote | null => {
@@ -154,6 +185,7 @@ export const quoteStorage = {
     if (index === -1) return null;
     quotes[index] = { ...quotes[index], ...updates };
     saveToStorage(STORAGE_KEYS.QUOTES, quotes);
+    syncSave(COLLECTIONS.QUOTES, quotes[index]);
     return quotes[index];
   },
   delete: (id: string): boolean => {
@@ -161,6 +193,7 @@ export const quoteStorage = {
     const filtered = quotes.filter(q => q.id !== id);
     if (filtered.length === quotes.length) return false;
     saveToStorage(STORAGE_KEYS.QUOTES, filtered);
+    syncDelete(COLLECTIONS.QUOTES, id);
     return true;
   },
 };
@@ -178,6 +211,7 @@ export const orderStorage = {
     const orders = getFromStorage<Order>(STORAGE_KEYS.ORDERS);
     orders.push(order);
     saveToStorage(STORAGE_KEYS.ORDERS, orders);
+    syncSave(COLLECTIONS.ORDERS, order);
     return order;
   },
   update: (id: string, updates: Partial<Order>): Order | null => {
@@ -186,13 +220,15 @@ export const orderStorage = {
     if (index === -1) return null;
     orders[index] = { ...orders[index], ...updates };
     saveToStorage(STORAGE_KEYS.ORDERS, orders);
+    syncSave(COLLECTIONS.ORDERS, orders[index]);
     return orders[index];
   },
   delete: (id: string): boolean => {
     const orders = getFromStorage<Order>(STORAGE_KEYS.ORDERS);
     const filtered = orders.filter(o => o.id !== id);
     if (filtered.length === orders.length) return false;
-    saveToStorage(STORAGE_KEYS.ORDERS, filtered);
+    saveToStorage(STORAGE_KEYS.ORDERS, orders.filter(o => o.id !== id));
+    syncDelete(COLLECTIONS.ORDERS, id);
     return true;
   },
 };
@@ -214,6 +250,7 @@ export const deliveryStorage = {
     const deliveries = getFromStorage<DeliveryNote>(STORAGE_KEYS.DELIVERIES);
     deliveries.push(delivery);
     saveToStorage(STORAGE_KEYS.DELIVERIES, deliveries);
+    syncSave(COLLECTIONS.DELIVERIES, delivery);
     return delivery;
   },
   update: (id: string, updates: Partial<DeliveryNote>): DeliveryNote | null => {
@@ -222,13 +259,15 @@ export const deliveryStorage = {
     if (index === -1) return null;
     deliveries[index] = { ...deliveries[index], ...updates };
     saveToStorage(STORAGE_KEYS.DELIVERIES, deliveries);
+    syncSave(COLLECTIONS.DELIVERIES, deliveries[index]);
     return deliveries[index];
   },
   delete: (id: string): boolean => {
     const deliveries = getFromStorage<DeliveryNote>(STORAGE_KEYS.DELIVERIES);
     const filtered = deliveries.filter(d => d.id !== id);
     if (filtered.length === deliveries.length) return false;
-    saveToStorage(STORAGE_KEYS.DELIVERIES, filtered);
+    saveToStorage(STORAGE_KEYS.DELIVERIES, deliveries.filter(d => d.id !== id));
+    syncDelete(COLLECTIONS.DELIVERIES, id);
     return true;
   },
 };
@@ -246,6 +285,7 @@ export const invoiceStorage = {
     const invoices = getFromStorage<Invoice>(STORAGE_KEYS.INVOICES);
     invoices.push(invoice);
     saveToStorage(STORAGE_KEYS.INVOICES, invoices);
+    syncSave(COLLECTIONS.INVOICES, invoice);
     return invoice;
   },
   update: (id: string, updates: Partial<Invoice>): Invoice | null => {
@@ -254,13 +294,15 @@ export const invoiceStorage = {
     if (index === -1) return null;
     invoices[index] = { ...invoices[index], ...updates };
     saveToStorage(STORAGE_KEYS.INVOICES, invoices);
+    syncSave(COLLECTIONS.INVOICES, invoices[index]);
     return invoices[index];
   },
   delete: (id: string): boolean => {
     const invoices = getFromStorage<Invoice>(STORAGE_KEYS.INVOICES);
     const filtered = invoices.filter(i => i.id !== id);
     if (filtered.length === invoices.length) return false;
-    saveToStorage(STORAGE_KEYS.INVOICES, filtered);
+    saveToStorage(STORAGE_KEYS.INVOICES, invoices.filter(i => i.id !== id));
+    syncDelete(COLLECTIONS.INVOICES, id);
     return true;
   },
 };

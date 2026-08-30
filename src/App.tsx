@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { initSync } from './services/syncManager';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
@@ -18,6 +19,10 @@ import SupplierDashboard from './pages/SupplierDashboard';
 import './index.css';
 
 const App: React.FC = () => {
+  useEffect(() => {
+    initSync();
+  }, []);
+
   return (
     <Router>
       <Routes>
