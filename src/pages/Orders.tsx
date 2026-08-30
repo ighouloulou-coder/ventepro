@@ -209,18 +209,28 @@ const Orders: React.FC = () => {
                 <td>{new Date(order.deliveryDate).toLocaleDateString('fr-FR')}</td>
                 <td className="actions">
                   <button className="btn btn-small" onClick={() => openDetail(order)} title="Voir">👁️</button>
-                  {order.status === 'en_attente' && (
-                    <button className="btn btn-small" onClick={() => updateStatus(order.id, 'confirmée')} title="Confirmer">✅</button>
-                  )}
-                  {order.status === 'confirmée' && (
-                    <button className="btn btn-small btn-primary" onClick={() => updateStatus(order.id, 'en_cours')} title="En cours">🚚</button>
-                  )}
-                  {order.status === 'en_cours' && (
-                    <button className="btn btn-small btn-success" onClick={() => updateStatus(order.id, 'expédiée')} title="Expédiée">📦</button>
-                  )}
-                  {order.status === 'expédiée' && (
-                    <button className="btn btn-small btn-success" onClick={() => updateStatus(order.id, 'livrée')} title="Livrée">✅</button>
-                  )}
+                  <select
+                    className="form-input"
+                    style={{ width: 'auto', fontSize: '0.8em', padding: '4px 8px' }}
+                    value={order.status}
+                    onChange={(e) => {
+                      const newStatus = e.target.value as Order['status'];
+                      if (newStatus === 'annulée') {
+                        if (window.confirm('Annuler cette commande ?')) {
+                          updateStatus(order.id, newStatus);
+                        }
+                      } else {
+                        updateStatus(order.id, newStatus);
+                      }
+                    }}
+                  >
+                    <option value="en_attente">⏳ En attente</option>
+                    <option value="confirmée">✅ Confirmée</option>
+                    <option value="en_cours">🚚 En cours</option>
+                    <option value="expédiée">📦 Expédiée</option>
+                    <option value="livrée">✔️ Livrée</option>
+                    <option value="annulée">❌ Annulée</option>
+                  </select>
                   <button className="btn btn-small btn-danger" onClick={() => {
                     if (window.confirm('Supprimer cette commande ?')) { orderStorage.delete(order.id); loadData(); }
                   }} title="Supprimer">🗑️</button>
