@@ -245,6 +245,19 @@ projet de prospections/
 - [x] Build réussi
 - [x] Push vers GitHub
 
+### Session 11 (31 août 2026 - Assistant Karim + Fix Logout)
+- [x] Chatbot IA avec avatar animé SVG (homme professionnel)
+- [x] Drag & drop pour déplacer l'assistant
+- [x] Messages proactifs (parle quand le chat est fermé)
+- [x] Animation de salutation (wave)
+- [x] Indicateur d'humeur (happy/thinking/idle)
+- [x] Nom : Karim - Assistant IA
+- [x] Fix logout : supprime Firebase Auth du logout
+- [x] Logout utilise juste localStorage + redirection
+- [x] Déploiement sur https://ventepro-ruby-nu.vercel.app/
+- [x] Build réussi
+- [x] Push vers GitHub
+
 ---
 
 ## ✅ Tâches Accomplies (Résumé)
@@ -267,6 +280,12 @@ projet de prospections/
 | 14 | Permissions par section (16 sections) | S9 | ✅ |
 | 15 | Changement/reset mdp dans Settings | S9 | ✅ |
 | 16 | ⚠️ DERNIER COMMIT PAS ENCORE DÉPLOYÉ (limite Vercel) | S9 | ⏳ |
+| 17 | Service AI Agent (aiAgent.ts) | S10 | ✅ |
+| 18 | Chatbot IA flottant | S10 | ✅ |
+| 19 | Agent notifications auto | S10 | ✅ |
+| 20 | Assistant Karim (avatar animé + drag & drop) | S11 | ✅ |
+| 21 | Messages proactifs de Karim | S11 | ✅ |
+| 22 | Fix logout (localStorage + redirection) | S11 | ✅ |
 | 12 | Responsive mobile déjà couvert | S8 | ✅ |
 
 ## 🚀 Prochaines Étapes
