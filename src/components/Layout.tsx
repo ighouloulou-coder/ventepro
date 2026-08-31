@@ -257,33 +257,41 @@ const Layout: React.FC = () => {
       {/* Main Content */}
       <DemoBanner />
       <main className="main-content-3d">
-        {/* Search Button (Desktop) */}
-        <motion.button
-          onClick={() => setSearchOpen(true)}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          style={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            width: 56,
-            height: 56,
-            borderRadius: '50%',
-            background: 'var(--primary)',
-            color: 'white',
-            border: 'none',
-            fontSize: '1.3rem',
-            cursor: 'pointer',
-            boxShadow: '0 10px 30px -5px rgba(59, 130, 246, 0.5)',
-            zIndex: 100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          title="Recherche (Ctrl+K)"
-        >
-          🔍
-        </motion.button>
+        {/* Floating Buttons - Colonne ordonnée */}
+        <div style={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          zIndex: 100,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 12,
+        }}>
+          {/* Bouton Recherche */}
+          <motion.button
+            onClick={() => setSearchOpen(true)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              background: '#10b981',
+              color: 'white',
+              border: 'none',
+              fontSize: '1.1rem',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            title="Recherche (Ctrl+K)"
+          >
+            🔍
+          </motion.button>
+        </div>
         <Outlet />
         <Chat />
       </main>

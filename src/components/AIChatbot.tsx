@@ -242,7 +242,7 @@ const AIChatbot: React.FC = () => {
         onDragEnd={() => setIsDragging(false)}
         style={{
           position: 'fixed',
-          bottom: 100,
+          bottom: 88,
           right: 24,
           zIndex: 200,
           cursor: isDragging ? 'grabbing' : 'grab',
