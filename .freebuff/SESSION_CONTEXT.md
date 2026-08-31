@@ -17,6 +17,9 @@
 7. Service Worker PWA amélioré (mode hors ligne)
 8. Système de notifications Toast (`useToast` hook)
 9. Composants Skeleton, EmptyState, ConfirmDialog
+10. **Sécurité Firebase Auth** - email/password + Google + inscription
+11. Firestore Rules sécurisées avec auth requise
+12. Déconnexion et affichage utilisateur dans la sidebar
 
 ### 🎯 Prochaines actions possibles
 - Vérifier que la sync marche en production

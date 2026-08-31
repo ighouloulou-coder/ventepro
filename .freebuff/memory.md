@@ -181,6 +181,17 @@ projet de prospections/
 - [x] Build réussi
 - [x] Push vers GitHub
 
+### Session 5 (31 août 2026 - Sécurité Firebase Auth)
+- [x] Nouveau service authService.ts avec Firebase Authentication
+- [x] Login mis à jour avec email/password et Google
+- [x] Inscription avec création de compte
+- [x] Déconnexion sécurisée depuis la sidebar
+- [x] Affichage de l'utilisateur connecté dans le Layout
+- [x] Firestore Rules sécurisées avec auth requise
+- [x] Support mode démo pour les tests
+- [x] Build réussi
+- [x] Push vers GitHub
+
 ---
 
 ## 🚀 Prochaines Étapes
