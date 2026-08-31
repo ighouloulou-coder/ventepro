@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Suspense } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
+import { ToastProvider } from './components/Toast';
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Products = React.lazy(() => import('./pages/Products'));
 const Clients = React.lazy(() => import('./pages/Clients'));
@@ -108,9 +109,11 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <Router>
-        <AnimatedRoutes />
-      </Router>
+      <ToastProvider>
+        <Router>
+          <AnimatedRoutes />
+        </Router>
+      </ToastProvider>
     </ErrorBoundary>
   );
 };
