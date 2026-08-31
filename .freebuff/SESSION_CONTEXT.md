@@ -13,6 +13,7 @@
 3. Sync temps réel + polling 30s + chargement initial
 4. **17 collections** synchronisées sur Firebase
 5. Créé système mémoire dans `.freebuff/` pour continuité entre sessions
+6. Ajout gestion utilisateurs dans Settings (ajouter, modifier, supprimer)
 
 ### 🎯 Prochaines actions possibles
 - Vérifier que la sync marche en production

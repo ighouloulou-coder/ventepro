@@ -161,6 +161,15 @@ projet de prospections/
 - [x] Mise à jour de la mémoire avec historique des sessions
 - [x] Push vers GitHub
 
+### Session 3 (31 août 2026 - Ajout gestion utilisateurs)
+- [x] Ajout du composant UserManagement dans Settings.tsx
+- [x] Correction syntaxe UserManagement.tsx (erreur de build)
+- [x] Possibilité d'ajouter, modifier et supprimer des utilisateurs
+- [x] Changement de mot de passe et reset
+- [x] Build réussi
+- [x] Push vers GitHub
+- [x] Déploiement Vercel automatique
+
 ---
 
 ## 🚀 Prochaines Étapes
