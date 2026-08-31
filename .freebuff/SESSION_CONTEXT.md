@@ -21,7 +21,8 @@
 11. Firestore Rules sécurisées avec auth requise
 12. Déconnexion et affichage utilisateur dans la sidebar
 13. Déployé règles Firestore (`firebase deploy --only firestore:rules`)
-14. **Fix Login CSS** - réécriture 100% styles inline pour éviter conflits
+14. **Fix Login CSS v2** - fichier Login.css dédié sans conflits
+15. Toutes les classes préfixées par `login-`
 
 ### 🎯 Prochaines actions possibles
 - Vérifier que la sync marche en production

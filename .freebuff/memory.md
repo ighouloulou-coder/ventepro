@@ -203,6 +203,14 @@ projet de prospections/
 - [x] Push vers GitHub
 - [x] Vérification déploiement Vercel
 
+### Session 7 (31 août 2026 - Fix Login CSS v2)
+- [x] Nouveau fichier Login.css dédié (pas de conflit index.css)
+- [x] Login.tsx utilise Login.css au lieu de styles inline
+- [x] Toutes les classes préfixées par login- pour éviter conflits
+- [x] Champs email, mot de passe, nom tous visibles
+- [x] Build réussi
+- [x] Push vers GitHub
+
 ---
 
 ## 🚀 Prochaines Étapes
