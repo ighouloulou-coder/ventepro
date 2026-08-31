@@ -1,78 +1,122 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  loginWithEmail, 
-  registerWithEmail, 
-  loginWithGoogle,
-  isAuthenticated 
-} from '../services/authService';
 import './Login.css';
 
+// ============================================
+// 🔐 Login simplifié : username + mot de passe
+// ============================================
+
+interface StoredUser {
+  id: string;
+  username: string;
+  displayName: string;
+  passwordHash: string;
+  role: 'admin' | 'user';
+  permissions: string[];
+}
+
+const USERS_KEY = 'tradelink_users_v2';
+
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return 'h_' + Math.abs(hash).toString(36);
+}
+
+function getUsers(): StoredUser[] {
+  try {
+    const data = localStorage.getItem(USERS_KEY);
+    if (!data) return [];
+    return JSON.parse(data);
+  } catch { return []; }
+}
+
+function initDefaultAdmins(): void {
+  const users = getUsers();
+  if (users.length === 0) {
+    const admins: StoredUser[] = [
+      {
+        id: 'admin_ismail',
+        username: 'ISMAIL',
+        displayName: 'Ismail',
+        passwordHash: simpleHash('2024'),
+        role: 'admin',
+        permissions: ['all'],
+      },
+      {
+        id: 'admin_houssam',
+        username: 'HOUSSAM',
+        displayName: 'Houssam',
+        passwordHash: simpleHash('2026'),
+        role: 'admin',
+        permissions: ['all'],
+      },
+    ];
+    localStorage.setItem(USERS_KEY, JSON.stringify(admins));
+  }
+}
+
 const Login: React.FC = () => {
-  const [mode, setMode] = useState<'login' | 'register'>('login');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const cardRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isAuthenticated()) {
+    initDefaultAdmins();
+    // Redirect if already logged in
+    const saved = localStorage.getItem('tradelink_current_user');
+    if (saved) {
       window.location.href = '/';
     }
   }, []);
 
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x, y });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
     setLoading(true);
 
     try {
-      if (mode === 'login') {
-        await loginWithEmail(email, password);
-        setSuccess('Connexion réussie ! Redirection...');
-        setTimeout(() => { window.location.href = '/'; }, 1000);
-      } else {
-        if (!displayName.trim()) {
-          setError('Le nom est requis');
-          setLoading(false);
-          return;
-        }
-        await registerWithEmail(email, password, displayName);
-        setSuccess('Compte créé ! Redirection...');
-        setTimeout(() => { window.location.href = '/'; }, 1000);
-      }
-    } catch (err: any) {
-      let msg = 'Une erreur est survenue';
-      switch (err.code) {
-        case 'auth/user-not-found': msg = 'Aucun compte trouvé avec cet email'; break;
-        case 'auth/wrong-password': msg = 'Mot de passe incorrect'; break;
-        case 'auth/invalid-email': msg = 'Email invalide'; break;
-        case 'auth/email-already-in-use': msg = 'Cet email est déjà utilisé'; break;
-        case 'auth/weak-password': msg = 'Le mot de passe doit contenir au moins 6 caractères'; break;
-        case 'auth/invalid-credential': msg = 'Email ou mot de passe incorrect'; break;
-        default: msg = err.message || 'Erreur de connexion';
-      }
-      setError(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
+      const users = getUsers();
+      const user = users.find(
+        u => u.username.toLowerCase() === username.toLowerCase() && u.passwordHash === simpleHash(password)
+      );
 
-  const handleGoogleLogin = async () => {
-    setError('');
-    setLoading(true);
-    try {
-      await loginWithGoogle();
-      setSuccess('Connexion Google réussie !');
-      setTimeout(() => { window.location.href = '/'; }, 1000);
-    } catch (err: any) {
-      if (err.code !== 'auth/popup-closed-by-user') {
-        setError('Erreur de connexion Google');
+      if (!user) {
+        setError('Nom d\'utilisateur ou mot de passe incorrect');
+        setLoading(false);
+        return;
       }
+
+      // Save session
+      localStorage.setItem('tradelink_current_user', JSON.stringify({
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+        permissions: user.permissions,
+      }));
+      localStorage.setItem('tradelink_access', 'granted');
+
+      // Redirect
+      window.location.href = '/';
+    } catch (err: any) {
+      setError('Erreur de connexion');
     } finally {
       setLoading(false);
     }
@@ -102,10 +146,16 @@ const Login: React.FC = () => {
       </div>
 
       <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setMousePos({ x: 0, y: 0 })}
         className="login-card"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
+        style={{
+          transform: `perspective(1000px) rotateX(${mousePos.y * 5}deg) rotateY(${mousePos.x * -5}deg)`,
+        }}
       >
         {/* Logo */}
         <motion.div
@@ -119,58 +169,25 @@ const Login: React.FC = () => {
 
         {/* Title */}
         <h1 className="login-title">TRADE LINK</h1>
-        <p className="login-subtitle">
-          {mode === 'login' ? 'Connectez-vous à votre compte' : 'Créez votre compte'}
-        </p>
+        <p className="login-subtitle">Connectez-vous à votre compte</p>
 
-        {/* Mode Toggle */}
-        <div className="login-toggle">
-          <button
-            type="button"
-            className={`login-toggle-btn ${mode === 'login' ? 'active' : ''}`}
-            onClick={() => { setMode('login'); setError(''); setSuccess(''); }}
-          >
-            Connexion
-          </button>
-          <button
-            type="button"
-            className={`login-toggle-btn ${mode === 'register' ? 'active' : ''}`}
-            onClick={() => { setMode('register'); setError(''); setSuccess(''); }}
-          >
-            Inscription
-          </button>
-        </div>
-
-        {/* Messages */}
+        {/* Error */}
         {error && (
           <div className="login-msg error">❌ {error}</div>
-        )}
-        {success && (
-          <div className="login-msg success">✅ {success}</div>
         )}
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
-          {mode === 'register' && (
-            <div className="login-field">
-              <label className="login-label">Nom complet</label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Votre nom"
-              />
-            </div>
-          )}
-
           <div className="login-field">
-            <label className="login-label">Email</label>
+            <label className="login-label">Nom d'utilisateur</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="votre@email.com"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Votre nom d'utilisateur"
               required
+              autoComplete="username"
+              autoFocus
             />
           </div>
 
@@ -183,7 +200,7 @@ const Login: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                minLength={6}
+                autoComplete="current-password"
                 style={{ paddingRight: 50 }}
               />
               <button
@@ -194,40 +211,18 @@ const Login: React.FC = () => {
                 {showPassword ? '👁️' : '👁️‍🗨️'}
               </button>
             </div>
-            {mode === 'register' && (
-              <p className="login-hint">Minimum 6 caractères</p>
-            )}
           </div>
 
           <motion.button
             type="submit"
             disabled={loading}
-            className={`login-submit primary`}
+            className="login-submit primary"
             whileHover={{ scale: loading ? 1 : 1.02 }}
             whileTap={{ scale: loading ? 1 : 0.98 }}
           >
-            {loading ? '⏳ Chargement...' : mode === 'login' ? '🚀 Se connecter' : '✨ Créer le compte'}
+            {loading ? '⏳ Chargement...' : '🚀 Se connecter'}
           </motion.button>
         </form>
-
-        {/* Divider */}
-        <div className="login-divider">
-          <div className="login-divider-line" />
-          <span className="login-divider-text">ou</span>
-          <div className="login-divider-line" />
-        </div>
-
-        {/* Google Login */}
-        <motion.button
-          className="login-google-btn"
-          onClick={handleGoogleLogin}
-          disabled={loading}
-          whileHover={{ scale: loading ? 1 : 1.02 }}
-          whileTap={{ scale: loading ? 1 : 0.98 }}
-        >
-          <span style={{ fontSize: '1.2rem' }}>🔵</span>
-          Continuer avec Google
-        </motion.button>
 
         {/* Demo Mode */}
         <motion.button
@@ -236,7 +231,7 @@ const Login: React.FC = () => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          🎮 Mode démo (sans inscription)
+          🎮 Mode démo (sans connexion)
         </motion.button>
       </motion.div>
     </div>
