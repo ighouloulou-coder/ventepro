@@ -87,6 +87,8 @@ export const COLLECTIONS = {
   USERS: 'tradelink_users',
   CHAT: 'tradelink_chat',
   WORKFLOWS: 'tradelink_workflows',
+  ACTIVITY: 'tradelink_activity',
+  BACKUPS: 'tradelink_backups',
 } as const;
 
 // ============================================

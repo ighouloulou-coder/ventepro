@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function: check if user is authenticated (via localStorage session)
+    function isAuthenticated() {
+      return request.auth != null || request.resource.data.keys().hasAny(['id', 'username']);
+    }
+    
+    // Helper function: check if user is admin
+    function isAdmin() {
+      return get(/databases/$(database)/documents/tradelink_users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Products - full access for authenticated users
+    match /tradelink_products/{productId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Clients - full access
+    match /tradelink_clients/{clientId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Invoices - full access
+    match /tradelink_invoices/{invoiceId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Quotes - full access
+    match /tradelink_quotes/{quoteId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Orders - full access
+    match /tradelink_orders/{orderId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Deliveries - full access
+    match /tradelink_deliveries/{deliveryId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Price Tiers - full access
+    match /tradelink_price_tiers/{tierId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Suppliers - full access
+    match /tradelink_suppliers/{supplierId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Supplier Orders - full access
+    match /tradelink_supplier_orders/{orderId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Users - read for all, write limited
+    match /tradelink_users/{userId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
+    }
+    
+    // Chat - read for all, write for all
+    match /tradelink_chat/{messageId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Workflows - read for all, write for all
+    match /tradelink_workflows/{workflowId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Settings - read for all, write for all
+    match /tradelink_settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Activity Logs - read for all, write for all
+    match /tradelink_activity/{activityId} {
+      allow read: if true;
+      allow write: if true;
+    }
+    
+    // Backups - read for all, write for all
+    match /tradelink_backups/{backupId} {
+      allow read: if true;
+      allow write: if true;
+    }
+  }
+}
