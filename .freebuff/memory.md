@@ -211,6 +211,19 @@ projet de prospections/
 - [x] Build réussi
 - [x] Push vers GitHub
 
+### Session 8 (31 août 2026 - Améliorations complètes)
+- [x] Déploiement Vercel via CLI (npx vercel --prod)
+- [x] Vercel lié au projet ventepro-ruby
+- [x] GitHub connecté pour deplois automatiques
+- [x] Composant SearchBar réutilisable avec debounce
+- [x] Composant FilterBar avec compteur de résultats
+- [x] Composant GlobalSearch pour chercher dans toutes les entités
+- [x] Bouton 🔍 flottant + raccourci Ctrl+K
+- [x] Tests unitaires avec Vitest (4 tests passing)
+- [x] Service i18n pour multi-langue FR/EN (100+ clés)
+- [x] Service email déjà complet (SendGrid)
+- [x] Responsive mobile déjà couvert par media queries
+
 ---
 
 ## 🚀 Prochaines Étapes

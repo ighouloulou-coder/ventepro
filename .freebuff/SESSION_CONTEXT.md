@@ -23,6 +23,11 @@
 13. Déployé règles Firestore (`firebase deploy --only firestore:rules`)
 14. **Fix Login CSS v2** - fichier Login.css dédié sans conflits
 15. Toutes les classes préfixées par `login-`
+16. **Déploiement Vercel CLI** + GitHub connecté
+17. **Recherche globale** - Ctrl+K, SearchBar, FilterBar, GlobalSearch
+18. **Tests unitaires** - Vitest configuré avec 4 tests
+19. **Multi-langue** - Service i18n FR/EN avec 100+ clés
+20. **Email** - Service SendGrid déjà complet
 
 ### 🎯 Prochaines actions possibles
 - Vérifier que la sync marche en production
