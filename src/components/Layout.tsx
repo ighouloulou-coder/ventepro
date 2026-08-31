@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initTheme, toggleTheme } from '../services/theme';
 import DemoBanner from './DemoBanner';
+import Chat from './Chat';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -148,6 +149,7 @@ const Layout: React.FC = () => {
       <DemoBanner />
       <main className="main-content-3d">
         <Outlet />
+        <Chat />
       </main>
     </div>
   );

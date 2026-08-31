@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { login as userLogin, loginAsDemo, initDefaultAdmin } from '../services/userService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { db, getDocument, saveDocument, COLLECTIONS } from '../services/firebase';
 import ParticleBackground from '../components/ParticleBackground';
@@ -44,6 +45,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     (async () => {
       await initDefaultCodeIfNeeded();
+      initDefaultAdmin();
       const codeFromCloud = await getAccessCode();
       setAccessCode(codeFromCloud);
       setLoading(false);
@@ -60,14 +62,16 @@ const Login: React.FC = () => {
 
   const handleMouseLeave = () => setMousePos({ x: 0, y: 0 });
   const handleDemo = () => {
+    loginAsDemo();
     localStorage.setItem('tradelink_demo', 'true');
     window.location.href = '/';
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (code === accessCode) {
-      localStorage.setItem('tradelink_access', 'granted');
+    const user = userLogin(code, code);
+    if (user || code === accessCode) {
+      if (user) localStorage.setItem('tradelink_access', 'granted');
       localStorage.setItem('tradelink_access_time', new Date().toISOString());
       window.location.href = '/';
     } else {

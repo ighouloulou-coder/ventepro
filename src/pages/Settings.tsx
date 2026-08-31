@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import UserManagement from '../components/UserManagement';
 import NotificationSettings from '../components/NotificationSettings';
 import { db, getDocument, saveDocument, COLLECTIONS } from '../services/firebase';
 
