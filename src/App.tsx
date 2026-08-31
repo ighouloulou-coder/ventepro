@@ -21,6 +21,7 @@ const SupplierDashboard = React.lazy(() => import('./pages/SupplierDashboard'));
 const FirebaseTest = React.lazy(() => import('./pages/FirebaseTest'));
 import Login from './pages/Login';
 const Settings = React.lazy(() => import('./pages/Settings'));
+const Analytics = React.lazy(() => import('./pages/Analytics'));
 import SplashScreen from './components/SplashScreen';
 import './index.css';
 
@@ -81,6 +82,7 @@ function AnimatedRoutes() {
             <Route path="supplier-dashboard" element={<SupplierDashboard />} />
             <Route path="firebase-test" element={<FirebaseTest />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="analytics" element={<Analytics />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

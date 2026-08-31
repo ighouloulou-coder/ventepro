@@ -44,6 +44,8 @@ const Layout: React.FC = () => {
     { path: '/suppliers', label: 'Fournisseurs', icon: '🏭' },
     { path: '/supplier-orders', label: 'Cmd Fournisseurs', icon: '📋' },
     { divider: true },
+    { path: '/analytics', label: 'Analytics', icon: '📊' },
+    { divider: true },
     { path: '/settings', label: 'Paramètres', icon: '⚙️' },
   ];
 
