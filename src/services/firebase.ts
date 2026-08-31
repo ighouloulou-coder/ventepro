@@ -6,95 +6,60 @@ import {
   setDoc,
   deleteDoc,
   getDocs,
-  onSnapshot,
-  enableIndexedDbPersistence,
+  getDoc,
 } from 'firebase/firestore';
 
 // ============================================
-// 🔥 Config Firebase — TRADE LINK INTERNATIONALE
+// 🔥 Config Firebase — HARDCODÉ pour garantir le fonctionnement
 // ============================================
 const firebaseConfig = {
-  apiKey: "AIzaSyDemo_TradeLink_2024",
-  authDomain: "tradelink-internationale.firebaseapp.com",
-  projectId: "tradelink-internationale",
-  storageBucket: "tradelink-internationale.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456",
+  apiKey: "AIzaSyDV6LdXrfQxZGv8KiDVTv7mbr1fz_VmUC0",
+  authDomain: "ventepro-714f5.firebaseapp.com",
+  projectId: "ventepro-714f5",
+  storageBucket: "ventepro-714f5.firebasestorage.app",
+  messagingSenderId: "213916622362",
+  appId: "1:213916622362:web:fd219ffab51fc03892fba3",
 };
 
 // Initialiser Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let app: any = null;
+let db: any = null;
 
-// Activer la persistance offline
-enableIndexedDbPersistence(db).catch(() => {});
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  console.log('🔥 Firebase OK - Projet:', firebaseConfig.projectId);
+} catch (e: any) {
+  console.error('❌ Erreur Firebase:', e.message);
+}
 
 export { db };
 
 // ============================================
-// 🔄 Sync Service — temps réel avec Firestore
+// 🔄 Save / Delete
 // ============================================
-
-export interface SyncCallbacks<T> {
-  onUpdate: (data: T[]) => void;
-  onError?: (error: Error) => void;
-}
-
-/**
- * Écouter une collection en temps réel
- */
-export function subscribeToCollection<T extends { id: string }>(
-  collectionName: string,
-  callbacks: SyncCallbacks<T>
-): () => void {
-  const collectionRef = collection(db, collectionName);
-
-  const unsubscribe = onSnapshot(
-    collectionRef,
-    (snapshot: any) => {
-      const data = snapshot.docs.map((d: any) => ({
-        id: d.id,
-        ...d.data(),
-      })) as T[];
-      callbacks.onUpdate(data);
-    },
-    (error: any) => {
-      console.error(`Erreur sync ${collectionName}:`, error);
-      callbacks.onError?.(error);
-    }
-  );
-
-  return unsubscribe;
-}
-
-/**
- * Sauvegarder un document
- */
 export async function saveDocument<T extends { id: string }>(
   collectionName: string,
   document: T
 ): Promise<void> {
+  if (!db) throw new Error('Firebase non initialisé');
   const docRef = doc(db, collectionName, document.id);
   await setDoc(docRef, document);
 }
 
-/**
- * Supprimer un document
- */
 export async function deleteDocument(
   collectionName: string,
   documentId: string
 ): Promise<void> {
+  if (!db) throw new Error('Firebase non initialisé');
   const docRef = doc(db, collectionName, documentId);
   await deleteDoc(docRef);
 }
 
-/**
- * Charger tous les documents (une seule fois)
- */
 export async function loadCollection<T extends { id: string }>(
   collectionName: string
 ): Promise<T[]> {
+  if (!db) throw new Error('Firebase non initialisé');
   const collectionRef = collection(db, collectionName);
   const snapshot = await getDocs(collectionRef);
   return snapshot.docs.map((d: any) => ({
@@ -104,7 +69,7 @@ export async function loadCollection<T extends { id: string }>(
 }
 
 // ============================================
-// 🗂️ Noms des collections Firestore
+// 🗂️ Noms des collections
 // ============================================
 export const COLLECTIONS = {
   PRODUCTS: 'tradelink_products',
@@ -118,6 +83,23 @@ export const COLLECTIONS = {
   SUPPLIER_ORDERS: 'tradelink_supplier_orders',
   SUPPLIER_INVOICES: 'tradelink_supplier_invoices',
   SUPPLIER_DELIVERIES: 'tradelink_supplier_deliveries',
+  SETTINGS: 'tradelink_settings',
+  USERS: 'tradelink_users',
+  CHAT: 'tradelink_chat',
+  WORKFLOWS: 'tradelink_workflows',
 } as const;
+
+// ============================================
+// 📖 Read single document
+// ============================================
+export async function getDocument(
+  collectionName: string,
+  documentId: string
+): Promise<any | null> {
+  if (!db) throw new Error('Firebase non initialisé');
+  const docRef = doc(db, collectionName, documentId);
+  const snapshot = await getDoc(docRef);
+  return snapshot.exists() ? { id: snapshot.id, ...snapshot.data() } : null;
+}
 
 export default app;

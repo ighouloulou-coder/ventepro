@@ -27,6 +27,13 @@ function getWorkflows(): WorkflowItem[] {
   } catch { return []; }
 }
 
+async function syncToFirebase(wf: WorkflowItem) {
+  try {
+    const { saveDocument, COLLECTIONS } = await import('./firebase');
+    await saveDocument(COLLECTIONS.WORKFLOWS, wf as any);
+  } catch {}
+}
+
 function saveWorkflows(wf: WorkflowItem[]) {
   localStorage.setItem(WORKFLOW_KEY, JSON.stringify(wf));
 }
@@ -51,6 +58,7 @@ export function createWorkflow(type: 'quote' | 'order', itemId: string): Workflo
   const wfs = getWorkflows();
   wfs.push(wf);
   saveWorkflows(wfs);
+  syncToFirebase(wf);
   return wf;
 }
 
@@ -66,6 +74,7 @@ export function approveStep(workflowId: string, stepIndex: number, approvedBy: s
     wf.status = 'approved';
   }
   saveWorkflows(wfs);
+  syncToFirebase(wf);
   return true;
 }
 
@@ -76,6 +85,7 @@ export function rejectStep(workflowId: string, stepIndex: number, rejectedBy: st
   wf.steps[stepIndex] = { ...wf.steps[stepIndex], status: 'rejected', approvedBy: rejectedBy, timestamp: new Date().toISOString(), comment };
   wf.status = 'rejected';
   saveWorkflows(wfs);
+  syncToFirebase(wf);
   return true;
 }
 

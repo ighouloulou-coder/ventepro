@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getCurrentUser } from '../services/userService';
+import { loadMessages, loadMessagesSync, sendMessage } from '../services/chatService';
 
 interface Message {
   id: string;
@@ -10,7 +11,7 @@ interface Message {
   timestamp: string;
 }
 
-const CHAT_KEY = 'tradelink_chat_messages';
+
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -21,8 +22,8 @@ const Chat: React.FC = () => {
   const user = getCurrentUser();
 
   useEffect(() => {
-    loadMessages();
-    const interval = setInterval(loadMessages, 3000);
+    loadMsgs();
+    const interval = setInterval(loadMsgs, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -30,32 +31,21 @@ const Chat: React.FC = () => {
     messagesEnd.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const loadMessages = () => {
-    try {
-      const data = localStorage.getItem(CHAT_KEY);
-      const msgs: Message[] = data ? JSON.parse(data) : [];
-      setMessages(msgs);
-      if (!isOpen) {
-        const lastRead = localStorage.getItem('tradelink_chat_read') || '';
-        const newMsgs = msgs.filter(m => m.timestamp > lastRead && m.userId !== user?.id);
-        setUnread(newMsgs.length);
-      }
-    } catch {}
+  const loadMsgs = async () => {
+    const msgs = await loadMessages();
+    setMessages(msgs);
+    if (!isOpen) {
+      const lastRead = localStorage.getItem('tradelink_chat_read') || '';
+      const newMsgs = msgs.filter(m => m.timestamp > lastRead && m.userId !== user?.id);
+      setUnread(newMsgs.length);
+    }
   };
 
-  const sendMessage = () => {
+  const doSend = async () => {
     if (!input.trim() || !user) return;
-    const msg: Message = {
-      id: 'msg_' + Date.now(),
-      userId: user.id,
-      userName: user.displayName || user.username,
-      text: input.trim(),
-      timestamp: new Date().toISOString(),
-    };
-    const updated = [...messages, msg].slice(-100);
-    localStorage.setItem(CHAT_KEY, JSON.stringify(updated));
-    setMessages(updated);
+    await sendMessage(user.id, user.displayName || user.username, input);
     setInput('');
+    loadMsgs();
   };
 
   const openChat = () => {
@@ -145,7 +135,7 @@ const Chat: React.FC = () => {
               <input
                 value={input}
                 onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && sendMessage()}
+                onKeyDown={e => e.key === 'Enter' && doSend()}
                 placeholder="Ecrire un message..."
                 style={{
                   flex: 1, padding: '10px 14px', border: '2px solid var(--border-color)',
@@ -154,7 +144,7 @@ const Chat: React.FC = () => {
                 }}
               />
               <motion.button
-                onClick={sendMessage}
+                onClick={doSend}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
