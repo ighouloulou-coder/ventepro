@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { priceTierStorage, clientStorage, productStorage } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { PriceTier, Client, Product } from '../types';
 import { formatCurrencyAmount } from '../services/storage';
 import { sanitizeAmount, sanitizeQuantity } from '../services/sanitize';
@@ -20,6 +23,11 @@ const Pricing: React.FC = () => {
   });
 
   useEffect(() => { loadData(); }, []);
+
+  const stableLoadData = useCallback(() => {
+    loadData();
+  }, []);
+  useSyncReload(stableLoadData, 'tradelink_price_tiers');
 
   const loadData = () => {
     setTiers(priceTierStorage.getAll());
@@ -113,7 +121,9 @@ const Pricing: React.FC = () => {
   });
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>💲 Tarification par Client</h2>
         <button className="btn btn-primary" onClick={() => openModal()}>+ Nouveau Tarif</button>
@@ -287,6 +297,7 @@ const Pricing: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

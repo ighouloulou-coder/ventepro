@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import {
   SupplierOrder,
   SupplierOrderStatus,
@@ -9,6 +11,7 @@ import {
 } from '../types';
 import { supplierOrderStorage, supplierStorage, formatCurrencyAmount } from '../services/supplierStorage';
 import { productStorage } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 
 const SupplierOrders: React.FC = () => {
   const [orders, setOrders] = useState<SupplierOrder[]>([]);
@@ -25,6 +28,11 @@ const SupplierOrders: React.FC = () => {
     loadOrders();
     setProducts(productStorage.getAll());
   }, []);
+
+  const stableLoadData = useCallback(() => {
+    loadOrders();
+  }, []);
+  useSyncReload(stableLoadData);
 
   useEffect(() => {
     filterOrders();
@@ -180,7 +188,9 @@ const SupplierOrders: React.FC = () => {
   };
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div>
           <h2>📋 Commandes Fournisseurs</h2>
@@ -443,6 +453,7 @@ const SupplierOrders: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

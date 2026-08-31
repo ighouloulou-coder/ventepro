@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Suspense } from 'react';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
-import Dashboard from './pages/Dashboard';
-import Products from './pages/Products';
-import Clients from './pages/Clients';
-import Quotes from './pages/Quotes';
-import Orders from './pages/Orders';
-import Deliveries from './pages/Deliveries';
-import Pricing from './pages/Pricing';
-import OverdueDashboard from './pages/OverdueDashboard';
-import ClientPortal from './pages/ClientPortal';
-import SignaturePage from './pages/SignaturePage';
-import Invoices from './pages/Invoices';
-import Suppliers from './pages/Suppliers';
-import SupplierOrders from './pages/SupplierOrders';
-import SupplierDashboard from './pages/SupplierDashboard';
-import FirebaseTest from './pages/FirebaseTest';
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const Products = React.lazy(() => import('./pages/Products'));
+const Clients = React.lazy(() => import('./pages/Clients'));
+const Quotes = React.lazy(() => import('./pages/Quotes'));
+const Orders = React.lazy(() => import('./pages/Orders'));
+const Deliveries = React.lazy(() => import('./pages/Deliveries'));
+const Pricing = React.lazy(() => import('./pages/Pricing'));
+const OverdueDashboard = React.lazy(() => import('./pages/OverdueDashboard'));
+const ClientPortal = React.lazy(() => import('./pages/ClientPortal'));
+const SignaturePage = React.lazy(() => import('./pages/SignaturePage'));
+const Invoices = React.lazy(() => import('./pages/Invoices'));
+const Suppliers = React.lazy(() => import('./pages/Suppliers'));
+const SupplierOrders = React.lazy(() => import('./pages/SupplierOrders'));
+const SupplierDashboard = React.lazy(() => import('./pages/SupplierDashboard'));
+const FirebaseTest = React.lazy(() => import('./pages/FirebaseTest'));
 import Login from './pages/Login';
-import Settings from './pages/Settings';
+const Settings = React.lazy(() => import('./pages/Settings'));
 import SplashScreen from './components/SplashScreen';
 import './index.css';
 
@@ -60,6 +61,7 @@ function AnimatedRoutes() {
         transition={pageTransition}
         style={{ width: '100%', minHeight: '100vh' }}
       >
+        <Suspense fallback={<div className="loading">Chargement...</div>}>
         <Routes location={location}>
           <Route path="/login" element={<Login />} />
           <Route path="/sign" element={<SignaturePage />} />
@@ -82,6 +84,7 @@ function AnimatedRoutes() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
       </motion.div>
     </AnimatePresence>
   );

@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, LineChart, Line
 } from 'recharts';
 import { invoiceStorage, clientStorage, formatCurrencyAmount } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { Invoice, Client, Currency } from '../types';
 import { sendInvoiceReminder, saveReminder, type Reminder } from '../services/notifications';
 import { sendInvoiceReminderSMS, logSMS } from '../services/smsService';
@@ -18,6 +21,12 @@ const OverdueDashboard: React.FC = () => {
     setInvoices(invoiceStorage.getAll());
     setClients(clientStorage.getAll());
   }, []);
+
+  const stableLoadData = useCallback(() => {
+    setInvoices(invoiceStorage.getAll());
+    setClients(clientStorage.getAll());
+  }, []);
+  useSyncReload(stableLoadData);
 
   // Données filtrées
   const unpaidInvoices = invoices.filter(i => i.status !== 'payée' && i.status !== 'annulée');
@@ -119,7 +128,9 @@ const OverdueDashboard: React.FC = () => {
   };
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <h2>📊 Tableau de Bord des Impayés</h2>
 
       {/* Stats principales */}
@@ -319,6 +330,7 @@ const OverdueDashboard: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

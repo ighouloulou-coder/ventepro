@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { quoteStorage, clientStorage, productStorage, priceTierStorage } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { Quote, QuoteItem, Client, Product, Currency } from '../types';
 import { formatCurrencyAmount } from '../services/storage';
 import { sanitizeAmount, sanitizeQuantity } from '../services/sanitize';
@@ -26,6 +29,11 @@ const Quotes: React.FC = () => {
   const [quoteItems, setQuoteItems] = useState<QuoteItem[]>([]);
 
   useEffect(() => { loadData(); }, []);
+
+  const stableLoadData = useCallback(() => {
+    loadData();
+  }, []);
+  useSyncReload(stableLoadData, 'tradelink_quotes');
 
   const loadData = () => {
     setQuotes(quoteStorage.getAll());
@@ -171,7 +179,9 @@ const Quotes: React.FC = () => {
   };
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>📄 Gestion des Devis</h2>
         <div className="header-actions">
@@ -378,6 +388,7 @@ const Quotes: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

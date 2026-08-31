@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { invoiceStorage, quoteStorage, orderStorage, deliveryStorage, clientStorage, formatCurrencyAmount } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { Invoice, Quote, Order, DeliveryNote, Client } from '../types';
 import { generateQuotePDF } from '../services/pdfQuoteExport';
 import { exportSingleInvoice } from '../services/excelExport';
@@ -17,6 +20,11 @@ const ClientPortal: React.FC = () => {
   useEffect(() => {
     setClients(clientStorage.getAll());
   }, []);
+
+  const stableLoadClients = useCallback(() => {
+    setClients(clientStorage.getAll());
+  }, []);
+  useSyncReload(stableLoadClients, 'tradelink_clients');
 
   useEffect(() => {
     if (selectedClientId) {
@@ -45,7 +53,9 @@ const ClientPortal: React.FC = () => {
   };
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>👤 Portail Client</h2>
       </div>
@@ -235,6 +245,7 @@ const ClientPortal: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

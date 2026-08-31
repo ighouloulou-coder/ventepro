@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { deliveryStorage, orderStorage, clientStorage } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { DeliveryNote, DeliveryItem, Order } from '../types';
 import { sanitizeInput } from '../services/sanitize';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,6 +26,11 @@ const Deliveries: React.FC = () => {
   const [deliveryItems, setDeliveryItems] = useState<DeliveryItem[]>([]);
 
   useEffect(() => { loadData(); }, []);
+
+  const stableLoadData = useCallback(() => {
+    loadData();
+  }, []);
+  useSyncReload(stableLoadData, 'tradelink_deliveries');
 
   const loadData = () => {
     setDeliveries(deliveryStorage.getAll());
@@ -125,7 +133,9 @@ const Deliveries: React.FC = () => {
   };
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>🚚 Bons de Livraison</h2>
         <button className="btn btn-primary" onClick={openModal}>+ Nouveau Bon de Livraison</button>
@@ -284,6 +294,7 @@ const Deliveries: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

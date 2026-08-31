@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { productStorage } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { Product } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, sanitizeAmount, sanitizeQuantity, isValidString } from '../services/sanitize';
@@ -39,6 +42,11 @@ const Products: React.FC = () => {
   useEffect(() => {
     loadProducts();
   }, []);
+
+  const stableLoadProducts = useCallback(() => {
+    setProducts(productStorage.getAll());
+  }, []);
+  useSyncReload(stableLoadProducts, 'tradelink_products');
 
   const loadProducts = () => {
     setProducts(productStorage.getAll());
@@ -141,7 +149,9 @@ const Products: React.FC = () => {
   }));
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>📦 Gestion des Produits</h2>
         <button className="btn btn-primary" onClick={() => openModal()}>
@@ -398,6 +408,7 @@ const Products: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

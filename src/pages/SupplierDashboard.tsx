@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { SupplierDashboardStats } from '../types';
 import { getSupplierDashboardStats, formatCurrencyAmount } from '../services/supplierStorage';
 
@@ -14,7 +16,9 @@ const SupplierDashboard: React.FC = () => {
   }
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>🏭 Tableau de Bord Fournisseurs</h2>
         <p style={{ color: 'var(--text-muted)' }}>Vue d'ensemble de la gestion fournisseurs</p>
@@ -152,6 +156,7 @@ const SupplierDashboard: React.FC = () => {
         </div>
       </div>
     </div>
+    </AnimatedPage>
   );
 };
 

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import {
   Supplier,
   SupplierContact,
@@ -11,6 +13,7 @@ import {
   SUPPLIER_CATEGORY_LABELS,
 } from '../types';
 import { supplierStorage, formatCurrencyAmount } from '../services/supplierStorage';
+import { useSyncReload } from '../hooks/useSyncReload';
 
 const emptySupplier: Partial<Supplier> = {
   name: '',
@@ -57,6 +60,11 @@ const Suppliers: React.FC = () => {
   useEffect(() => {
     loadSuppliers();
   }, []);
+
+  const stableLoadData = useCallback(() => {
+    loadSuppliers();
+  }, []);
+  useSyncReload(stableLoadData);
 
   useEffect(() => {
     filterSuppliers();
@@ -244,7 +252,9 @@ const Suppliers: React.FC = () => {
   };
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       {/* Header */}
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
         <div>
@@ -887,6 +897,7 @@ const Suppliers: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

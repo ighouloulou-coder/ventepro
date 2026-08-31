@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { invoiceStorage, clientStorage, productStorage } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { Invoice, InvoiceItem, Client, Product } from '../types';
 import { exportInvoiceToPDF, exportAllInvoicesToPDF } from '../services/pdfExport';
 import { exportInvoicesToExcel, exportSalesReport } from '../services/excelExport';
@@ -45,6 +48,11 @@ const Invoices: React.FC = () => {
       localStorage.removeItem('convertQuoteInvoice');
     }
   }, []);
+
+  const stableLoadData = useCallback(() => {
+    loadData();
+  }, []);
+  useSyncReload(stableLoadData, 'tradelink_invoices');
 
   const loadData = () => {
     setInvoices(invoiceStorage.getAll());
@@ -205,7 +213,9 @@ const Invoices: React.FC = () => {
   const totalFiltered = filteredInvoices.reduce((sum, i) => sum + i.total, 0);
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>🧾 Gestion des Factures</h2>
         <div className="header-actions">
@@ -587,6 +597,7 @@ const Invoices: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

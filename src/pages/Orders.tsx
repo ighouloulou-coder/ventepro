@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { orderStorage, clientStorage, productStorage, priceTierStorage } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { Order, OrderItem, Client, Product, Currency } from '../types';
 import { formatCurrencyAmount } from '../services/storage';
 import { sanitizeAmount, sanitizeQuantity, sanitizeInput } from '../services/sanitize';
@@ -34,6 +37,11 @@ const Orders: React.FC = () => {
       localStorage.removeItem('convertQuote');
     }
   }, []);
+
+  const stableLoadData = useCallback(() => {
+    loadData();
+  }, []);
+  useSyncReload(stableLoadData, 'tradelink_orders');
 
   const loadData = () => {
     setOrders(orderStorage.getAll());
@@ -177,7 +185,9 @@ const Orders: React.FC = () => {
   };
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>📋 Bons de Commande</h2>
         <button className="btn btn-primary" onClick={openModal}>+ Nouvelle Commande</button>
@@ -370,6 +380,7 @@ const Orders: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

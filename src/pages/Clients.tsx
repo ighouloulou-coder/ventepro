@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import AnimatedPage from '../components/AnimatedPage';
+import FloatingShapes from '../components/FloatingShapes';
 import { clientStorage } from '../services/storage';
+import { useSyncReload } from '../hooks/useSyncReload';
 import { Client } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, sanitizeEmail, sanitizePhone, isValidString } from '../services/sanitize';
@@ -20,6 +23,11 @@ const Clients: React.FC = () => {
   useEffect(() => {
     loadClients();
   }, []);
+
+  const stableLoadClients = useCallback(() => {
+    setClients(clientStorage.getAll());
+  }, []);
+  useSyncReload(stableLoadClients, 'tradelink_clients');
 
   const loadClients = () => {
     setClients(clientStorage.getAll());
@@ -99,7 +107,9 @@ const Clients: React.FC = () => {
   );
 
   return (
-    <div className="page">
+    <AnimatedPage>
+    <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+      <FloatingShapes />
       <div className="page-header">
         <h2>👥 Gestion des Clients</h2>
         <button className="btn btn-primary" onClick={() => openModal()}>
@@ -207,6 +217,7 @@ const Clients: React.FC = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 
