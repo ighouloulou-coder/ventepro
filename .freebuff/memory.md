@@ -170,6 +170,17 @@ projet de prospections/
 - [x] Push vers GitHub
 - [x] Déploiement Vercel automatique
 
+### Session 4 (31 août 2026 - Design & PWA)
+- [x] Service Worker amélioré (v3) pour mode hors ligne
+- [x] Système de notifications Toast (useToast hook)
+- [x] Composants Skeleton pour états de chargement
+- [x] Composants EmptyState pour les listes vides
+- [x] Composant ConfirmDialog pour confirmations
+- [x] ToastProvider intégré dans App.tsx
+- [x] PWA prête pour installation sur mobile
+- [x] Build réussi
+- [x] Push vers GitHub
+
 ---
 
 ## 🚀 Prochaines Étapes

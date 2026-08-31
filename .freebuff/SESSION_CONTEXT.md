@@ -14,6 +14,9 @@
 4. **17 collections** synchronisées sur Firebase
 5. Créé système mémoire dans `.freebuff/` pour continuité entre sessions
 6. Ajout gestion utilisateurs dans Settings (ajouter, modifier, supprimer)
+7. Service Worker PWA amélioré (mode hors ligne)
+8. Système de notifications Toast (`useToast` hook)
+9. Composants Skeleton, EmptyState, ConfirmDialog
 
 ### 🎯 Prochaines actions possibles
 - Vérifier que la sync marche en production
