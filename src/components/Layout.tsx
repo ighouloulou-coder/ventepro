@@ -35,17 +35,14 @@ const Layout: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (e) {
-      // Fallback if Firebase logout fails
-      localStorage.removeItem('tradelink_current_user');
-      localStorage.removeItem('tradelink_access');
-      localStorage.removeItem('tradelink_demo');
-      navigate('/login');
-    }
+  const handleLogout = () => {
+    // Toujours nettoyer le localStorage d'abord
+    localStorage.removeItem('tradelink_current_user');
+    localStorage.removeItem('tradelink_access');
+    localStorage.removeItem('tradelink_demo');
+    localStorage.removeItem('tradelink_access_time');
+    // Rediriger vers login
+    window.location.href = '/login';
   };
 
   useEffect(() => { setSidebarOpen(false); }, [location.pathname]);
