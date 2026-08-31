@@ -12,6 +12,7 @@
 2. Mis à jour tous les services (storage, suppliers, users, chat, workflows, activity)
 3. Sync temps réel + polling 30s + chargement initial
 4. **17 collections** synchronisées sur Firebase
+5. Créé système mémoire dans `.freebuff/` pour continuité entre sessions
 
 ### 🎯 Prochaines actions possibles
 - Vérifier que la sync marche en production
