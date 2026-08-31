@@ -258,6 +258,14 @@ projet de prospections/
 - [x] Build réussi
 - [x] Push vers GitHub
 
+### Session 12 (31 août 2026 - Fix boutons flottants)
+- [x] Réordonné les boutons flottants (plus de superposition)
+- [x] Recherche 🔍 : bottom 24px
+- [x] Karim 🧠 : bottom 88px
+- [x] Espacement 12px entre les boutons
+- [x] Build réussi
+- [x] Push vers GitHub
+
 ---
 
 ## ✅ Tâches Accomplies (Résumé)

@@ -1,7 +1,7 @@
 # 🚀 Contexte de Session - VentePro
 
 > **Date :** 31 août 2026
-> **Statut :** ✅ 11 sessions, 28 tâches, DÉPLOYÉ sur https://ventepro-ruby-nu.vercel.app/
+> **Statut :** ✅ 12 sessions, 31 tâches, DÉPLOYÉ sur https://ventepro-ruby-nu.vercel.app/
 
 ## 📌 Résumé Rapide
 
@@ -30,10 +30,13 @@
 20. 👑 **Admins : ISMAIL/2024, HOUSSAM/2026**
 21. 📋 **Permissions par section (16 sections)**
 22. 🔑 **Changement/reset mdp dans Settings**
+23. 🧑 **Assistant Karim** (avatar animé + drag & drop)
+24. 🔧 **Fix logout** (localStorage + redirection)
+25. 📐 **Boutons flottants réorganisés** (plus de superposition)
 
-### ⚠️ ALERTE : Dernier commit PAS déployé
-- **Cause** : Limite Vercel free tier (100 deplois/jour)
-- **Solution** : Attendre demain ou `npx vercel --prod`
+### ✅ Site déployé et à jour
+- **URL** : https://ventepro-ruby-nu.vercel.app/
+- **Dernier commit** : fix boutons flottants
 
 ### 🎯 Prochaines actions possibles
 - Vérifier que la sync marche en production
