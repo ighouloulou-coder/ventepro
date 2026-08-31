@@ -7,7 +7,8 @@ import {
   SupplierDashboardStats,
   Currency,
 } from '../types';
-import { saveDocument, deleteDocument, COLLECTIONS } from './firebase';
+import { saveDocument, deleteDocument, COLLECTIONS, db } from './firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 const STORAGE_KEYS = {
   SUPPLIERS: 'tradelink_suppliers',
@@ -30,12 +31,66 @@ function saveToStorage<T>(key: string, data: T[]): void {
 }
 
 async function syncSave<T extends { id: string }>(collectionName: string, data: T): Promise<void> {
-  try { await saveDocument(collectionName, data); } catch (e) { /* offline */ }
+  try { await saveDocument(collectionName, data); } catch (e) { console.warn('⚠️ Firestore save failed:', e); }
 }
 
 async function syncDelete(collectionName: string, id: string): Promise<void> {
-  try { await deleteDocument(collectionName, id); } catch (e) { /* offline */ }
+  try { await deleteDocument(collectionName, id); } catch (e) { console.warn('⚠️ Firestore delete failed:', e); }
 }
+
+// ============================================
+// ☁️ Load from Firestore + Real-time sync
+// ============================================
+async function loadSupplierCollections(): Promise<void> {
+  if (!db) { console.warn('⚠️ Firebase non initialisé pour fournisseurs'); return; }
+  console.log('☁️ Chargement des données fournisseurs depuis Firestore...');
+  const cols: [string, string][] = [
+    [COLLECTIONS.SUPPLIERS, STORAGE_KEYS.SUPPLIERS],
+    [COLLECTIONS.SUPPLIER_ORDERS, STORAGE_KEYS.SUPPLIER_ORDERS],
+    [COLLECTIONS.SUPPLIER_INVOICES, STORAGE_KEYS.SUPPLIER_INVOICES],
+    [COLLECTIONS.SUPPLIER_DELIVERIES, STORAGE_KEYS.SUPPLIER_DELIVERIES],
+  ];
+  for (const [col, key] of cols) {
+    try {
+      const snap = await getDocs(collection(db, col));
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      saveToStorage(key, data);
+      console.log(`✅ ${col}: ${data.length} documents`);
+    } catch (e: any) {
+      console.error(`❌ Erreur chargement ${col}:`, e.message);
+    }
+  }
+}
+
+let supplierPolling = false;
+async function pollSupplierSync(): Promise<void> {
+  if (supplierPolling) return;
+  supplierPolling = true;
+  try {
+    const cols: [string, string][] = [
+      [COLLECTIONS.SUPPLIERS, STORAGE_KEYS.SUPPLIERS],
+      [COLLECTIONS.SUPPLIER_ORDERS, STORAGE_KEYS.SUPPLIER_ORDERS],
+      [COLLECTIONS.SUPPLIER_INVOICES, STORAGE_KEYS.SUPPLIER_INVOICES],
+      [COLLECTIONS.SUPPLIER_DELIVERIES, STORAGE_KEYS.SUPPLIER_DELIVERIES],
+    ];
+    for (const [col, key] of cols) {
+      try {
+        const snap = await getDocs(collection(db, col));
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        saveToStorage(key, data);
+        window.dispatchEvent(new CustomEvent('data-sync', { detail: { collection: col } }));
+      } catch (e: any) { console.error(`❌ Polling ${col}:`, e.message); }
+    }
+  } finally { supplierPolling = false; }
+}
+
+(async () => {
+  try {
+    await loadSupplierCollections();
+    setInterval(pollSupplierSync, 30000);
+    console.log('🚀 Sync fournisseurs initialisée !');
+  } catch (e) { console.error('❌ Erreur init sync fournisseurs:', e); }
+})();
 
 // ============================================
 // 🏭 Suppliers
