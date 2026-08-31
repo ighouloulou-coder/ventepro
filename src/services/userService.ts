@@ -1,6 +1,6 @@
 // User Management Service - Firebase Sync
 import { COLLECTIONS } from './firebase';
-import { syncToFirestore, deleteFromFirestore, loadCollection, getFromStorage, saveToStorage } from './firebaseSync';
+import { syncToFirestore, deleteFromFirestore, getFromStorage, saveToStorage } from './firebaseSync';
 
 export interface User {
   id: string;

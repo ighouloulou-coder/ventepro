@@ -1,7 +1,7 @@
 // ============================================
 // 🔔 Agent de Notifications Automatiques
 // ============================================
-import { productStorage, clientStorage, invoiceStorage, orderStorage } from './storage';
+import { productStorage, invoiceStorage, orderStorage } from './storage';
 import { supplierStorage } from './supplierStorage';
 
 export interface Notification {

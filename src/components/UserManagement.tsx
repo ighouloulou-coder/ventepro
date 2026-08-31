@@ -90,7 +90,6 @@ const UserManagement: React.FC = () => {
     setCurrentUser(getCurrentUser());
   }, []);
 
-  const reload = () => setUsers(getUsers());
 
   // ============================================
   // Create User

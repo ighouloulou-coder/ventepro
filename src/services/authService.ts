@@ -27,7 +27,7 @@ export interface User {
   uid: string;
   email: string | null;
   displayName: string | null;
-  photoURL: string | null;
+  photoURL: string | null | undefined;
   role: 'admin' | 'user' | 'viewer';
   createdAt: string;
 }
@@ -48,7 +48,7 @@ export async function loginWithEmail(email: string, password: string): Promise<U
       uid: firebaseUser.uid,
       email: firebaseUser.email,
       displayName: firebaseUser.displayName || email.split('@')[0],
-      photoURL: firebaseUser.photoURL,
+      photoURL: firebaseUser.photoURL ?? null,
       role: 'user', // Par défaut, on pourra mapper depuis Firestore
       createdAt: firebaseUser.metadata.creationTime || new Date().toISOString(),
     };
@@ -127,8 +127,8 @@ export function onAuthChange(callback: (user: User | null) => void): () => void 
       const user: User = {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
-        displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0],
-        photoURL: firebaseUser.photoURL,
+        displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || null,
+        photoURL: firebaseUser.photoURL || null,
         role: 'user',
         createdAt: firebaseUser.metadata.creationTime || new Date().toISOString(),
       };
@@ -193,7 +193,7 @@ export async function loginWithGoogle(): Promise<User> {
       uid: firebaseUser.uid,
       email: firebaseUser.email,
       displayName: firebaseUser.displayName,
-      photoURL: firebaseUser.photoURL,
+      photoURL: firebaseUser.photoURL || null,
       role: 'user',
       createdAt: new Date().toISOString(),
     };

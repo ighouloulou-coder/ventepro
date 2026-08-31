@@ -105,6 +105,7 @@ const Products: React.FC = () => {
       category: sanitizeInput(finalCategory),
       unit: 'pièce',
       sku: '',
+      minStock: 5,
       photo: formData.photo,
       createdAt: editingProduct?.createdAt || new Date().toISOString(),
     };

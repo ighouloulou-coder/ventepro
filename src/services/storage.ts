@@ -1,5 +1,5 @@
 import { Product, Client, Invoice, Quote, Order, DeliveryNote, PriceTier, DashboardStats, Currency } from '../types';
-import { db, COLLECTIONS } from './firebase';
+import { COLLECTIONS } from './firebase';
 import { syncToFirestore, deleteFromFirestore, getFromStorage, saveToStorage } from './firebaseSync';
 
 // ============================================
@@ -306,15 +306,17 @@ export const getDashboardStats = (): DashboardStats => {
   const cm = new Date().getMonth(), cy = new Date().getFullYear();
   const mi = paid.filter(i => { const d = new Date(i.createdAt); return d.getMonth() === cm && d.getFullYear() === cy; });
   const ms = mi.reduce((s, i) => s + i.total, 0);
-  const ri = [...invoices].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
-  const ro = [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
   return {
     totalSales, monthlySales: ms, totalClients: clients.length, totalProducts: products.length,
+    pendingInvoices: invoices.filter(i => i.status !== 'payée' && i.status !== 'annulée').length,
     pendingQuotes: quotes.filter(q => q.status === 'brouillon' || q.status === 'envoyé').length,
     pendingOrders: orders.filter(o => o.status === 'en_attente' || o.status === 'confirmée').length,
     overdueInvoices: invoices.filter(i => i.status === 'en_retard').length,
-    pendingDeliveries: deliveries.filter(d => d.status === 'en_cours' || d.status === 'planifiée').length,
-    recentInvoices: ri, recentOrders: ro, lowStockProducts: products.filter(p => p.stock <= p.minStock),
-    currency: 'MAD',
+    pendingDeliveries: deliveries.filter(d => d.status === 'en_cours' || d.status === 'préparation').length,
+    recentInvoices: [...invoices].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5),
+    recentOrders: [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5),
+    totalQuotesAmount: quotes.reduce((s, q) => s + q.total, 0),
+    totalOrdersAmount: orders.reduce((s, o) => s + o.total, 0),
+    currency: 'MAD' as const,
   };
 };

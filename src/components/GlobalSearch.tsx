@@ -40,8 +40,8 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
 
     // Products
     productStorage.getAll().forEach(p => {
-      if (p.name.toLowerCase().includes(q) || p.reference?.toLowerCase().includes(q)) {
-        allResults.push({ type: 'Produit', icon: '📦', label: p.name, sublabel: `Réf: ${p.reference || '-'}`, path: '/products' });
+      if (p.name.toLowerCase().includes(q) || p.sku?.toLowerCase().includes(q)) {
+        allResults.push({ type: 'Produit', icon: '📦', label: p.name, sublabel: `Réf: ${p.sku || '-'}`, path: '/products' });
       }
     });
 
@@ -54,22 +54,22 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
 
     // Invoices
     invoiceStorage.getAll().forEach(i => {
-      if (i.reference?.toLowerCase().includes(q) || i.clientName?.toLowerCase().includes(q)) {
-        allResults.push({ type: 'Facture', icon: '🧾', label: i.reference || `Facture #${i.id}`, sublabel: `${i.clientName || ''} - ${i.total} MAD`, path: '/invoices' });
+      if (i.id?.toLowerCase().includes(q) || i.clientName?.toLowerCase().includes(q)) {
+        allResults.push({ type: 'Facture', icon: '🧾', label: i.id || `Facture #${i.id}`, sublabel: `${i.clientName || ''} - ${i.total} MAD`, path: '/invoices' });
       }
     });
 
     // Quotes
     quoteStorage.getAll().forEach(q2 => {
-      if (q2.reference?.toLowerCase().includes(q) || q2.clientName?.toLowerCase().includes(q)) {
-        allResults.push({ type: 'Devis', icon: '📄', label: q2.reference || `Devis #${q2.id}`, sublabel: `${q2.clientName || ''} - ${q2.total} MAD`, path: '/quotes' });
+      if (q2.id?.toLowerCase().includes(q) || q2.clientName?.toLowerCase().includes(q)) {
+        allResults.push({ type: 'Devis', icon: '📄', label: q2.id || `Devis #${q2.id}`, sublabel: `${q2.clientName || ''} - ${q2.total} MAD`, path: '/quotes' });
       }
     });
 
     // Orders
     orderStorage.getAll().forEach(o => {
-      if (o.reference?.toLowerCase().includes(q) || o.clientName?.toLowerCase().includes(q)) {
-        allResults.push({ type: 'Commande', icon: '📋', label: o.reference || `Commande #${o.id}`, sublabel: `${o.clientName || ''} - ${o.total} MAD`, path: '/orders' });
+      if (o.id?.toLowerCase().includes(q) || o.clientName?.toLowerCase().includes(q)) {
+        allResults.push({ type: 'Commande', icon: '📋', label: o.id || `Commande #${o.id}`, sublabel: `${o.clientName || ''} - ${o.total} MAD`, path: '/orders' });
       }
     });
 

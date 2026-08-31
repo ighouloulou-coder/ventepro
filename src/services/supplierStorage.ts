@@ -7,7 +7,7 @@ import {
   SupplierDashboardStats,
   Currency,
 } from '../types';
-import { db, COLLECTIONS } from './firebase';
+import { COLLECTIONS } from './firebase';
 import { syncToFirestore, deleteFromFirestore, getFromStorage, saveToStorage } from './firebaseSync';
 
 // ============================================

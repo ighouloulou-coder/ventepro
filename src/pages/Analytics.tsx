@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, LineChart, Line, Legend } from 'recharts';
+
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area, PieChart, Pie, Cell, Legend } from 'recharts';
 import { getKPIs, getSalesForecast, getProductPerformance, getClientAnalytics, getCashFlowData, type KPI, type Forecast } from '../services/analyticsService';
 import AnimatedPage from '../components/AnimatedPage';
 import FloatingShapes from '../components/FloatingShapes';

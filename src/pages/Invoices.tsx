@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { notifyNewInvoice } from '../services/notifications-push';
 import AnimatedPage from '../components/AnimatedPage';
 import FloatingShapes from '../components/FloatingShapes';
 import { invoiceStorage, clientStorage, productStorage } from '../services/storage';
@@ -156,6 +155,7 @@ const Invoices: React.FC = () => {
       currency: 'MAD',
       status: 'brouillon',
       paymentTerms: 30,
+      paidAmount: 0,
       notes: '',
       createdAt: new Date().toISOString(),
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),

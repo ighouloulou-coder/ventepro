@@ -50,7 +50,7 @@ export function exportAllDeliveriesToCalendar() {
     ics += 'DTEND:' + fmt(end) + '\n';
     ics += 'SUMMARY:Livraison - ' + d.clientName + '\n';
     ics += 'DESCRIPTION:Client: ' + d.clientName + (d.notes ? '\n' + d.notes : '') + '\n';
-    if (d.address) ics += 'LOCATION:' + d.address + '\n';
+    if (d.deliveryAddress) ics += 'LOCATION:' + d.deliveryAddress + '\n';
     ics += 'END:VEVENT\n';
   });
   ics += 'END:VCALENDAR';

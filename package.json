@@ -8,8 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "bot": "node src/bot/twitch-bot.js"
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
@@ -24,7 +23,6 @@
     "react-router-dom": "^6.20.0",
     "recharts": "^2.10.3",
     "three": "^0.185.1",
-    "tmi.js": "^1.8.5",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

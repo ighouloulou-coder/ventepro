@@ -2,7 +2,7 @@
 // 🔥 FIREBASE SYNC - Service unifié pour TOUS les data
 // ============================================
 import { db, loadCollection, saveDocument, deleteDocument, COLLECTIONS } from './firebase';
-import { collection, getDocs, onSnapshot, query, orderBy, limit } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 // ============================================
 // 📦 Toutes les collections à synchroniser
@@ -28,7 +28,6 @@ const ALL_COLLECTIONS = [
   { collection: COLLECTIONS.SETTINGS, key: 'tradelink_settings', label: 'Paramètres' },
   
   // Communication & Activity
-  { collection: COLLECTIONS.CHAT, key: 'tradelink_chat_messages', label: 'Messages chat' },
   { collection: COLLECTIONS.WORKFLOWS, key: 'tradelink_workflows', label: 'Workflows' },
   { collection: COLLECTIONS.ACTIVITY, key: 'tradelink_activity', label: 'Journal d\'activité' },
   { collection: COLLECTIONS.BACKUPS, key: 'tradelink_backups', label: 'Sauvegardes' },
@@ -85,7 +84,7 @@ async function loadCollectionFromFirestore(colName: string, storageKey: string):
 export async function syncToFirestore<T extends { id: string }>(
   collectionName: string, 
   data: T, 
-  storageKey: string
+  _storageKey: string
 ): Promise<void> {
   if (!db) {
     console.error(`❌ [SAVE] Firebase db null ! Sauvegarde locale uniquement`);

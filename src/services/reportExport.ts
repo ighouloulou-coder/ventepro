@@ -1,5 +1,5 @@
 // Report Export Service - PDF and Excel
-import { invoiceStorage, productStorage, clientStorage, orderStorage, quoteStorage } from './storage';
+import { invoiceStorage, productStorage, clientStorage } from './storage';
 
 function downloadFile(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
@@ -18,21 +18,26 @@ export function exportDashboardPDF() {
   const invoices = invoiceStorage.getAll();
   const clients = clientStorage.getAll();
   const products = productStorage.getAll();
-  const paid = invoices.filter(i => i.status === 'payee');
+  const paid = invoices.filter(i => i.status === 'payée');
   const total = paid.reduce((s, i) => s + i.total, 0);
   
-  const html = \`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Rapport Dashboard</title>
+  const dateStr = new Date().toLocaleDateString('fr-FR');
+  const rows = invoices.slice(0, 20).map(i =>
+    `<tr><td>#${i.id.slice(0,8)}</td><td>${i.clientName}</td><td>${fmt(i.total)}</td><td>${i.status}</td><td>${new Date(i.createdAt).toLocaleDateString('fr-FR')}</td></tr>`
+  ).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Rapport Dashboard</title>
   <style>body{font-family:system-ui;padding:40px;color:#1f2937}h1{color:#2563eb}table{width:100%;border-collapse:collapse;margin:20px 0}th,td{padding:8px 12px;border:1px solid #e5e7eb;text-align:left;font-size:13px}th{background:#f3f4f6;font-weight:600}.stat{display:inline-block;margin:10px 20px;padding:15px;background:#f9fafb;border-radius:10px;border:1px solid #e5e7eb}.stat h3{margin:0;font-size:12px;color:#6b7280}.stat p{margin:4px 0 0;font-size:20px;font-weight:700}</style></head><body>
   <h1>Rapport Dashboard - TRADE LINK</h1>
-  <p>Date: \${new Date().toLocaleDateString('fr-FR')}</p>
-  <div class="stat"><h3>Ventes Totales</h3><p>\${fmt(total)}</p></div>
-  <div class="stat"><h3>Clients</h3><p>\${clients.length}</p></div>
-  <div class="stat"><h3>Produits</h3><p>\${products.length}</p></div>
-  <div class="stat"><h3>Factures Payees</h3><p>\${paid.length}</p></div>
+  <p>Date: ${dateStr}</p>
+  <div class="stat"><h3>Ventes Totales</h3><p>${fmt(total)}</p></div>
+  <div class="stat"><h3>Clients</h3><p>${clients.length}</p></div>
+  <div class="stat"><h3>Produits</h3><p>${products.length}</p></div>
+  <div class="stat"><h3>Factures Payees</h3><p>${paid.length}</p></div>
   <h2>Factures Recentes</h2>
   <table><tr><th>#</th><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th></tr>
-  \${invoices.slice(0, 20).map(i => '<tr><td>#'+i.id.slice(0,8)+'</td><td>'+i.clientName+'</td><td>'+fmt(i.total)+'</td><td>'+i.status+'</td><td>'+new Date(i.createdAt).toLocaleDateString('fr-FR')+'</td></tr>').join('')}
-  </table></body></html>\`;
+  ${rows}
+  </table></body></html>`;
   
   const blob = new Blob([html], { type: 'text/html' });
   downloadFile(blob, 'rapport-dashboard-' + Date.now() + '.html');
@@ -66,7 +71,7 @@ export function exportClientsCSV() {
 }
 
 export function exportSalesReport() {
-  const invoices = invoiceStorage.getAll().filter(i => i.status === 'payee');
+  const invoices = invoiceStorage.getAll().filter(i => i.status === 'payée');
   const byMonth: Record<string, number> = {};
   const months = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
   invoices.forEach(i => {

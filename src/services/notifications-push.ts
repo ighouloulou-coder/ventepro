@@ -18,7 +18,6 @@ export function sendLocalNotification(title: string, body: string, url?: string)
     body,
     icon: '/icon-192.svg',
     badge: '/icon-192.png',
-    vibrate: [100, 50, 100],
     tag: 'tradelink-' + Date.now(),
   });
   if (url) {

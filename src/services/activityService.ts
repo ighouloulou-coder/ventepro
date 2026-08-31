@@ -14,7 +14,6 @@ export interface ActivityLog {
 }
 
 const ACTIVITY_KEY = 'tradelink_activity';
-const LOGS_PER_PAGE = 50;
 
 function generateId(): string {
   return 'act_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);

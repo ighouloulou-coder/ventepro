@@ -13,7 +13,7 @@ const shimmer = {
   initial: { backgroundPosition: '-200% 0' },
   animate: { 
     backgroundPosition: '200% 0',
-    transition: { duration: 1.5, repeat: Infinity, ease: 'linear' }
+    transition: { duration: 1.5, repeat: Infinity, ease: 'linear' as const }
   },
 };
 

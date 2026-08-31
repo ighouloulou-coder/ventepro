@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initTheme, toggleTheme } from '../services/theme';
-import { getCurrentUser, logout } from '../services/authService';
+import { getCurrentUser } from '../services/authService';
 import DemoBanner from './DemoBanner';
-import Chat from './Chat';
 import GlobalSearch from './GlobalSearch';
-import AIChatbot from './AIChatbot';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -14,7 +12,6 @@ const Layout: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     initTheme();
@@ -293,14 +290,11 @@ const Layout: React.FC = () => {
           </motion.button>
         </div>
         <Outlet />
-        <Chat />
       </main>
 
       {/* Global Search */}
       <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      {/* AI Chatbot */}
-      <AIChatbot />
     </div>
   );
 };

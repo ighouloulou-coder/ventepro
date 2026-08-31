@@ -1,5 +1,5 @@
 // Backup Service - Auto backup to Firebase
-import { db, saveDocument, loadCollection, COLLECTIONS } from './firebase';
+import { saveDocument, loadCollection, COLLECTIONS } from './firebase';
 import { productStorage, clientStorage, invoiceStorage, quoteStorage, orderStorage, deliveryStorage } from './storage';
 
 export interface BackupData {

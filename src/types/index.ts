@@ -13,6 +13,7 @@ export interface Product {
   unit: string; // kg, L, pièce, carton, palette...
   sku: string; // Code article / référence
   photo: string; // Base64 de la photo ou URL
+  minStock: number; // Seuil de stock bas
   createdAt: string;
 }
 
@@ -183,6 +184,7 @@ export interface Invoice {
   currency: Currency;
   status: 'brouillon' | 'envoyée' | 'payée' | 'partiellement_payée' | 'en_retard' | 'annulée';
   paymentTerms: number;
+  paidAmount: number; // Montant déjà payé
   dueDate: string;
   notes: string;
   createdAt: string;
@@ -200,6 +202,7 @@ export interface DashboardStats {
   pendingOrders: number;
   pendingQuotes: number;
   pendingDeliveries: number;
+  overdueInvoices: number;
   recentInvoices: Invoice[];
   recentOrders: Order[];
   totalQuotesAmount: number;

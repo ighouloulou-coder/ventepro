@@ -1,9 +1,10 @@
 import {
   saveDocument,
   deleteDocument,
-  subscribeToCollection,
   COLLECTIONS,
 } from './firebase';
+import { db } from './firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 // ============================================
 // 🔄 Sync Manager — Bridge localStorage ↔ Firestore
@@ -78,8 +79,15 @@ class SyncManager {
       return;
     }
 
-    const unsubscribe = subscribeToCollection<T>(collectionName, {
-      onUpdate: (data) => {
+    if (!db) return;
+
+    const unsubscribe = onSnapshot(
+      collection(db, collectionName),
+      (snapshot) => {
+        const data: T[] = snapshot.docs.map((d) => ({
+          id: d.id,
+          ...d.data(),
+        })) as T[];
         this.setLocalStorage(localStorageKey, data);
         onUpdate?.(data);
         window.dispatchEvent(
@@ -87,8 +95,8 @@ class SyncManager {
             detail: { collection: collectionName, data },
           })
         );
-      },
-    });
+      }
+    );
 
     this.unsubscribeMap.set(collectionName, unsubscribe);
   }
@@ -114,14 +122,14 @@ class SyncManager {
   private async flushPendingSync(): Promise<void> {
     if (this.pendingSync.size === 0) return;
 
-    for (const [id, collection] of this.pendingSync) {
+    for (const [id, collectionName] of this.pendingSync) {
       try {
-        const localStorageKey = this.getStorageKeyForCollection(collection);
+        const localStorageKey = this.getStorageKeyForCollection(collectionName);
         if (localStorageKey) {
           const items = this.getLocalStorage<{ id: string }>(localStorageKey);
           const item = items.find((i) => i.id === id);
           if (item) {
-            await saveDocument(collection, item);
+            await saveDocument(collectionName, item);
           }
         }
       } catch (error) {
@@ -132,7 +140,7 @@ class SyncManager {
     this.pendingSync.clear();
   }
 
-  private getStorageKeyForCollection(collection: string): string | null {
+  private getStorageKeyForCollection(col: string): string | null {
     const mapping: Record<string, string> = {
       [COLLECTIONS.PRODUCTS]: 'tradelink_products',
       [COLLECTIONS.CLIENTS]: 'tradelink_clients',
@@ -146,7 +154,7 @@ class SyncManager {
       [COLLECTIONS.SUPPLIER_INVOICES]: 'tradelink_supplier_invoices',
       [COLLECTIONS.SUPPLIER_DELIVERIES]: 'tradelink_supplier_deliveries',
     };
-    return mapping[collection] || null;
+    return mapping[col] || null;
   }
 }
 

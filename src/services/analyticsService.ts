@@ -1,5 +1,5 @@
 // Analytics & KPI Service
-import { invoiceStorage, clientStorage, productStorage, orderStorage, quoteStorage, deliveryStorage } from './storage';
+import { invoiceStorage, clientStorage, productStorage, orderStorage, quoteStorage } from './storage';
 
 export interface KPI {
   label: string;
@@ -30,13 +30,13 @@ export function getKPIs(): KPI[] {
     const lm = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     return d.getMonth() === lm.getMonth() && d.getFullYear() === lm.getFullYear();
   });
-  const thisMonthPaid = thisMonth.filter(i => i.status === 'payee');
-  const lastMonthPaid = lastMonth.filter(i => i.status === 'payee');
+  const thisMonthPaid = thisMonth.filter(i => i.status === 'payée');
+  const lastMonthPaid = lastMonth.filter(i => i.status === 'payée');
   const thisTotal = thisMonthPaid.reduce((s, i) => s + i.total, 0);
   const lastTotal = lastMonthPaid.reduce((s, i) => s + i.total, 0);
   const trend = lastTotal > 0 ? ((thisTotal - lastTotal) / lastTotal * 100) : 0;
   const avgOrder = orders.length > 0 ? orders.reduce((s, o) => s + (o.total || 0), 0) / orders.length : 0;
-  const unpaid = invoices.filter(i => i.status !== 'payee' && i.status !== 'annulee');
+  const unpaid = invoices.filter(i => i.status !== 'payée' && i.status !== 'annulée');
   const unpaidTotal = unpaid.reduce((s, i) => s + i.total, 0);
   const lowStock = products.filter(p => p.stock < 10).length;
   const conversionRate = quoteStorage.getAll().length > 0 ? (orders.length / quoteStorage.getAll().length * 100) : 0;
@@ -48,13 +48,13 @@ export function getKPIs(): KPI[] {
     { label: 'Taux Conversion', value: conversionRate.toFixed(1) + '%', trend: 0, icon: '📈', color: '#10b981' },
     { label: 'Clients Actifs', value: String(clients.length), trend: 0, icon: '👥', color: '#06b6d4' },
     { label: 'Stock Bas', value: String(lowStock), trend: 0, icon: '⚠️', color: '#dc2626' },
-    { label: 'Commandes en Cours', value: String(orders.filter(o => o.status !== 'livree').length), trend: 0, icon: '📋', color: '#8b5cf6' },
+    { label: 'Commandes en Cours', value: String(orders.filter(o => o.status !== 'livrée').length), trend: 0, icon: '📋', color: '#8b5cf6' },
     { label: 'Factures Payees', value: String(thisMonthPaid.length), trend: 0, icon: '✅', color: '#16a34a' },
   ];
 }
 
 export function getSalesForecast(): Forecast[] {
-  const invoices = invoiceStorage.getAll().filter(i => i.status === 'payee');
+  const invoices = invoiceStorage.getAll().filter(i => i.status === 'payée');
   const months = ['Jan','Fev','Mar','Avr','Mai','Jun','Jul','Aou','Sep','Oct','Nov','Dec'];
   const now = new Date();
   const monthlyData: number[] = [];
@@ -78,7 +78,7 @@ export function getSalesForecast(): Forecast[] {
 }
 
 export function getProductPerformance() {
-  const invoices = invoiceStorage.getAll().filter(i => i.status === 'payee');
+  const invoices = invoiceStorage.getAll().filter(i => i.status === 'payée');
   const perf: Record<string, { name: string; revenue: number; quantity: number }> = {};
   invoices.forEach(inv => {
     inv.items.forEach(item => {
@@ -91,7 +91,7 @@ export function getProductPerformance() {
 }
 
 export function getClientAnalytics() {
-  const invoices = invoiceStorage.getAll().filter(i => i.status === 'payee');
+  const invoices = invoiceStorage.getAll().filter(i => i.status === 'payée');
   const analytics: Record<string, { name: string; total: number; orders: number; lastOrder: string }> = {};
   invoices.forEach(inv => {
     if (!analytics[inv.clientId]) analytics[inv.clientId] = { name: inv.clientName, total: 0, orders: 0, lastOrder: inv.createdAt };
@@ -110,11 +110,11 @@ export function getCashFlowData() {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
     const paid = invoices.filter(inv => {
       const id = new Date(inv.createdAt);
-      return id.getMonth() === d.getMonth() && id.getFullYear() === d.getFullYear() && inv.status === 'payee';
+      return id.getMonth() === d.getMonth() && id.getFullYear() === d.getFullYear() && inv.status === 'payée';
     }).reduce((s, inv) => s + inv.total, 0);
     const pending = invoices.filter(inv => {
       const id = new Date(inv.createdAt);
-      return id.getMonth() === d.getMonth() && id.getFullYear() === d.getFullYear() && inv.status !== 'payee' && inv.status !== 'annulee';
+      return id.getMonth() === d.getMonth() && id.getFullYear() === d.getFullYear() && inv.status !== 'payée' && inv.status !== 'annulée';
     }).reduce((s, inv) => s + inv.total, 0);
     return { mois: months[d.getMonth()], encaisse: paid, attente: pending };
   }).reverse();

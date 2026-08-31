@@ -85,7 +85,6 @@ export const COLLECTIONS = {
   SUPPLIER_DELIVERIES: 'tradelink_supplier_deliveries',
   SETTINGS: 'tradelink_settings',
   USERS: 'tradelink_users',
-  CHAT: 'tradelink_chat',
   WORKFLOWS: 'tradelink_workflows',
   ACTIVITY: 'tradelink_activity',
   BACKUPS: 'tradelink_backups',
