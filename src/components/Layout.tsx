@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initTheme, toggleTheme } from '../services/theme';
+import DemoBanner from './DemoBanner';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -144,6 +145,7 @@ const Layout: React.FC = () => {
       </motion.aside>
 
       {/* Main Content */}
+      <DemoBanner />
       <main className="main-content-3d">
         <Outlet />
       </main>

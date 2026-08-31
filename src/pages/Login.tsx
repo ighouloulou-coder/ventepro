@@ -59,6 +59,10 @@ const Login: React.FC = () => {
   };
 
   const handleMouseLeave = () => setMousePos({ x: 0, y: 0 });
+  const handleDemo = () => {
+    localStorage.setItem('tradelink_demo', 'true');
+    window.location.href = '/';
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -211,6 +215,20 @@ const Login: React.FC = () => {
             </motion.span>
           </motion.button>
         </motion.form>
+
+
+          <motion.button
+            type="button"
+            className="login-button login-button-demo"
+            onClick={handleDemo}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            style={{ marginTop: 12, background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)', border: '1px solid rgba(255,255,255,0.15)' }}
+          >
+            <span>👁️</span>
+            <span>Mode Démo (Invité)</span>
+          </motion.button>
 
         <motion.p
           className="login-footer"

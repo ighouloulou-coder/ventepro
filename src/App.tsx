@@ -25,7 +25,7 @@ import SplashScreen from './components/SplashScreen';
 import './index.css';
 
 function isAuthenticated(): boolean {
-  return localStorage.getItem('tradelink_access') === 'granted';
+  return localStorage.getItem('tradelink_access') === 'granted' || localStorage.getItem('tradelink_demo') === 'true';
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {

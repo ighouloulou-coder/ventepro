@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="80" fill="url(#bg)"/>
+  <text x="96" y="230" font-size="160" text-anchor="middle" fill="white" font-family="system-ui" font-weight="900">TL</text>
+  <text x="96" y="310" font-size="44" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="system-ui" font-weight="500">TRADE LINK</text>
+</svg>
