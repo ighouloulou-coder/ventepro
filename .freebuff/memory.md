@@ -224,6 +224,18 @@ projet de prospections/
 - [x] Service email déjà complet (SendGrid)
 - [x] Responsive mobile déjà couvert par media queries
 
+### Session 9 (31 août 2026 - Auth simplifiée + Admins)
+- [x] Login simplifié : juste username + mot de passe (pas email)
+- [x] Supprimé : inscription, Google login, mode démo visible
+- [x] 2 comptes admin créés : ISMAIL/2024, HOUSSAM/2026
+- [x] Gestion utilisateurs avec permissions par section (16 sections)
+- [x] Changement de mot de passe admin dans Settings
+- [x] Reset mot de passe pour les admins
+- [x] Suppression section code d'accès dans Settings
+- [x] Info Auth Firebase dans Settings
+- [x] Fix permissions Vercel (chmod +x vite)
+- [x] RESTE À DÉPLOYER : limite Vercel free tier atteinte (100 deplois/jour)
+
 ---
 
 ## ✅ Tâches Accomplies (Résumé)
@@ -241,6 +253,11 @@ projet de prospections/
 | 9 | Tests unitaires (Vitest) | S8 | ✅ |
 | 10 | Service i18n multi-langue (FR/EN, 100+ clés) | S8 | ✅ |
 | 11 | Service email (SendGrid) déjà complet | S8 | ✅ |
+| 12 | Login simplifié username/mdp | S9 | ✅ |
+| 13 | Admins ISMAIL/2024, HOUSSAM/2026 | S9 | ✅ |
+| 14 | Permissions par section (16 sections) | S9 | ✅ |
+| 15 | Changement/reset mdp dans Settings | S9 | ✅ |
+| 16 | ⚠️ DERNIER COMMIT PAS ENCORE DÉPLOYÉ (limite Vercel) | S9 | ⏳ |
 | 12 | Responsive mobile déjà couvert | S8 | ✅ |
 
 ## 🚀 Prochaines Étapes
@@ -295,7 +312,10 @@ npm run bot
 
 ## 🐛 Bugs Connuis
 
-- Aucun bug critique identifié pour le moment
+- **URGENT** : Les derniers commits (session 9) ne sont pas déployés sur Vercel
+- **Cause** : Limite de 100 deplois/jour sur le free tier Vercel atteinte
+- **Solution** : Attendre demain ou passer au plan Pro Vercel
+- **Erreur Vercel** : `vite: Permission denied` (corrigé dans vercel.json avec chmod +x)
 
 ---
 
@@ -312,6 +332,19 @@ npm run bot
 9. **i18n** : Service dans `src/services/i18n.ts`. Commande : `t('key')`
 10. **Recherche** : Ctrl+K ou bouton 🔍 flottant
 11. **Email** : Service SendGrid dans `src/services/emailService.ts`
+12. **Auth** : Username + mot de passe (pas d'email). Users dans localStorage `tradelink_users_v2`
+13. **Admins** : ISMAIL/2024 et HOUSSAM/2026. Rôle `admin` avec permissions `all`
+14. **Permissions** : 16 sections configurables par utilisateur dans `UserManagement.tsx`
+15. **Vercel Limit** : 100 deplois/jour sur free tier. Dernier commit PAS encore déployé
+
+## 👑 Comptes Admin
+
+| Login | Mot de passe | Rôle | ID |
+|-------|-------------|------|-----|
+| ISMAIL | 2024 | 🔑 Admin | admin_ismail |
+| HOUSSAM | 2026 | 🔑 Admin | admin_houssam |
+
+> ⚠️ Les identifiants sont stockés dans `localStorage` via le fichier `tradelink_users_v2`. Ils sont créés automatiquement au premier chargement du Login.
 
 ## 🔗 Fichiers Importants
 
