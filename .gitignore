@@ -28,4 +28,3 @@ data/
 
 .vercel
 .env*
-package-lock.json
