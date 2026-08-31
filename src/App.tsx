@@ -27,8 +27,10 @@ const Monitoring = React.lazy(() => import('./pages/Monitoring'));
 import SplashScreen from './components/SplashScreen';
 import './index.css';
 
+import { isAuthenticated as checkAuth } from './services/authService';
+
 function isAuthenticated(): boolean {
-  return localStorage.getItem('tradelink_access') === 'granted' || localStorage.getItem('tradelink_demo') === 'true' || !!localStorage.getItem('tradelink_current_user');
+  return checkAuth() || localStorage.getItem('tradelink_demo') === 'true';
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {

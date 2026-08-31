@@ -1,19 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initTheme, toggleTheme } from '../services/theme';
+import { getCurrentUser, logout } from '../services/authService';
 import DemoBanner from './DemoBanner';
 import Chat from './Chat';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     initTheme();
     setIsDark(document.documentElement.getAttribute('data-theme') === 'dark');
+    setUser(getCurrentUser());
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (e) {
+      // Fallback if Firebase logout fails
+      localStorage.removeItem('tradelink_current_user');
+      localStorage.removeItem('tradelink_access');
+      localStorage.removeItem('tradelink_demo');
+      navigate('/login');
+    }
+  };
 
   useEffect(() => { setSidebarOpen(false); }, [location.pathname]);
 
@@ -141,6 +158,82 @@ const Layout: React.FC = () => {
             );
           })}
         </nav>
+
+        {/* User Info & Logout */}
+        <div style={{
+          padding: '16px 20px',
+          borderTop: '1px solid var(--border-color)',
+          marginTop: 'auto',
+        }}>
+          {user && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              marginBottom: 12,
+            }}>
+              <div style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 700,
+                fontSize: '1rem',
+              }}>
+                {(user.displayName || user.email || 'U').charAt(0).toUpperCase()}
+              </div>
+              <div style={{ flex: 1, overflow: 'hidden' }}>
+                <p style={{
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {user.displayName || 'Utilisateur'}
+                </p>
+                <p style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--text-muted)',
+                  margin: 0,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}>
+                  {user.email || 'Demo'}
+                </p>
+              </div>
+            </div>
+          )}
+          <motion.button
+            onClick={handleLogout}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              width: '100%',
+              padding: '10px 16px',
+              background: 'var(--danger)',
+              color: 'white',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            🚪 Déconnexion
+          </motion.button>
+        </div>
 
         {/* Sidebar footer decoration */}
         <div className="sidebar-footer-3d">

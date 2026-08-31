@@ -1,55 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { login as userLogin, loginAsDemo, initDefaultAdmin } from '../services/userService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { db, getDocument, saveDocument, COLLECTIONS } from '../services/firebase';
+import { 
+  loginWithEmail, 
+  registerWithEmail, 
+  loginWithGoogle,
+  isAuthenticated 
+} from '../services/authService';
 import ParticleBackground from '../components/ParticleBackground';
 
-const DEFAULT_CODE = 'tradelink2024';
-const SETTINGS_DOC_ID = 'access_config';
-
-async function getAccessCode(): Promise<string> {
-  try {
-    if (!db) return DEFAULT_CODE;
-    const doc = await getDocument(COLLECTIONS.SETTINGS, SETTINGS_DOC_ID);
-    if (doc && doc.code) return doc.code;
-  } catch (e) {
-    console.warn('⚠️ Impossible de lire le code depuis Firestore, utilise le défaut');
-  }
-  return DEFAULT_CODE;
-}
-
-async function initDefaultCodeIfNeeded(): Promise<void> {
-  try {
-    if (!db) return;
-    const existing = await getDocument(COLLECTIONS.SETTINGS, SETTINGS_DOC_ID);
-    if (!existing) {
-      await saveDocument(COLLECTIONS.SETTINGS, {
-        id: SETTINGS_DOC_ID,
-        code: DEFAULT_CODE,
-        updatedAt: new Date().toISOString(),
-      });
-    }
-  } catch (e) {
-    console.warn('⚠️ Init code par défaut échouée:', e);
-  }
-}
-
 const Login: React.FC = () => {
-  const [code, setCode] = useState('');
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [accessCode, setAccessCode] = useState(DEFAULT_CODE);
+  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    (async () => {
-      await initDefaultCodeIfNeeded();
-      initDefaultAdmin();
-      const codeFromCloud = await getAccessCode();
-      setAccessCode(codeFromCloud);
-      setLoading(false);
-    })();
+    // Rediriger si déjà connecté
+    if (isAuthenticated()) {
+      window.location.href = '/';
+    }
   }, []);
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -61,216 +36,447 @@ const Login: React.FC = () => {
   };
 
   const handleMouseLeave = () => setMousePos({ x: 0, y: 0 });
-  const handleDemo = () => {
-    loginAsDemo();
-    localStorage.setItem('tradelink_demo', 'true');
-    window.location.href = '/';
-  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = userLogin(code, code);
-    if (user || code === accessCode) {
-      if (user) localStorage.setItem('tradelink_access', 'granted');
-      localStorage.setItem('tradelink_access_time', new Date().toISOString());
-      window.location.href = '/';
-    } else {
-      setError(true);
-      setCode('');
-      setTimeout(() => setError(false), 3000);
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      if (mode === 'login') {
+        await loginWithEmail(email, password);
+        setSuccess('Connexion réussie ! Redirection...');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      } else {
+        if (!displayName.trim()) {
+          setError('Le nom est requis');
+          setLoading(false);
+          return;
+        }
+        await registerWithEmail(email, password, displayName);
+        setSuccess('Compte créé ! Redirection...');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      }
+    } catch (err: any) {
+      let errorMessage = 'Une erreur est survenue';
+      
+      switch (err.code) {
+        case 'auth/user-not-found':
+          errorMessage = 'Aucun compte trouvé avec cet email';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Mot de passe incorrect';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Email invalide';
+          break;
+        case 'auth/email-already-in-use':
+          errorMessage = 'Cet email est déjà utilisé';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Le mot de passe doit contenir au moins 6 caractères';
+          break;
+        case 'auth/invalid-credential':
+          errorMessage = 'Email ou mot de passe incorrect';
+          break;
+        default:
+          errorMessage = err.message || 'Erreur de connexion';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="login-loading">
-        <ParticleBackground density={40} />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="login-loading-content"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-            className="login-spinner"
-          />
-          <p>Chargement...</p>
-        </motion.div>
-      </div>
-    );
-  }
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    
+    try {
+      await loginWithGoogle();
+      setSuccess('Connexion Google réussie !');
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1000);
+    } catch (err: any) {
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError('Erreur de connexion Google');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="login-page">
-      <ParticleBackground density={50} />
+    <div className="login-page" style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%)',
+      position: 'relative',
+      overflow: 'hidden',
+    }}>
+      <ParticleBackground />
       
-      {/* Animated gradient orbs */}
-      <div className="login-orbs">
-        <motion.div
-          className="login-orb login-orb-1"
-          animate={{ x: [0, 100, -50, 0], y: [0, -80, 60, 0], scale: [1, 1.2, 0.9, 1] }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="login-orb login-orb-2"
-          animate={{ x: [0, -80, 60, 0], y: [0, 100, -40, 0], scale: [1, 0.8, 1.1, 1] }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="login-orb login-orb-3"
-          animate={{ x: [0, 60, -80, 0], y: [0, -60, 80, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
-      </div>
-
       <motion.div
         ref={cardRef}
-        className="login-card"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        initial={{ opacity: 0, y: 40, scale: 0.9, rotateX: 10 }}
-        animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 20, delay: 0.2 }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
         style={{
-          transform: `perspective(1000px) rotateY(${mousePos.x * 5}deg) rotateX(${-mousePos.y * 5}deg)`,
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: 24,
+          padding: 40,
+          width: '100%',
+          maxWidth: 420,
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+          position: 'relative',
+          zIndex: 10,
+          transform: `perspective(1000px) rotateX(${mousePos.y * 5}deg) rotateY(${mousePos.x * -5}deg)`,
         }}
       >
-        {/* Glare overlay */}
-        <div
-          className="login-glare"
-          style={{
-            background: `radial-gradient(circle at ${(mousePos.x + 0.5) * 100}% ${(mousePos.y + 0.5) * 100}%, rgba(255,255,255,0.12) 0%, transparent 60%)`,
-          }}
-        />
-
+        {/* Logo */}
         <motion.div
-          className="login-logo"
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.4 }}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: 'spring' }}
+          style={{
+            width: 80,
+            height: 80,
+            borderRadius: 20,
+            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 24px',
+            boxShadow: '0 10px 30px -5px rgba(59, 130, 246, 0.5)',
+          }}
         >
-          <div className="login-logo-icon">💰</div>
+          <span style={{ fontSize: '2.5rem' }}>💰</span>
         </motion.div>
 
-        <motion.h1
-          className="login-title"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-        >
+        {/* Title */}
+        <h1 style={{
+          fontSize: '1.8rem',
+          fontWeight: 800,
+          textAlign: 'center',
+          marginBottom: 8,
+          background: 'linear-gradient(135deg, #1f2937 0%, #3b82f6 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        }}>
           TRADE LINK
-        </motion.h1>
+        </h1>
+        <p style={{
+          textAlign: 'center',
+          color: '#6b7280',
+          marginBottom: 32,
+          fontSize: '0.9rem',
+        }}>
+          {mode === 'login' ? 'Connectez-vous à votre compte' : 'Créez votre compte'}
+        </p>
 
-        <motion.p
-          className="login-subtitle"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          Gestion des Ventes & Prospection
-        </motion.p>
+        {/* Mode Toggle */}
+        <div style={{
+          display: 'flex',
+          background: '#f3f4f6',
+          borderRadius: 12,
+          padding: 4,
+          marginBottom: 24,
+        }}>
+          <button
+            onClick={() => { setMode('login'); setError(''); setSuccess(''); }}
+            style={{
+              flex: 1,
+              padding: '12px',
+              border: 'none',
+              borderRadius: 10,
+              background: mode === 'login' ? 'white' : 'transparent',
+              color: mode === 'login' ? '#1f2937' : '#6b7280',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: mode === 'login' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+            }}
+          >
+            Connexion
+          </button>
+          <button
+            onClick={() => { setMode('register'); setError(''); setSuccess(''); }}
+            style={{
+              flex: 1,
+              padding: '12px',
+              border: 'none',
+              borderRadius: 10,
+              background: mode === 'register' ? 'white' : 'transparent',
+              color: mode === 'register' ? '#1f2937' : '#6b7280',
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              boxShadow: mode === 'register' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
+            }}
+          >
+            Inscription
+          </button>
+        </div>
 
-        <motion.form
-          onSubmit={handleSubmit}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.7 }}
-        >
-          <div className="login-input-group">
-            <label className="login-label">🔑 Code d'accès</label>
-            <motion.input
-              type="password"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              placeholder="••••••••"
-              autoFocus
-              className={`login-input ${error ? 'login-input-error' : ''}`}
-              whileFocus={{ scale: 1.02, boxShadow: '0 0 0 3px rgba(59,130,246,0.3)' }}
+        {/* Error/Success Messages */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{
+                background: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: 12,
+                padding: 12,
+                marginBottom: 16,
+                color: '#991b1b',
+                fontSize: '0.85rem',
+              }}
+            >
+              ❌ {error}
+            </motion.div>
+          )}
+          {success && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              style={{
+                background: '#f0fdf4',
+                border: '1px solid #bbf7d0',
+                borderRadius: 12,
+                padding: 12,
+                marginBottom: 16,
+                color: '#166534',
+                fontSize: '0.85rem',
+              }}
+            >
+              ✅ {success}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit}>
+          {mode === 'register' && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              style={{ marginBottom: 16 }}
+            >
+              <label style={{
+                display: 'block',
+                marginBottom: 6,
+                fontWeight: 600,
+                fontSize: '0.85rem',
+                color: '#374151',
+              }}>
+                Nom complet
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Votre nom"
+                style={{
+                  width: '100%',
+                  padding: '14px 16px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: 12,
+                  fontSize: '1rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+              />
+            </motion.div>
+          )}
+
+          <div style={{ marginBottom: 16 }}>
+            <label style={{
+              display: 'block',
+              marginBottom: 6,
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              color: '#374151',
+            }}>
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="votre@email.com"
+              required
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                border: '2px solid #e5e7eb',
+                borderRadius: 12,
+                fontSize: '1rem',
+                outline: 'none',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
 
-          <AnimatePresence>
-            {error && (
-              <motion.p
-                className="login-error"
-                initial={{ opacity: 0, y: -10, height: 0 }}
-                animate={{ opacity: 1, y: 0, height: 'auto' }}
-                exit={{ opacity: 0, y: -10, height: 0 }}
+          <div style={{ marginBottom: 24 }}>
+            <label style={{
+              display: 'block',
+              marginBottom: 6,
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              color: '#374151',
+            }}>
+              Mot de passe
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                style={{
+                  width: '100%',
+                  padding: '14px 50px 14px 16px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: 12,
+                  fontSize: '1rem',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
+                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '1.2rem',
+                }}
               >
-                ❌ Code incorrect. Veuillez réessayer.
-              </motion.p>
+                {showPassword ? '👁️' : '👁️‍🗨️'}
+              </button>
+            </div>
+            {mode === 'register' && (
+              <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 6 }}>
+                Minimum 6 caractères
+              </p>
             )}
-          </AnimatePresence>
+          </div>
 
           <motion.button
             type="submit"
-            className="login-button"
-            whileHover={{ scale: 1.02, boxShadow: '0 8px 30px rgba(59,130,246,0.4)' }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            disabled={loading}
+            whileHover={{ scale: loading ? 1 : 1.02 }}
+            whileTap={{ scale: loading ? 1 : 0.98 }}
+            style={{
+              width: '100%',
+              padding: 16,
+              background: loading ? '#9ca3af' : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              color: 'white',
+              border: 'none',
+              borderRadius: 12,
+              fontSize: '1rem',
+              fontWeight: 700,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              boxShadow: loading ? 'none' : '0 10px 20px -5px rgba(59, 130, 246, 0.4)',
+            }}
           >
-            <span>Entrer</span>
-            <motion.span
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              →
-            </motion.span>
+            {loading ? '⏳ Chargement...' : mode === 'login' ? '🚀 Se connecter' : '✨ Créer le compte'}
           </motion.button>
-        </motion.form>
+        </form>
 
-
-          <motion.button
-            type="button"
-            className="login-button login-button-demo"
-            onClick={handleDemo}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            style={{ marginTop: 12, background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)', border: '1px solid rgba(255,255,255,0.15)' }}
-          >
-            <span>👁️</span>
-            <span>Mode Démo (Invité)</span>
-          </motion.button>
-
-        <motion.p
-          className="login-footer"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
-        >
-          Demandez le code à l'administrateur
-        </motion.p>
-
-        {/* Decorative floating dots */}
-        <div className="login-dots">
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="login-dot"
-              animate={{
-                y: [0, -10, 0],
-                opacity: [0.3, 0.7, 0.3],
-              }}
-              transition={{
-                duration: 2 + i * 0.3,
-                repeat: Infinity,
-                delay: i * 0.2,
-              }}
-            />
-          ))}
+        {/* Divider */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          margin: '24px 0',
+          color: '#9ca3af',
+          fontSize: '0.85rem',
+        }}>
+          <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
+          <span style={{ padding: '0 16px' }}>ou</span>
+          <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
         </div>
-      </motion.div>
 
-      {/* Version badge */}
-      <motion.div
-        className="login-version"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-      >
-        v2.0 — Design 3D
+        {/* Google Login */}
+        <motion.button
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          whileHover={{ scale: loading ? 1 : 1.02 }}
+          whileTap={{ scale: loading ? 1 : 0.98 }}
+          style={{
+            width: '100%',
+            padding: 14,
+            background: 'white',
+            color: '#374151',
+            border: '2px solid #e5e7eb',
+            borderRadius: 12,
+            fontSize: '0.95rem',
+            fontWeight: 600,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 10,
+          }}
+        >
+          <span style={{ fontSize: '1.2rem' }}>🔵</span>
+          Continuer avec Google
+        </motion.button>
+
+        {/* Demo Mode */}
+        <motion.button
+          onClick={() => {
+            localStorage.setItem('tradelink_demo', 'true');
+            localStorage.setItem('tradelink_access', 'granted');
+            window.location.href = '/';
+          }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          style={{
+            width: '100%',
+            padding: 14,
+            background: 'transparent',
+            color: '#6b7280',
+            border: 'none',
+            fontSize: '0.85rem',
+            cursor: 'pointer',
+            marginTop: 12,
+          }}
+        >
+          🎮 Mode démo (sans inscription)
+        </motion.button>
       </motion.div>
     </div>
   );
