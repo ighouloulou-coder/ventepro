@@ -6,6 +6,7 @@ import { getCurrentUser, logout } from '../services/authService';
 import DemoBanner from './DemoBanner';
 import Chat from './Chat';
 import GlobalSearch from './GlobalSearch';
+import AIChatbot from './AIChatbot';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -292,6 +293,9 @@ const Layout: React.FC = () => {
 
       {/* Global Search */}
       <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {/* AI Chatbot */}
+      <AIChatbot />
     </div>
   );
 };
