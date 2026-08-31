@@ -1,5 +1,6 @@
 // Chat Service - Firebase Sync
-import { db, saveDocument, loadCollection, COLLECTIONS } from './firebase';
+import { COLLECTIONS } from './firebase';
+import { syncToFirestore, loadCollection, getFromStorage, saveToStorage } from './firebaseSync';
 
 export interface Message {
   id: string;
@@ -9,40 +10,19 @@ export interface Message {
   timestamp: string;
 }
 
-let cachedMessages: Message[] | null = null;
-
-async function getMessagesFirebase(): Promise<Message[]> {
-  if (cachedMessages) return cachedMessages;
-  try {
-    const data = await loadCollection<Message>(COLLECTIONS.CHAT);
-    cachedMessages = data.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
-    return cachedMessages;
-  } catch { return []; }
-}
-
-function getMessagesLocal(): Message[] {
-  try {
-    const data = localStorage.getItem('tradelink_chat_messages');
-    return data ? JSON.parse(data) : [];
-  } catch { return []; }
-}
-
-function saveMessagesLocal(msgs: Message[]) {
-  localStorage.setItem('tradelink_chat_messages', JSON.stringify(msgs));
-  cachedMessages = msgs;
-}
+const CHAT_KEY = 'tradelink_chat_messages';
 
 export async function loadMessages(): Promise<Message[]> {
-  const fbMsgs = await getMessagesFirebase();
+  const fbMsgs = await loadCollection<Message>(COLLECTIONS.CHAT);
   if (fbMsgs.length > 0) {
-    saveMessagesLocal(fbMsgs);
+    saveToStorage(CHAT_KEY, fbMsgs.sort((a, b) => a.timestamp.localeCompare(b.timestamp)));
     return fbMsgs;
   }
-  return getMessagesLocal();
+  return getFromStorage<Message>(CHAT_KEY);
 }
 
 export function loadMessagesSync(): Message[] {
-  return getMessagesLocal();
+  return getFromStorage<Message>(CHAT_KEY);
 }
 
 export async function sendMessage(userId: string, userName: string, text: string): Promise<Message> {
@@ -51,13 +31,13 @@ export async function sendMessage(userId: string, userName: string, text: string
     userId, userName, text: text.trim(),
     timestamp: new Date().toISOString(),
   };
-  const msgs = [...getMessagesLocal(), msg].slice(-200);
-  saveMessagesLocal(msgs);
+  const msgs = [...getFromStorage<Message>(CHAT_KEY), msg].slice(-200);
+  saveToStorage(CHAT_KEY, msgs);
   // Sync to Firebase in background
-  saveDocument(COLLECTIONS.CHAT, msg as any).catch(() => {});
+  syncToFirestore(COLLECTIONS.CHAT, msg as any, CHAT_KEY);
   return msg;
 }
 
 export function clearChatCache() {
-  cachedMessages = null;
+  // Cache is managed by firebaseSync
 }

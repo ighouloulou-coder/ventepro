@@ -7,9 +7,12 @@ import {
   SupplierDashboardStats,
   Currency,
 } from '../types';
-import { saveDocument, deleteDocument, COLLECTIONS, db } from './firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { db, COLLECTIONS } from './firebase';
+import { syncToFirestore, deleteFromFirestore, getFromStorage, saveToStorage } from './firebaseSync';
 
+// ============================================
+// 📦 Storage Keys
+// ============================================
 const STORAGE_KEYS = {
   SUPPLIERS: 'tradelink_suppliers',
   SUPPLIER_ORDERS: 'tradelink_supplier_orders',
@@ -19,78 +22,11 @@ const STORAGE_KEYS = {
 };
 
 // ============================================
-// 🗄️ Generic storage functions
+// 🔄 Dispatch custom event pour sync UI
 // ============================================
-function getFromStorage<T>(key: string): T[] {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
+function dispatchSyncEvent(col: string) {
+  window.dispatchEvent(new CustomEvent('data-sync', { detail: { collection: col } }));
 }
-
-function saveToStorage<T>(key: string, data: T[]): void {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
-async function syncSave<T extends { id: string }>(collectionName: string, data: T): Promise<void> {
-  try { await saveDocument(collectionName, data); } catch (e) { console.warn('⚠️ Firestore save failed:', e); }
-}
-
-async function syncDelete(collectionName: string, id: string): Promise<void> {
-  try { await deleteDocument(collectionName, id); } catch (e) { console.warn('⚠️ Firestore delete failed:', e); }
-}
-
-// ============================================
-// ☁️ Load from Firestore + Real-time sync
-// ============================================
-async function loadSupplierCollections(): Promise<void> {
-  if (!db) { console.warn('⚠️ Firebase non initialisé pour fournisseurs'); return; }
-  console.log('☁️ Chargement des données fournisseurs depuis Firestore...');
-  const cols: [string, string][] = [
-    [COLLECTIONS.SUPPLIERS, STORAGE_KEYS.SUPPLIERS],
-    [COLLECTIONS.SUPPLIER_ORDERS, STORAGE_KEYS.SUPPLIER_ORDERS],
-    [COLLECTIONS.SUPPLIER_INVOICES, STORAGE_KEYS.SUPPLIER_INVOICES],
-    [COLLECTIONS.SUPPLIER_DELIVERIES, STORAGE_KEYS.SUPPLIER_DELIVERIES],
-  ];
-  for (const [col, key] of cols) {
-    try {
-      const snap = await getDocs(collection(db, col));
-      const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      saveToStorage(key, data);
-      console.log(`✅ ${col}: ${data.length} documents`);
-    } catch (e: any) {
-      console.error(`❌ Erreur chargement ${col}:`, e.message);
-    }
-  }
-}
-
-let supplierPolling = false;
-async function pollSupplierSync(): Promise<void> {
-  if (supplierPolling) return;
-  supplierPolling = true;
-  try {
-    const cols: [string, string][] = [
-      [COLLECTIONS.SUPPLIERS, STORAGE_KEYS.SUPPLIERS],
-      [COLLECTIONS.SUPPLIER_ORDERS, STORAGE_KEYS.SUPPLIER_ORDERS],
-      [COLLECTIONS.SUPPLIER_INVOICES, STORAGE_KEYS.SUPPLIER_INVOICES],
-      [COLLECTIONS.SUPPLIER_DELIVERIES, STORAGE_KEYS.SUPPLIER_DELIVERIES],
-    ];
-    for (const [col, key] of cols) {
-      try {
-        const snap = await getDocs(collection(db, col));
-        const data = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        saveToStorage(key, data);
-        window.dispatchEvent(new CustomEvent('data-sync', { detail: { collection: col } }));
-      } catch (e: any) { console.error(`❌ Polling ${col}:`, e.message); }
-    }
-  } finally { supplierPolling = false; }
-}
-
-(async () => {
-  try {
-    await loadSupplierCollections();
-    setInterval(pollSupplierSync, 30000);
-    console.log('🚀 Sync fournisseurs initialisée !');
-  } catch (e) { console.error('❌ Erreur init sync fournisseurs:', e); }
-})();
 
 // ============================================
 // 🏭 Suppliers
@@ -128,7 +64,8 @@ export const supplierStorage = {
     const suppliers = getFromStorage<Supplier>(STORAGE_KEYS.SUPPLIERS);
     suppliers.push(supplier);
     saveToStorage(STORAGE_KEYS.SUPPLIERS, suppliers);
-    syncSave(COLLECTIONS.SUPPLIERS, supplier);
+    syncToFirestore(COLLECTIONS.SUPPLIERS, supplier, STORAGE_KEYS.SUPPLIERS);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIERS);
     return supplier;
   },
 
@@ -138,7 +75,8 @@ export const supplierStorage = {
     if (index === -1) return null;
     suppliers[index] = { ...suppliers[index], ...updates };
     saveToStorage(STORAGE_KEYS.SUPPLIERS, suppliers);
-    syncSave(COLLECTIONS.SUPPLIERS, suppliers[index]);
+    syncToFirestore(COLLECTIONS.SUPPLIERS, suppliers[index], STORAGE_KEYS.SUPPLIERS);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIERS);
     return suppliers[index];
   },
 
@@ -146,8 +84,9 @@ export const supplierStorage = {
     const suppliers = getFromStorage<Supplier>(STORAGE_KEYS.SUPPLIERS);
     const filtered = suppliers.filter(s => s.id !== id);
     if (filtered.length === suppliers.length) return false;
-    saveToStorage(STORAGE_KEYS.SUPPLIERS, suppliers.filter(s => s.id !== id));
-    syncDelete(COLLECTIONS.SUPPLIERS, id);
+    saveToStorage(STORAGE_KEYS.SUPPLIERS, filtered);
+    deleteFromFirestore(COLLECTIONS.SUPPLIERS, id);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIERS);
     return true;
   },
 
@@ -157,7 +96,8 @@ export const supplierStorage = {
     if (index === -1) return null;
     suppliers[index].ratings.push(rating);
     saveToStorage(STORAGE_KEYS.SUPPLIERS, suppliers);
-    syncSave(COLLECTIONS.SUPPLIERS, suppliers[index]);
+    syncToFirestore(COLLECTIONS.SUPPLIERS, suppliers[index], STORAGE_KEYS.SUPPLIERS);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIERS);
     return suppliers[index];
   },
 
@@ -196,7 +136,8 @@ export const supplierOrderStorage = {
     const orders = getFromStorage<SupplierOrder>(STORAGE_KEYS.SUPPLIER_ORDERS);
     orders.push(order);
     saveToStorage(STORAGE_KEYS.SUPPLIER_ORDERS, orders);
-    syncSave(COLLECTIONS.SUPPLIER_ORDERS, order);
+    syncToFirestore(COLLECTIONS.SUPPLIER_ORDERS, order, STORAGE_KEYS.SUPPLIER_ORDERS);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_ORDERS);
     return order;
   },
 
@@ -206,7 +147,8 @@ export const supplierOrderStorage = {
     if (index === -1) return null;
     orders[index] = { ...orders[index], ...updates };
     saveToStorage(STORAGE_KEYS.SUPPLIER_ORDERS, orders);
-    syncSave(COLLECTIONS.SUPPLIER_ORDERS, orders[index]);
+    syncToFirestore(COLLECTIONS.SUPPLIER_ORDERS, orders[index], STORAGE_KEYS.SUPPLIER_ORDERS);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_ORDERS);
     return orders[index];
   },
 
@@ -214,8 +156,9 @@ export const supplierOrderStorage = {
     const orders = getFromStorage<SupplierOrder>(STORAGE_KEYS.SUPPLIER_ORDERS);
     const filtered = orders.filter(o => o.id !== id);
     if (filtered.length === orders.length) return false;
-    saveToStorage(STORAGE_KEYS.SUPPLIER_ORDERS, orders.filter(o => o.id !== id));
-    syncDelete(COLLECTIONS.SUPPLIER_ORDERS, id);
+    saveToStorage(STORAGE_KEYS.SUPPLIER_ORDERS, filtered);
+    deleteFromFirestore(COLLECTIONS.SUPPLIER_ORDERS, id);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_ORDERS);
     return true;
   },
 };
@@ -245,7 +188,8 @@ export const supplierInvoiceStorage = {
     const invoices = getFromStorage<SupplierInvoice>(STORAGE_KEYS.SUPPLIER_INVOICES);
     invoices.push(invoice);
     saveToStorage(STORAGE_KEYS.SUPPLIER_INVOICES, invoices);
-    syncSave(COLLECTIONS.SUPPLIER_INVOICES, invoice);
+    syncToFirestore(COLLECTIONS.SUPPLIER_INVOICES, invoice, STORAGE_KEYS.SUPPLIER_INVOICES);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_INVOICES);
     return invoice;
   },
 
@@ -255,7 +199,8 @@ export const supplierInvoiceStorage = {
     if (index === -1) return null;
     invoices[index] = { ...invoices[index], ...updates };
     saveToStorage(STORAGE_KEYS.SUPPLIER_INVOICES, invoices);
-    syncSave(COLLECTIONS.SUPPLIER_INVOICES, invoices[index]);
+    syncToFirestore(COLLECTIONS.SUPPLIER_INVOICES, invoices[index], STORAGE_KEYS.SUPPLIER_INVOICES);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_INVOICES);
     return invoices[index];
   },
 
@@ -263,8 +208,9 @@ export const supplierInvoiceStorage = {
     const invoices = getFromStorage<SupplierInvoice>(STORAGE_KEYS.SUPPLIER_INVOICES);
     const filtered = invoices.filter(i => i.id !== id);
     if (filtered.length === invoices.length) return false;
-    saveToStorage(STORAGE_KEYS.SUPPLIER_INVOICES, invoices.filter(i => i.id !== id));
-    syncDelete(COLLECTIONS.SUPPLIER_INVOICES, id);
+    saveToStorage(STORAGE_KEYS.SUPPLIER_INVOICES, filtered);
+    deleteFromFirestore(COLLECTIONS.SUPPLIER_INVOICES, id);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_INVOICES);
     return true;
   },
 };
@@ -299,7 +245,8 @@ export const supplierDeliveryStorage = {
     const deliveries = getFromStorage<SupplierDelivery>(STORAGE_KEYS.SUPPLIER_DELIVERIES);
     deliveries.push(delivery);
     saveToStorage(STORAGE_KEYS.SUPPLIER_DELIVERIES, deliveries);
-    syncSave(COLLECTIONS.SUPPLIER_DELIVERIES, delivery);
+    syncToFirestore(COLLECTIONS.SUPPLIER_DELIVERIES, delivery, STORAGE_KEYS.SUPPLIER_DELIVERIES);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_DELIVERIES);
     return delivery;
   },
 
@@ -309,7 +256,8 @@ export const supplierDeliveryStorage = {
     if (index === -1) return null;
     deliveries[index] = { ...deliveries[index], ...updates };
     saveToStorage(STORAGE_KEYS.SUPPLIER_DELIVERIES, deliveries);
-    syncSave(COLLECTIONS.SUPPLIER_DELIVERIES, deliveries[index]);
+    syncToFirestore(COLLECTIONS.SUPPLIER_DELIVERIES, deliveries[index], STORAGE_KEYS.SUPPLIER_DELIVERIES);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_DELIVERIES);
     return deliveries[index];
   },
 
@@ -317,8 +265,9 @@ export const supplierDeliveryStorage = {
     const deliveries = getFromStorage<SupplierDelivery>(STORAGE_KEYS.SUPPLIER_DELIVERIES);
     const filtered = deliveries.filter(d => d.id !== id);
     if (filtered.length === deliveries.length) return false;
-    saveToStorage(STORAGE_KEYS.SUPPLIER_DELIVERIES, deliveries.filter(d => d.id !== id));
-    syncDelete(COLLECTIONS.SUPPLIER_DELIVERIES, id);
+    saveToStorage(STORAGE_KEYS.SUPPLIER_DELIVERIES, filtered);
+    deleteFromFirestore(COLLECTIONS.SUPPLIER_DELIVERIES, id);
+    dispatchSyncEvent(COLLECTIONS.SUPPLIER_DELIVERIES);
     return true;
   },
 };

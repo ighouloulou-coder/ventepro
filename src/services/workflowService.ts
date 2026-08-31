@@ -1,4 +1,7 @@
-// Approval Workflow Service
+// Approval Workflow Service - Firebase Sync
+import { COLLECTIONS } from './firebase';
+import { syncToFirestore, getFromStorage, saveToStorage } from './firebaseSync';
+
 export interface ApprovalStep {
   id: string;
   label: string;
@@ -20,24 +23,6 @@ export interface WorkflowItem {
 
 const WORKFLOW_KEY = 'tradelink_workflows';
 
-function getWorkflows(): WorkflowItem[] {
-  try {
-    const data = localStorage.getItem(WORKFLOW_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch { return []; }
-}
-
-async function syncToFirebase(wf: WorkflowItem) {
-  try {
-    const { saveDocument, COLLECTIONS } = await import('./firebase');
-    await saveDocument(COLLECTIONS.WORKFLOWS, wf as any);
-  } catch {}
-}
-
-function saveWorkflows(wf: WorkflowItem[]) {
-  localStorage.setItem(WORKFLOW_KEY, JSON.stringify(wf));
-}
-
 function generateId() { return 'wf_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
 
 export function createWorkflow(type: 'quote' | 'order', itemId: string): WorkflowItem {
@@ -55,15 +40,15 @@ export function createWorkflow(type: 'quote' | 'order', itemId: string): Workflo
     status: 'pending',
     createdAt: new Date().toISOString(),
   };
-  const wfs = getWorkflows();
+  const wfs = getFromStorage<WorkflowItem>(WORKFLOW_KEY);
   wfs.push(wf);
-  saveWorkflows(wfs);
-  syncToFirebase(wf);
+  saveToStorage(WORKFLOW_KEY, wfs);
+  syncToFirestore(COLLECTIONS.WORKFLOWS, wf as any, WORKFLOW_KEY);
   return wf;
 }
 
 export function approveStep(workflowId: string, stepIndex: number, approvedBy: string, comment?: string): boolean {
-  const wfs = getWorkflows();
+  const wfs = getFromStorage<WorkflowItem>(WORKFLOW_KEY);
   const wf = wfs.find(w => w.id === workflowId);
   if (!wf) return false;
   if (stepIndex >= wf.steps.length) return false;
@@ -73,35 +58,35 @@ export function approveStep(workflowId: string, stepIndex: number, approvedBy: s
   } else {
     wf.status = 'approved';
   }
-  saveWorkflows(wfs);
-  syncToFirebase(wf);
+  saveToStorage(WORKFLOW_KEY, wfs);
+  syncToFirestore(COLLECTIONS.WORKFLOWS, wf as any, WORKFLOW_KEY);
   return true;
 }
 
 export function rejectStep(workflowId: string, stepIndex: number, rejectedBy: string, comment?: string): boolean {
-  const wfs = getWorkflows();
+  const wfs = getFromStorage<WorkflowItem>(WORKFLOW_KEY);
   const wf = wfs.find(w => w.id === workflowId);
   if (!wf) return false;
   wf.steps[stepIndex] = { ...wf.steps[stepIndex], status: 'rejected', approvedBy: rejectedBy, timestamp: new Date().toISOString(), comment };
   wf.status = 'rejected';
-  saveWorkflows(wfs);
-  syncToFirebase(wf);
+  saveToStorage(WORKFLOW_KEY, wfs);
+  syncToFirestore(COLLECTIONS.WORKFLOWS, wf as any, WORKFLOW_KEY);
   return true;
 }
 
 export function getWorkflowForItem(type: string, itemId: string): WorkflowItem | undefined {
-  return getWorkflows().find(w => w.type === type && w.itemId === itemId);
+  return getFromStorage<WorkflowItem>(WORKFLOW_KEY).find(w => w.type === type && w.itemId === itemId);
 }
 
 export function getAllWorkflows(): WorkflowItem[] {
-  return getWorkflows();
+  return getFromStorage<WorkflowItem>(WORKFLOW_KEY);
 }
 
 export function getPendingApprovals(): WorkflowItem[] {
-  return getWorkflows().filter(w => w.status === 'pending');
+  return getFromStorage<WorkflowItem>(WORKFLOW_KEY).filter(w => w.status === 'pending');
 }
 
 export function deleteWorkflow(workflowId: string) {
-  const wfs = getWorkflows().filter(w => w.id !== workflowId);
-  saveWorkflows(wfs);
+  const wfs = getFromStorage<WorkflowItem>(WORKFLOW_KEY).filter(w => w.id !== workflowId);
+  saveToStorage(WORKFLOW_KEY, wfs);
 }

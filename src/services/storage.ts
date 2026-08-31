@@ -1,6 +1,10 @@
 import { Product, Client, Invoice, Quote, Order, DeliveryNote, PriceTier, DashboardStats, Currency } from '../types';
-import { db, saveDocument, deleteDocument, loadCollection, COLLECTIONS } from './firebase';
+import { db, COLLECTIONS } from './firebase';
+import { syncToFirestore, deleteFromFirestore, getFromStorage, saveToStorage } from './firebaseSync';
 
+// ============================================
+// 📦 Storage Keys (conservés pour compatibilité)
+// ============================================
 const STORAGE_KEYS = {
   PRODUCTS: 'tradelink_products',
   CLIENTS: 'tradelink_clients',
@@ -12,124 +16,11 @@ const STORAGE_KEYS = {
 };
 
 // ============================================
-// 🗄️ localStorage cache
+// 🔄 Dispatch custom event pour sync UI
 // ============================================
-function getFromStorage<T>(key: string): T[] {
-  try {
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : [];
-  } catch { return []; }
-}
-
-function saveToStorage<T>(key: string, data: T[]): void {
-  localStorage.setItem(key, JSON.stringify(data));
-}
-
 function dispatchSyncEvent(col: string) {
   window.dispatchEvent(new CustomEvent('data-sync', { detail: { collection: col } }));
 }
-
-// ============================================
-// ☁️ CRITIQUE : Charger depuis Firestore
-// ============================================
-async function loadFromFirestore(colName: string, storageKey: string): Promise<boolean> {
-  if (!db) {
-    console.error(`❌ [${colName}] Firebase db est null !`);
-    return false;
-  }
-  try {
-    const data = await loadCollection<any>(colName);
-    saveToStorage(storageKey, data);
-    console.log(`✅ [${colName}] ${data.length} documents chargés depuis Firestore`);
-    return true;
-  } catch (e: any) {
-    console.error(`❌ [${colName}] Erreur chargement:`, e.message || e);
-    return false;
-  }
-}
-
-async function loadAllFromFirestore(): Promise<void> {
-  console.log('☁️ === CHARGEMENT DEPUIS FIRESTORE ===');
-  const cols: [string, string][] = [
-    [COLLECTIONS.PRODUCTS, STORAGE_KEYS.PRODUCTS],
-    [COLLECTIONS.CLIENTS, STORAGE_KEYS.CLIENTS],
-    [COLLECTIONS.INVOICES, STORAGE_KEYS.INVOICES],
-    [COLLECTIONS.QUOTES, STORAGE_KEYS.QUOTES],
-    [COLLECTIONS.ORDERS, STORAGE_KEYS.ORDERS],
-    [COLLECTIONS.DELIVERIES, STORAGE_KEYS.DELIVERIES],
-    [COLLECTIONS.PRICE_TIERS, STORAGE_KEYS.PRICE_TIERS],
-  ];
-
-  let ok = 0;
-  for (const [col, key] of cols) {
-    if (await loadFromFirestore(col, key)) ok++;
-  }
-  console.log(`☁️ === TERMINÉ : ${ok}/${cols.length} collections OK ===`);
-}
-
-// ============================================
-// 🔄 CRITIQUE : Écriture vers Firestore
-// ============================================
-async function syncSave<T extends { id: string }>(collectionName: string, data: T): Promise<void> {
-  if (!db) {
-    console.error(`❌ [SAVE] Firebase db null ! Impossible de sauvegarder ${collectionName}`);
-    return;
-  }
-  try {
-    await saveDocument(collectionName, data);
-    console.log(`✅ [SAVE] ${collectionName}/${data.id} sauvegardé dans Firestore`);
-  } catch (e: any) {
-    console.error(`❌ [SAVE] Erreur ${collectionName}:`, e.message || e);
-  }
-}
-
-async function syncDelete(collectionName: string, id: string): Promise<void> {
-  if (!db) return;
-  try {
-    await deleteDocument(collectionName, id);
-    console.log(`✅ [DELETE] ${collectionName}/${id} supprimé de Firestore`);
-  } catch (e: any) {
-    console.error(`❌ [DELETE] Erreur ${collectionName}:`, e.message || e);
-  }
-}
-
-// ============================================
-// 🔄 Polling : recharge toutes les 30s
-// ============================================
-let polling = false;
-
-async function pollSync(): Promise<void> {
-  if (polling) return;
-  polling = true;
-  try {
-    const cols: [string, string][] = [
-      [COLLECTIONS.PRODUCTS, STORAGE_KEYS.PRODUCTS],
-      [COLLECTIONS.CLIENTS, STORAGE_KEYS.CLIENTS],
-      [COLLECTIONS.INVOICES, STORAGE_KEYS.INVOICES],
-      [COLLECTIONS.QUOTES, STORAGE_KEYS.QUOTES],
-      [COLLECTIONS.ORDERS, STORAGE_KEYS.ORDERS],
-      [COLLECTIONS.DELIVERIES, STORAGE_KEYS.DELIVERIES],
-      [COLLECTIONS.PRICE_TIERS, STORAGE_KEYS.PRICE_TIERS],
-    ];
-    for (const [col, key] of cols) {
-      if (await loadFromFirestore(col, key)) dispatchSyncEvent(col);
-    }
-  } finally { polling = false; }
-}
-
-// ============================================
-// 🚀 INIT
-// ============================================
-(async () => {
-  console.log('🚀 Démarrage de la synchronisation...');
-  console.log('🔥 Firebase db:', db ? 'OK' : 'NULL !');
-
-  await loadAllFromFirestore();
-
-  // Polling toutes les 30 secondes
-  setInterval(pollSync, 30000);
-  console.log('⏰ Polling démarré (30s)');
-})();
 
 // ============================================
 // 📦 Products
@@ -141,7 +32,8 @@ export const productStorage = {
     const products = getFromStorage<Product>(STORAGE_KEYS.PRODUCTS);
     products.push(product);
     saveToStorage(STORAGE_KEYS.PRODUCTS, products);
-    syncSave(COLLECTIONS.PRODUCTS, product);
+    syncToFirestore(COLLECTIONS.PRODUCTS, product, STORAGE_KEYS.PRODUCTS);
+    dispatchSyncEvent(COLLECTIONS.PRODUCTS);
     return product;
   },
   update: (id: string, updates: Partial<Product>): Product | null => {
@@ -150,7 +42,8 @@ export const productStorage = {
     if (i === -1) return null;
     products[i] = { ...products[i], ...updates };
     saveToStorage(STORAGE_KEYS.PRODUCTS, products);
-    syncSave(COLLECTIONS.PRODUCTS, products[i]);
+    syncToFirestore(COLLECTIONS.PRODUCTS, products[i], STORAGE_KEYS.PRODUCTS);
+    dispatchSyncEvent(COLLECTIONS.PRODUCTS);
     return products[i];
   },
   delete: (id: string): boolean => {
@@ -158,7 +51,8 @@ export const productStorage = {
     const filtered = products.filter(p => p.id !== id);
     if (filtered.length === products.length) return false;
     saveToStorage(STORAGE_KEYS.PRODUCTS, filtered);
-    syncDelete(COLLECTIONS.PRODUCTS, id);
+    deleteFromFirestore(COLLECTIONS.PRODUCTS, id);
+    dispatchSyncEvent(COLLECTIONS.PRODUCTS);
     return true;
   },
   updateStock: (id: string, qty: number): Product | null => {
@@ -167,7 +61,8 @@ export const productStorage = {
     if (i === -1) return null;
     products[i].stock = Math.max(0, products[i].stock + qty);
     saveToStorage(STORAGE_KEYS.PRODUCTS, products);
-    syncSave(COLLECTIONS.PRODUCTS, products[i]);
+    syncToFirestore(COLLECTIONS.PRODUCTS, products[i], STORAGE_KEYS.PRODUCTS);
+    dispatchSyncEvent(COLLECTIONS.PRODUCTS);
     return products[i];
   },
 };
@@ -182,7 +77,8 @@ export const clientStorage = {
     const clients = getFromStorage<Client>(STORAGE_KEYS.CLIENTS);
     clients.push(client);
     saveToStorage(STORAGE_KEYS.CLIENTS, clients);
-    syncSave(COLLECTIONS.CLIENTS, client);
+    syncToFirestore(COLLECTIONS.CLIENTS, client, STORAGE_KEYS.CLIENTS);
+    dispatchSyncEvent(COLLECTIONS.CLIENTS);
     return client;
   },
   update: (id: string, updates: Partial<Client>): Client | null => {
@@ -191,7 +87,8 @@ export const clientStorage = {
     if (i === -1) return null;
     clients[i] = { ...clients[i], ...updates };
     saveToStorage(STORAGE_KEYS.CLIENTS, clients);
-    syncSave(COLLECTIONS.CLIENTS, clients[i]);
+    syncToFirestore(COLLECTIONS.CLIENTS, clients[i], STORAGE_KEYS.CLIENTS);
+    dispatchSyncEvent(COLLECTIONS.CLIENTS);
     return clients[i];
   },
   delete: (id: string): boolean => {
@@ -199,7 +96,8 @@ export const clientStorage = {
     const filtered = clients.filter(c => c.id !== id);
     if (filtered.length === clients.length) return false;
     saveToStorage(STORAGE_KEYS.CLIENTS, filtered);
-    syncDelete(COLLECTIONS.CLIENTS, id);
+    deleteFromFirestore(COLLECTIONS.CLIENTS, id);
+    dispatchSyncEvent(COLLECTIONS.CLIENTS);
     return true;
   },
 };
@@ -219,7 +117,8 @@ export const priceTierStorage = {
     const tiers = getFromStorage<PriceTier>(STORAGE_KEYS.PRICE_TIERS);
     tiers.push(tier);
     saveToStorage(STORAGE_KEYS.PRICE_TIERS, tiers);
-    syncSave(COLLECTIONS.PRICE_TIERS, tier);
+    syncToFirestore(COLLECTIONS.PRICE_TIERS, tier, STORAGE_KEYS.PRICE_TIERS);
+    dispatchSyncEvent(COLLECTIONS.PRICE_TIERS);
     return tier;
   },
   update: (id: string, updates: Partial<PriceTier>): PriceTier | null => {
@@ -228,7 +127,8 @@ export const priceTierStorage = {
     if (i === -1) return null;
     tiers[i] = { ...tiers[i], ...updates };
     saveToStorage(STORAGE_KEYS.PRICE_TIERS, tiers);
-    syncSave(COLLECTIONS.PRICE_TIERS, tiers[i]);
+    syncToFirestore(COLLECTIONS.PRICE_TIERS, tiers[i], STORAGE_KEYS.PRICE_TIERS);
+    dispatchSyncEvent(COLLECTIONS.PRICE_TIERS);
     return tiers[i];
   },
   delete: (id: string): boolean => {
@@ -236,7 +136,8 @@ export const priceTierStorage = {
     const filtered = tiers.filter(t => t.id !== id);
     if (filtered.length === tiers.length) return false;
     saveToStorage(STORAGE_KEYS.PRICE_TIERS, filtered);
-    syncDelete(COLLECTIONS.PRICE_TIERS, id);
+    deleteFromFirestore(COLLECTIONS.PRICE_TIERS, id);
+    dispatchSyncEvent(COLLECTIONS.PRICE_TIERS);
     return true;
   },
 };
@@ -251,7 +152,8 @@ export const quoteStorage = {
     const q = getFromStorage<Quote>(STORAGE_KEYS.QUOTES);
     q.push(quote);
     saveToStorage(STORAGE_KEYS.QUOTES, q);
-    syncSave(COLLECTIONS.QUOTES, quote);
+    syncToFirestore(COLLECTIONS.QUOTES, quote, STORAGE_KEYS.QUOTES);
+    dispatchSyncEvent(COLLECTIONS.QUOTES);
     return quote;
   },
   update: (id: string, updates: Partial<Quote>): Quote | null => {
@@ -260,7 +162,8 @@ export const quoteStorage = {
     if (i === -1) return null;
     q[i] = { ...q[i], ...updates };
     saveToStorage(STORAGE_KEYS.QUOTES, q);
-    syncSave(COLLECTIONS.QUOTES, q[i]);
+    syncToFirestore(COLLECTIONS.QUOTES, q[i], STORAGE_KEYS.QUOTES);
+    dispatchSyncEvent(COLLECTIONS.QUOTES);
     return q[i];
   },
   delete: (id: string): boolean => {
@@ -268,7 +171,8 @@ export const quoteStorage = {
     const f = q.filter(x => x.id !== id);
     if (f.length === q.length) return false;
     saveToStorage(STORAGE_KEYS.QUOTES, f);
-    syncDelete(COLLECTIONS.QUOTES, id);
+    deleteFromFirestore(COLLECTIONS.QUOTES, id);
+    dispatchSyncEvent(COLLECTIONS.QUOTES);
     return true;
   },
 };
@@ -283,7 +187,8 @@ export const orderStorage = {
     const o = getFromStorage<Order>(STORAGE_KEYS.ORDERS);
     o.push(order);
     saveToStorage(STORAGE_KEYS.ORDERS, o);
-    syncSave(COLLECTIONS.ORDERS, order);
+    syncToFirestore(COLLECTIONS.ORDERS, order, STORAGE_KEYS.ORDERS);
+    dispatchSyncEvent(COLLECTIONS.ORDERS);
     return order;
   },
   update: (id: string, updates: Partial<Order>): Order | null => {
@@ -292,7 +197,8 @@ export const orderStorage = {
     if (i === -1) return null;
     o[i] = { ...o[i], ...updates };
     saveToStorage(STORAGE_KEYS.ORDERS, o);
-    syncSave(COLLECTIONS.ORDERS, o[i]);
+    syncToFirestore(COLLECTIONS.ORDERS, o[i], STORAGE_KEYS.ORDERS);
+    dispatchSyncEvent(COLLECTIONS.ORDERS);
     return o[i];
   },
   delete: (id: string): boolean => {
@@ -300,7 +206,8 @@ export const orderStorage = {
     const f = o.filter(x => x.id !== id);
     if (f.length === o.length) return false;
     saveToStorage(STORAGE_KEYS.ORDERS, f);
-    syncDelete(COLLECTIONS.ORDERS, id);
+    deleteFromFirestore(COLLECTIONS.ORDERS, id);
+    dispatchSyncEvent(COLLECTIONS.ORDERS);
     return true;
   },
 };
@@ -316,7 +223,8 @@ export const deliveryStorage = {
     const d = getFromStorage<DeliveryNote>(STORAGE_KEYS.DELIVERIES);
     d.push(delivery);
     saveToStorage(STORAGE_KEYS.DELIVERIES, d);
-    syncSave(COLLECTIONS.DELIVERIES, delivery);
+    syncToFirestore(COLLECTIONS.DELIVERIES, delivery, STORAGE_KEYS.DELIVERIES);
+    dispatchSyncEvent(COLLECTIONS.DELIVERIES);
     return delivery;
   },
   update: (id: string, updates: Partial<DeliveryNote>): DeliveryNote | null => {
@@ -325,7 +233,8 @@ export const deliveryStorage = {
     if (i === -1) return null;
     d[i] = { ...d[i], ...updates };
     saveToStorage(STORAGE_KEYS.DELIVERIES, d);
-    syncSave(COLLECTIONS.DELIVERIES, d[i]);
+    syncToFirestore(COLLECTIONS.DELIVERIES, d[i], STORAGE_KEYS.DELIVERIES);
+    dispatchSyncEvent(COLLECTIONS.DELIVERIES);
     return d[i];
   },
   delete: (id: string): boolean => {
@@ -333,7 +242,8 @@ export const deliveryStorage = {
     const f = d.filter(x => x.id !== id);
     if (f.length === d.length) return false;
     saveToStorage(STORAGE_KEYS.DELIVERIES, f);
-    syncDelete(COLLECTIONS.DELIVERIES, id);
+    deleteFromFirestore(COLLECTIONS.DELIVERIES, id);
+    dispatchSyncEvent(COLLECTIONS.DELIVERIES);
     return true;
   },
 };
@@ -348,7 +258,8 @@ export const invoiceStorage = {
     const inv = getFromStorage<Invoice>(STORAGE_KEYS.INVOICES);
     inv.push(invoice);
     saveToStorage(STORAGE_KEYS.INVOICES, inv);
-    syncSave(COLLECTIONS.INVOICES, invoice);
+    syncToFirestore(COLLECTIONS.INVOICES, invoice, STORAGE_KEYS.INVOICES);
+    dispatchSyncEvent(COLLECTIONS.INVOICES);
     return invoice;
   },
   update: (id: string, updates: Partial<Invoice>): Invoice | null => {
@@ -357,7 +268,8 @@ export const invoiceStorage = {
     if (i === -1) return null;
     inv[i] = { ...inv[i], ...updates };
     saveToStorage(STORAGE_KEYS.INVOICES, inv);
-    syncSave(COLLECTIONS.INVOICES, inv[i]);
+    syncToFirestore(COLLECTIONS.INVOICES, inv[i], STORAGE_KEYS.INVOICES);
+    dispatchSyncEvent(COLLECTIONS.INVOICES);
     return inv[i];
   },
   delete: (id: string): boolean => {
@@ -365,7 +277,8 @@ export const invoiceStorage = {
     const f = inv.filter(x => x.id !== id);
     if (f.length === inv.length) return false;
     saveToStorage(STORAGE_KEYS.INVOICES, f);
-    syncDelete(COLLECTIONS.INVOICES, id);
+    deleteFromFirestore(COLLECTIONS.INVOICES, id);
+    dispatchSyncEvent(COLLECTIONS.INVOICES);
     return true;
   },
 };
@@ -397,13 +310,11 @@ export const getDashboardStats = (): DashboardStats => {
   const ro = [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 5);
   return {
     totalSales, monthlySales: ms, totalClients: clients.length, totalProducts: products.length,
-    pendingInvoices: invoices.filter(i => i.status === 'brouillon' || i.status === 'envoyée').length,
-    pendingOrders: orders.filter(o => o.status === 'en_attente' || o.status === 'confirmée' || o.status === 'en_cours').length,
     pendingQuotes: quotes.filter(q => q.status === 'brouillon' || q.status === 'envoyé').length,
-    pendingDeliveries: deliveries.filter(d => d.status === 'préparation' || d.status === 'en_cours').length,
-    recentInvoices: ri, recentOrders: ro,
-    totalQuotesAmount: quotes.filter(q => q.status === 'accepté').reduce((s, q) => s + q.total, 0),
-    totalOrdersAmount: orders.filter(o => o.status !== 'annulée').reduce((s, o) => s + o.total, 0),
+    pendingOrders: orders.filter(o => o.status === 'en_attente' || o.status === 'confirmée').length,
+    overdueInvoices: invoices.filter(i => i.status === 'en_retard').length,
+    pendingDeliveries: deliveries.filter(d => d.status === 'en_cours' || d.status === 'planifiée').length,
+    recentInvoices: ri, recentOrders: ro, lowStockProducts: products.filter(p => p.stock <= p.minStock),
     currency: 'MAD',
   };
 };

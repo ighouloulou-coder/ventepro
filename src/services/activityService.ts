@@ -1,5 +1,6 @@
 // Activity Logging Service - Firebase Sync
-import { db, saveDocument, loadCollection, COLLECTIONS } from './firebase';
+import { COLLECTIONS } from './firebase';
+import { syncToFirestore, loadCollection, getFromStorage, saveToStorage } from './firebaseSync';
 
 export interface ActivityLog {
   id: string;
@@ -19,17 +20,6 @@ function generateId(): string {
   return 'act_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 }
 
-function getLogsLocal(): ActivityLog[] {
-  try {
-    const data = localStorage.getItem(ACTIVITY_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch { return []; }
-}
-
-function saveLogsLocal(logs: ActivityLog[]) {
-  localStorage.setItem(ACTIVITY_KEY, JSON.stringify(logs.slice(-500)));
-}
-
 export async function logActivity(
   userId: string,
   userName: string,
@@ -39,48 +29,47 @@ export async function logActivity(
   details?: string
 ): Promise<void> {
   const log: ActivityLog = {
-    id: generateId(),
-    userId, userName, action, entity, entityId, details,
+    id: generateId(), userId, userName, action, entity, entityId, details,
     timestamp: new Date().toISOString(),
   };
   
-  const logs = getLogsLocal();
+  const logs = getFromStorage<ActivityLog>(ACTIVITY_KEY);
   logs.push(log);
-  saveLogsLocal(logs);
+  saveToStorage(ACTIVITY_KEY, logs.slice(-500));
   
   // Sync to Firebase in background
-  saveDocument(COLLECTIONS.ACTIVITY, log as any).catch(() => {});
+  syncToFirestore(COLLECTIONS.ACTIVITY, log as any, ACTIVITY_KEY);
 }
 
 export function getLogsLocalSync(): ActivityLog[] {
-  return getLogsLocal();
+  return getFromStorage<ActivityLog>(ACTIVITY_KEY);
 }
 
 export async function loadLogsFromFirebase(): Promise<ActivityLog[]> {
   try {
     const fbLogs = await loadCollection<ActivityLog>(COLLECTIONS.ACTIVITY);
     if (fbLogs.length > 0) {
-      saveLogsLocal(fbLogs.sort((a, b) => b.timestamp.localeCompare(a.timestamp)));
+      saveToStorage(ACTIVITY_KEY, fbLogs.sort((a, b) => b.timestamp.localeCompare(a.timestamp)));
       return fbLogs;
     }
-    return getLogsLocal();
-  } catch { return getLogsLocal(); }
+    return getFromStorage<ActivityLog>(ACTIVITY_KEY);
+  } catch { return getFromStorage<ActivityLog>(ACTIVITY_KEY); }
 }
 
 export function getRecentLogs(count: number = 20): ActivityLog[] {
-  return getLogsLocal().sort((a, b) => b.timestamp.localeCompare(a.timestamp)).slice(0, count);
+  return getFromStorage<ActivityLog>(ACTIVITY_KEY).sort((a, b) => b.timestamp.localeCompare(a.timestamp)).slice(0, count);
 }
 
 export function getLogsByUser(userId: string): ActivityLog[] {
-  return getLogsLocal().filter(l => l.userId === userId);
+  return getFromStorage<ActivityLog>(ACTIVITY_KEY).filter(l => l.userId === userId);
 }
 
 export function getLogsByEntity(entity: string): ActivityLog[] {
-  return getLogsLocal().filter(l => l.entity === entity);
+  return getFromStorage<ActivityLog>(ACTIVITY_KEY).filter(l => l.entity === entity);
 }
 
 export function getLogsStats() {
-  const logs = getLogsLocal();
+  const logs = getFromStorage<ActivityLog>(ACTIVITY_KEY);
   const now = new Date();
   const today = logs.filter(l => {
     const d = new Date(l.timestamp);
@@ -114,8 +103,8 @@ export function getLogsStats() {
 export function clearOldLogs(daysToKeep: number = 90) {
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - daysToKeep);
-  const logs = getLogsLocal().filter(l => new Date(l.timestamp) > cutoff);
-  saveLogsLocal(logs);
+  const logs = getFromStorage<ActivityLog>(ACTIVITY_KEY).filter(l => new Date(l.timestamp) > cutoff);
+  saveToStorage(ACTIVITY_KEY, logs);
 }
 
 // Auto-log helper for common actions

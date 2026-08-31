@@ -1,5 +1,6 @@
 // User Management Service - Firebase Sync
-import { db, saveDocument, loadCollection, deleteDocument, COLLECTIONS } from './firebase';
+import { COLLECTIONS } from './firebase';
+import { syncToFirestore, deleteFromFirestore, loadCollection, getFromStorage, saveToStorage } from './firebaseSync';
 
 export interface User {
   id: string;
@@ -12,6 +13,7 @@ export interface User {
 }
 
 const CURRENT_USER_KEY = 'tradelink_current_user';
+const USERS_KEY = 'tradelink_users';
 
 function simpleHash(str: string): string {
   let hash = 0;
@@ -27,46 +29,24 @@ function generateId(): string {
   return 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-let cachedUsers: User[] | null = null;
-
-async function getUsersFromFirebase(): Promise<User[]> {
-  if (cachedUsers) return cachedUsers;
-  try {
-    const data = await loadCollection<User>(COLLECTIONS.USERS);
-    cachedUsers = data;
-    return data;
-  } catch { return []; }
-}
-
 function getUsersLocal(): User[] {
-  try {
-    const data = localStorage.getItem('tradelink_users');
-    return data ? JSON.parse(data) : [];
-  } catch { return []; }
+  return getFromStorage<User>(USERS_KEY);
 }
 
 function saveUsersLocal(users: User[]) {
-  localStorage.setItem('tradelink_users', JSON.stringify(users));
-  cachedUsers = users;
+  saveToStorage(USERS_KEY, users);
 }
 
 export async function initDefaultAdmin(): Promise<void> {
-  const users = await getUsersFromFirebase();
+  const users = getUsersLocal();
   if (users.length === 0) {
     const admin: User = {
-      id: generateId(),
-      username: 'admin',
-      displayName: 'Administrateur',
-      passwordHash: simpleHash('admin123'),
-      role: 'admin',
+      id: generateId(), username: 'admin', displayName: 'Administrateur',
+      passwordHash: simpleHash('admin123'), role: 'admin',
       createdAt: new Date().toISOString(),
     };
-    try {
-      await saveDocument(COLLECTIONS.USERS, admin);
-      cachedUsers = [admin];
-    } catch {
-      saveUsersLocal([admin]);
-    }
+    saveUsersLocal([admin]);
+    syncToFirestore(COLLECTIONS.USERS, admin, USERS_KEY);
   }
 }
 
@@ -74,16 +54,12 @@ export function initDefaultAdminSync(): void {
   const users = getUsersLocal();
   if (users.length === 0) {
     const admin: User = {
-      id: generateId(),
-      username: 'admin',
-      displayName: 'Administrateur',
-      passwordHash: simpleHash('admin123'),
-      role: 'admin',
+      id: generateId(), username: 'admin', displayName: 'Administrateur',
+      passwordHash: simpleHash('admin123'), role: 'admin',
       createdAt: new Date().toISOString(),
     };
     saveUsersLocal([admin]);
-    // Also save to Firebase in background
-    saveDocument(COLLECTIONS.USERS, admin).catch(() => {});
+    syncToFirestore(COLLECTIONS.USERS, admin, USERS_KEY);
   }
 }
 
@@ -95,8 +71,7 @@ export function login(username: string, password: string): User | null {
     user.lastLogin = new Date().toISOString();
     saveUsersLocal(users);
     localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({ id: user.id, username: user.username }));
-    // Sync to Firebase in background
-    saveDocument(COLLECTIONS.USERS, user).catch(() => {});
+    syncToFirestore(COLLECTIONS.USERS, user, USERS_KEY);
     return user;
   }
   return null;
@@ -142,8 +117,7 @@ export function createUser(username: string, displayName: string, password: stri
   };
   users.push(newUser);
   saveUsersLocal(users);
-  // Sync to Firebase in background
-  saveDocument(COLLECTIONS.USERS, newUser).catch(() => {});
+  syncToFirestore(COLLECTIONS.USERS, newUser, USERS_KEY);
   return { ...newUser, passwordHash: '***' };
 }
 
@@ -153,8 +127,7 @@ export function deleteUser(userId: string): boolean {
   const filtered = users.filter(u => u.id !== userId);
   if (filtered.length === users.length) return false;
   saveUsersLocal(filtered);
-  // Delete from Firebase in background
-  deleteDocument(COLLECTIONS.USERS, userId).catch(() => {});
+  deleteFromFirestore(COLLECTIONS.USERS, userId);
   return true;
 }
 
@@ -164,7 +137,7 @@ export function changePassword(userId: string, oldPassword: string, newPassword:
   if (!user || user.passwordHash !== simpleHash(oldPassword)) return false;
   user.passwordHash = simpleHash(newPassword);
   saveUsersLocal(users);
-  saveDocument(COLLECTIONS.USERS, user).catch(() => {});
+  syncToFirestore(COLLECTIONS.USERS, user, USERS_KEY);
   return true;
 }
 
@@ -173,8 +146,8 @@ export function resetPassword(userId: string, newPassword: string): boolean {
   const user = users.find(u => u.id === userId);
   if (!user) return false;
   user.passwordHash = simpleHash(newPassword);
-  saveUsersLocal(user);
-  saveDocument(COLLECTIONS.USERS, user).catch(() => {});
+  saveUsersLocal(users);
+  syncToFirestore(COLLECTIONS.USERS, user, USERS_KEY);
   return true;
 }
 
