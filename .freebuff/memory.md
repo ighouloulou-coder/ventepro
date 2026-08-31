@@ -191,6 +191,17 @@ projet de prospections/
 - [x] Support mode démo pour les tests
 - [x] Build réussi
 - [x] Push vers GitHub
+- [x] Déployé les règles Firestore (firebase deploy --only firestore:rules)
+
+### Session 6 (31 août 2026 - Fix Login CSS)
+- [x] Problème identifié : CSS global .login-input écrasait les styles
+- [x] Réécriture complète Login.tsx avec 100% styles inline
+- [x] Toggle Connexion/Inscription visible
+- [x] Champs email + mot de passe + nom tous visibles
+- [x] Google login + mode démo fonctionnels
+- [x] Build réussi
+- [x] Push vers GitHub
+- [x] Vérification déploiement Vercel
 
 ---
 
