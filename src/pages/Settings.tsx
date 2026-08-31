@@ -213,6 +213,11 @@ const Settings: React.FC = () => {
         </form>
       </div>
 
+      {/* User Management */}
+      <div style={{ marginTop: 30 }}>
+        <UserManagement />
+      </div>
+
       {/* Info */}
       <div style={{
         background: '#fffbeb',
@@ -221,6 +226,7 @@ const Settings: React.FC = () => {
         padding: 16,
         fontSize: '0.85rem',
         color: '#92400e',
+        marginTop: 24,
       }}>
         <strong>⚠️ Important :</strong> Quand vous changez le code, tous les appareils connectés devront utiliser le nouveau code au prochain rechargement de la page.
       </div>
