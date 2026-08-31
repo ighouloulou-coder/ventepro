@@ -5,11 +5,13 @@ import { initTheme, toggleTheme } from '../services/theme';
 import { getCurrentUser, logout } from '../services/authService';
 import DemoBanner from './DemoBanner';
 import Chat from './Chat';
+import GlobalSearch from './GlobalSearch';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -17,6 +19,19 @@ const Layout: React.FC = () => {
     initTheme();
     setIsDark(document.documentElement.getAttribute('data-theme') === 'dark');
     setUser(getCurrentUser());
+    
+    // Keyboard shortcut: Ctrl+K for search
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+      if (e.key === 'Escape') {
+        setSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleLogout = async () => {
@@ -244,9 +259,39 @@ const Layout: React.FC = () => {
       {/* Main Content */}
       <DemoBanner />
       <main className="main-content-3d">
+        {/* Search Button (Desktop) */}
+        <motion.button
+          onClick={() => setSearchOpen(true)}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            background: 'var(--primary)',
+            color: 'white',
+            border: 'none',
+            fontSize: '1.3rem',
+            cursor: 'pointer',
+            boxShadow: '0 10px 30px -5px rgba(59, 130, 246, 0.5)',
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          title="Recherche (Ctrl+K)"
+        >
+          🔍
+        </motion.button>
         <Outlet />
         <Chat />
       </main>
+
+      {/* Global Search */}
+      <GlobalSearch isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
     </div>
   );
 };
