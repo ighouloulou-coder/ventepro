@@ -226,27 +226,41 @@ projet de prospections/
 
 ---
 
+## ✅ Tâches Accomplies (Résumé)
+
+| # | Tâche | Session | Statut |
+|---|-------|---------|--------|
+| 1 | Sync Firebase complète (17 collections) | S1 | ✅ |
+| 2 | Système mémoire `.freebuff/` | S2 | ✅ |
+| 3 | Gestion utilisateurs dans Settings | S3 | ✅ |
+| 4 | Design & PWA (Toast, Skeleton, EmptyState) | S4 | ✅ |
+| 5 | Sécurité Firebase Auth | S5 | ✅ |
+| 6 | Fix Login CSS (v1 + v2) | S6-S7 | ✅ |
+| 7 | Déploiement Vercel CLI + GitHub auto-deploy | S8 | ✅ |
+| 8 | Recherche globale (Ctrl+K, SearchBar, FilterBar, GlobalSearch) | S8 | ✅ |
+| 9 | Tests unitaires (Vitest) | S8 | ✅ |
+| 10 | Service i18n multi-langue (FR/EN, 100+ clés) | S8 | ✅ |
+| 11 | Service email (SendGrid) déjà complet | S8 | ✅ |
+| 12 | Responsive mobile déjà couvert | S8 | ✅ |
+
 ## 🚀 Prochaines Étapes
 
 ### Priorité Haute
 - [ ] Vérifier que la sync fonctionne en production
-- [ ] Tester sur mobile (responsive)
-- [ ] Ajouter des tests unitaires
-- [ ] Optimiser les performances (lazy loading, code splitting)
+- [ ] Intégrer i18n dans les composants
+- [ ] Optimiser les performances (code splitting)
 
 ### Priorité Moyenne
 - [ ] Ajouter export PDF pour devis
 - [ ] Améliorer le dashboard avec plus de graphiques
-- [ ] Ajouter des filtres avancés sur les listes
-- [ ] Implémenter la recherche globale
 - [ ] Ajouter des notifications push
+- [ ] Intégration Telegram pour notifications
 
 ### Priorité Basse
 - [ ] Mode hors ligne complet
-- [ ] Intégration Telegram pour notifications
 - [ ] Rapports personnalisables
 - [ ] Import/Export CSV
-- [ ] Multi-langue (FR/EN/AR)
+- [ ] Multi-langue arabe
 
 ---
 
@@ -288,10 +302,37 @@ npm run bot
 ## 📝 Notes Importantes
 
 1. **Firebase Config** : La config Firebase est hardcodée dans `firebase.ts` pour garantir le fonctionnement
-2. **Firestore Rules** : Les règles sont ouvertes (allow read/write: if true) pour faciliter le développement
+2. **Firestore Rules** : Sécurisées avec `isAuthenticated()` pour chaque collection
 3. **localStorage** : Utilisé comme cache, les données Firestore sont la source de vérité
-4. **Polling** : 30 secondes pour recharger les données
+4. **Polling** : 30 secondes pour recharger les données via `firebaseSync.ts`
 5. **Realtime** : `onSnapshot` pour les mises à jour instantanées
+6. **Login** : Fichier CSS dédié `Login.css` (pas de conflit avec `index.css`)
+7. **Vercel** : Déploiement automatique via GitHub. Commande : `npx vercel --prod`
+8. **Tests** : Vitest configuré. Commande : `npm run test`
+9. **i18n** : Service dans `src/services/i18n.ts`. Commande : `t('key')`
+10. **Recherche** : Ctrl+K ou bouton 🔍 flottant
+11. **Email** : Service SendGrid dans `src/services/emailService.ts`
+
+## 🔗 Fichiers Importants
+
+| Fichier | Rôle |
+|---------|------|
+| `src/services/firebaseSync.ts` | Sync Firebase unifié |
+| `src/services/firebase.ts` | Config Firebase + helpers |
+| `src/services/authService.ts` | Auth Firebase Auth |
+| `src/services/storage.ts` | Storage principal |
+| `src/services/supplierStorage.ts` | Storage fournisseurs |
+| `src/services/i18n.ts` | Multi-langue FR/EN |
+| `src/services/emailService.ts` | Notifications email |
+| `src/components/GlobalSearch.tsx` | Recherche globale |
+| `src/components/SearchBar.tsx` | Barre de recherche |
+| `src/components/FilterBar.tsx` | Filtres |
+| `src/components/Toast.tsx` | Notifications UI |
+| `src/components/EmptyState.tsx` | États vides |
+| `src/components/ConfirmDialog.tsx` | Dialogues confirmation |
+| `src/pages/Login.css` | Styles Login dédiés |
+| `firestore.rules` | Règles Firestore |
+| `.freebuff/memory.md` | Ce fichier mémoire |
 
 ---
 
