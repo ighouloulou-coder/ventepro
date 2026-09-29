@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import AnimatedPage from '../components/AnimatedPage';
 import FloatingShapes from '../components/FloatingShapes';
 import { productStorage } from '../services/storage';
@@ -27,6 +27,8 @@ const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [customCategory, setCustomCategory] = useState('');
   const [formData, setFormData] = useState({
@@ -37,6 +39,7 @@ const Products: React.FC = () => {
     stock: '',
     category: '',
     photo: '',
+    weightPerUnitKg: '',
   });
 
   useEffect(() => {
@@ -63,10 +66,11 @@ const Products: React.FC = () => {
         stock: product.stock.toString(),
         category: product.category,
         photo: product.photo || '',
+        weightPerUnitKg: product.weightPerUnitKg?.toString() || '',
       });
     } else {
       setEditingProduct(null);
-      setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '' });
+      setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '', weightPerUnitKg: '' });
     }
     setCustomCategory('');
     setIsModalOpen(true);
@@ -75,7 +79,7 @@ const Products: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '' });
+    setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '', weightPerUnitKg: '' });
     setCustomCategory('');
   };
 
@@ -92,6 +96,7 @@ const Products: React.FC = () => {
 
     const purchasePrice = sanitizeAmount(formData.purchasePrice);
     const salePrice = sanitizeAmount(formData.price);
+    const weightPerUnitKg = formData.weightPerUnitKg ? sanitizeAmount(formData.weightPerUnitKg) : 0;
     const margin = purchasePrice > 0 ? Math.round(((salePrice - purchasePrice) / purchasePrice) * 100) : 0;
 
     const productData: Product = {
@@ -107,6 +112,7 @@ const Products: React.FC = () => {
       sku: '',
       minStock: 5,
       photo: formData.photo,
+      weightPerUnitKg: weightPerUnitKg > 0 ? weightPerUnitKg : editingProduct?.weightPerUnitKg,
       createdAt: editingProduct?.createdAt || new Date().toISOString(),
     };
 
@@ -124,6 +130,94 @@ const Products: React.FC = () => {
     if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
       productStorage.delete(id);
       loadProducts();
+    }
+  };
+
+  // ============================================
+  // 📥 Import des produits depuis la base factures (base_produits.json)
+  // ============================================
+  const dedupKey = (name: string) => {
+    let s = (name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+    s = s.replace(/[^A-Z0-9]+/g, ' ').trim();
+    s = s.split(' ').map(w => (w.length > 3 && w.endsWith('S') ? w.slice(0, -1) : w)).join(' ');
+    return s;
+  };
+
+  const handleImportJson = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    try {
+      const base = JSON.parse(await file.text());
+      const entries = Object.entries(base) as [string, any][];
+
+      // Fusion dédoublonnée (mêmes règles que le script import-produits.mjs)
+      const merged = new Map<string, any>();
+      for (const [key, p] of entries) {
+        if (!p || p.type === 'service') continue; // frais livraison/transport exclus
+        const k = dedupKey(p.designation || key);
+        if (!k) continue;
+        const pu: number | null = p.pu_dernier ?? p.pu_moyen ?? null;
+        const ex = merged.get(k);
+        if (!ex) {
+          merged.set(k, {
+            name: p.designation, description: p.description || '',
+            price: pu, priceMin: p.pu_min ?? null, priceMax: p.pu_max ?? null,
+            weight: p.poids_unitaire_kg ?? null, date: p.derniere_vue || '',
+          });
+        } else {
+          if (pu && (p.derniere_vue || '') >= ex.date) { ex.price = pu; ex.date = p.derniere_vue || ex.date; }
+          const mins = [ex.priceMin, p.pu_min].filter((v: any) => v != null) as number[];
+          const maxs = [ex.priceMax, p.pu_max].filter((v: any) => v != null) as number[];
+          ex.priceMin = mins.length ? Math.min(...mins) : null;
+          ex.priceMax = maxs.length ? Math.max(...maxs) : null;
+          if (!ex.weight && p.poids_unitaire_kg) ex.weight = p.poids_unitaire_kg;
+          if (!ex.description && p.description) ex.description = p.description;
+        }
+      }
+
+      // Merge avec les produits existants (aucun écrasement de valeurs présentes)
+      const existants = productStorage.getAll();
+      const existantsParCle = new Map(existants.map(p => [dedupKey(p.name), p]));
+      let crees = 0, maj = 0;
+      for (const [k, p] of merged) {
+        const ex = existantsParCle.get(k);
+        if (ex) {
+          const upd: Partial<Product> = {};
+          if (!ex.price && p.price) upd.price = p.price;
+          if (p.priceMin != null && ex.priceMin == null) (upd as any).priceMin = p.priceMin;
+          if (p.priceMax != null && ex.priceMax == null) (upd as any).priceMax = p.priceMax;
+          if (p.weight && !ex.weightPerUnitKg) upd.weightPerUnitKg = p.weight;
+          if (Object.keys(upd).length) { productStorage.update(ex.id, upd); maj++; }
+        } else {
+          productStorage.create({
+            id: uuidv4(),
+            name: p.name,
+            description: p.description,
+            price: p.price ?? 0,      // PU HT facturé = prix de vente
+            purchasePrice: 0,          // prix d'achat non présent dans les factures de vente
+            margin: 0,
+            stock: 0,
+            category: '📦 Produit',
+            unit: 'pièce',
+            sku: '',
+            photo: '',
+            minStock: 5,
+            weightPerUnitKg: p.weight ?? undefined,
+            priceMin: p.priceMin ?? undefined,
+            priceMax: p.priceMax ?? undefined,
+            createdAt: new Date().toISOString(),
+          });
+          crees++;
+        }
+      }
+      loadProducts();
+      alert(`✅ Import terminé :\n• ${crees} produit(s) créé(s)\n• ${maj} produit(s) mis à jour\n• ${merged.size - crees - maj} déjà à jour\n\n(Services et doublons exclus — si tu n'es pas connecté(e), la sauvegarde cloud sera absente.)`);
+    } catch (err: any) {
+      alert('❌ Erreur import : ' + (err?.message || err));
+    } finally {
+      setImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -155,9 +249,25 @@ const Products: React.FC = () => {
       <FloatingShapes />
       <div className="page-header">
         <h2>📦 Gestion des Produits</h2>
-        <button className="btn btn-primary" onClick={() => openModal()}>
-          + Ajouter un Produit
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            style={{ display: 'none' }}
+            onChange={handleImportJson}
+          />
+          <button
+            className="btn btn-secondary"
+            disabled={importing}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {importing ? '⏳ Import en cours…' : '📥 Importer produits (JSON)'}
+          </button>
+          <button className="btn btn-primary" onClick={() => openModal()}>
+            + Ajouter un Produit
+          </button>
+        </div>
       </div>
 
       {/* Filtres par catégorie */}
@@ -199,6 +309,7 @@ const Products: React.FC = () => {
             <th>Description</th>
             <th>Prix Achat</th>
             <th>Prix Vente</th>
+            <th>Poids unitaire</th>
             <th>Marge</th>
             <th>Stock</th>
             <th>Catégorie</th>
@@ -208,7 +319,7 @@ const Products: React.FC = () => {
         <tbody>
           {filteredProducts.length === 0 ? (
             <tr>
-              <td colSpan={8} className="empty-state">Aucun produit trouvé</td>
+              <td colSpan={9} className="empty-state">Aucun produit trouvé</td>
             </tr>
           ) : (
             filteredProducts.map(product => (
@@ -235,6 +346,17 @@ const Products: React.FC = () => {
                 <td>{product.description}</td>
                 <td style={{ color: 'var(--gray-500)' }}>{formatCurrency(product.purchasePrice || 0)}</td>
                 <td><strong>{formatCurrency(product.price)}</strong></td>
+                <td>
+                  {product.weightPerUnitKg ? (
+                    <span style={{ fontSize: '0.8rem', color: 'var(--gray-600)' }}>
+                      {product.weightPerUnitKg < 1
+                        ? `${Math.round(product.weightPerUnitKg * 1000)} g`
+                        : `${product.weightPerUnitKg.toFixed(3).replace('.', ',')} kg`}
+                    </span>
+                  ) : (
+                    <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
+                  )}
+                </td>
                 <td>
                   {product.purchasePrice > 0 ? (
                     <span style={{
@@ -324,6 +446,20 @@ const Products: React.FC = () => {
                     value={formData.price}
                     onChange={e => setFormData({ ...formData, price: e.target.value })}
                     required
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Poids unitaire (kg)</label>
+                  <input
+                    type="number"
+                    step="0.001"
+                    min="0"
+                    placeholder="ex. 0,150 pour 150 g"
+                    value={formData.weightPerUnitKg}
+                    onChange={e => setFormData({ ...formData, weightPerUnitKg: e.target.value })}
                   />
                 </div>
               </div>

@@ -14,6 +14,9 @@ export interface Product {
   sku: string; // Code article / référence
   photo: string; // Base64 de la photo ou URL
   minStock: number; // Seuil de stock bas
+  weightPerUnitKg?: number; // Poids unitaire net en kg (douane / logistique)
+  priceMin?: number; // Plus bas PU HT facturé (MAD)
+  priceMax?: number; // Plus haut PU HT facturé (MAD)
   createdAt: string;
 }
 
