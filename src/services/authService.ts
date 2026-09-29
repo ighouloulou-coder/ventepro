@@ -108,13 +108,19 @@ export async function registerWithEmail(
 export async function logout(): Promise<void> {
   try {
     await signOut(auth);
+    console.log('✅ Déconnexion Firebase réussie');
+  } catch (error: any) {
+    // On n'échoue jamais : même si Firebase refuse, on nettoie et on sort
+    console.error('❌ Erreur déconnexion Firebase (nettoyage local quand même):', error.message);
+  } finally {
+    // Garde-fou : empêche toute reconnexion auto (restauration de session,
+    // listener onAuthStateChanged) de renvoyer vers l'app après le logout
+    sessionStorage.setItem('tradelink_logged_out', '1');
     localStorage.removeItem('tradelink_current_user');
     localStorage.removeItem('tradelink_access');
+    localStorage.removeItem('tradelink_access_time');
     localStorage.removeItem('tradelink_demo');
     console.log('✅ Déconnexion réussie');
-  } catch (error: any) {
-    console.error('❌ Erreur déconnexion:', error.message);
-    throw error;
   }
 }
 

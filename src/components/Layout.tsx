@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initTheme, toggleTheme } from '../services/theme';
-import { getCurrentUser } from '../services/authService';
+import { getCurrentUser, logout } from '../services/authService';
 import DemoBanner from './DemoBanner';
 import GlobalSearch from './GlobalSearch';
 
@@ -32,14 +32,15 @@ const Layout: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handleLogout = () => {
-    // Toujours nettoyer le localStorage d'abord
-    localStorage.removeItem('tradelink_current_user');
-    localStorage.removeItem('tradelink_access');
-    localStorage.removeItem('tradelink_demo');
-    localStorage.removeItem('tradelink_access_time');
-    // Rediriger vers login
-    window.location.href = '/login';
+  const handleLogout = async () => {
+    // Déconnexion EN LIGNE : révoque la session Firebase (signOut côté serveur)
+    // puis nettoie le localStorage — logout() n'échoue jamais (try/catch/finally)
+    try {
+      await logout();
+    } finally {
+      // Rediriger vers login dans tous les cas
+      window.location.href = '/login';
+    }
   };
 
   useEffect(() => { setSidebarOpen(false); }, [location.pathname]);

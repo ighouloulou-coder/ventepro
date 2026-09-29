@@ -72,8 +72,11 @@ const Login: React.FC = () => {
   useEffect(() => {
     initDefaultAdmins();
     // Redirect if already logged in
+    // ⚠️ Sauf juste après une déconnexion : on ne renvoie PAS vers l'app,
+    // même si une session Firebase persiste encore dans le navigateur.
+    const loggedOut = sessionStorage.getItem('tradelink_logged_out') === '1';
     const saved = localStorage.getItem('tradelink_current_user');
-    if (saved) {
+    if (saved && !loggedOut) {
       window.location.href = '/';
     }
   }, []);
@@ -104,6 +107,7 @@ const Login: React.FC = () => {
       }
 
       // Save session
+      sessionStorage.removeItem('tradelink_logged_out');
       localStorage.setItem('tradelink_current_user', JSON.stringify({
         id: user.id,
         username: user.username,
@@ -123,6 +127,7 @@ const Login: React.FC = () => {
   };
 
   const handleDemo = () => {
+    sessionStorage.removeItem('tradelink_logged_out');
     localStorage.setItem('tradelink_demo', 'true');
     localStorage.setItem('tradelink_access', 'granted');
     window.location.href = '/';
