@@ -28,12 +28,26 @@ import SplashScreen from './components/SplashScreen';
 import './index.css';
 
 import { isAuthenticated as checkAuth } from './services/authService';
+import { autoImportProduits } from './services/autoImport';
+import { onAuthStateChanged, getAuth } from 'firebase/auth';
+import firebaseApp from './services/firebase';
 
 function isAuthenticated(): boolean {
   return checkAuth() || localStorage.getItem('tradelink_demo') === 'true';
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const demarre = React.useRef(false);
+  React.useEffect(() => {
+    if (demarre.current) return;
+    demarre.current = true;
+    // 🔁 Import auto des produits dès qu'une session Firebase est active
+    try {
+      onAuthStateChanged(getAuth(firebaseApp), (user) => {
+        if (user) autoImportProduits(user.uid);
+      });
+    } catch { /* Firebase indisponible : ignorer */ }
+  }, []);
   if (!isAuthenticated()) {
     return <Navigate to="/login" replace />;
   }
