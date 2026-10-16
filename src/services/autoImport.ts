@@ -32,10 +32,12 @@ interface ProduitFusionne {
 }
 
 // ============================================
-// 📦 Fusion dédoublonnée de la base embarquée
+// 📦 Fusion dédoublonnée de la base embarquée (depuis les 237 factures PDF)
 // ============================================
 export function fusionnerBase(): Map<string, ProduitFusionne> {
   const merged = new Map<string, ProduitFusionne>();
+  
+  // Produits de la base embarquée (depuis les 237 factures PDF)
   for (const [key, p] of Object.entries(BASE_PRODUITS) as [string, any][]) {
     if (!p || p.type === 'service') continue; // frais livraison/transport exclus
     const k = dedupKey(p.designation || key);
@@ -59,6 +61,42 @@ export function fusionnerBase(): Map<string, ProduitFusionne> {
       if (!ex.description && p.description) ex.description = p.description;
     }
   }
+  
+  return merged;
+}
+
+// ============================================
+// 📦 Fusion dédoublonnée des produits Excel
+// ============================================
+export async function fusionnerBaseExcel(): Promise<Map<string, ProduitFusionne>> {
+  // Lecture du fichier JSON des produits Excel
+  const res = await fetch('/base_produits_excel.json', { cache: 'no-store' });
+  if (!res.ok) {
+    console.warn('⚠️ [AUTO-IMPORT] Impossible de charger base_produits_excel.json');
+    return new Map();
+  }
+  const baseExcel = await res.json();
+  
+  const merged = new Map<string, ProduitFusionne>();
+  
+  for (const [, p] of Object.entries(baseExcel) as [string, any][]) {
+    if (!p || !p.designation) continue;
+    const k = dedupKey(p.designation);
+    if (!k) continue;
+    const poid = p.poids_unitaire_kg ?? null;
+    const ex = merged.get(k);
+    if (!ex) {
+      merged.set(k, {
+        name: p.designation, description: '',
+        price: null, priceMin: null, priceMax: null,
+        weight: poid, date: '',
+      });
+    } else {
+      // Si ce produit n'a pas encore de poids, ajoute-le depuis Excel
+      if (!ex.weight && poid) ex.weight = poid;
+    }
+  }
+  
   return merged;
 }
 
@@ -73,7 +111,8 @@ export async function autoImportProduits(_uid?: string): Promise<void> {
   try {
     if (localStorage.getItem(FLAG) === '1') return; // déjà importé ici
 
-    const produits = fusionnerBase();
+    // Fusionne la base embarquée + les produits Excel
+    const produits = await fusionnerBaseExcel();
     console.log(`📥 [AUTO-IMPORT] ${produits.size} produits uniques à synchroniser…`);
 
     // Produits déjà dans Firestore (n'importe lequel utilisateur les voit)
@@ -154,7 +193,7 @@ export async function autoImportProduits(_uid?: string): Promise<void> {
 // ============================================
 export async function verifierImport(): Promise<{ total: number; importes: number }> {
   const snap = await getDocs(collection(db, COLLECTION));
-  const produits = fusionnerBase();
+  const produits = await fusionnerBaseExcel();
   const dansCloud = new Set(snap.docs.map(d => dedupKey((d.data() as Product)?.name || '')));
   let importes = 0;
   produits.forEach((_, k) => { if (dansCloud.has(k)) importes++; });

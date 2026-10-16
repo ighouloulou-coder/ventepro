@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Invoice } from '../types';
+import { Invoice, DeliveryNote } from '../types';
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('fr-FR', {
@@ -128,6 +128,103 @@ export const exportInvoiceToPDF = (invoice: Invoice) => {
 
   // Sauvegarder
   doc.save(`facture-${invoice.id.slice(0, 8)}.pdf`);
+};
+
+export const exportDeliveryToPDF = (delivery: DeliveryNote) => {
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
+
+  // En-tête
+  doc.setFontSize(20);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(37, 99, 235);
+  doc.text('BON DE LIVRAISON', 14, 25);
+
+  // Informations du bon
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(100, 100, 100);
+
+  doc.text(`Bon #: ${delivery.id.slice(0, 8).toUpperCase()}`, 14, 35);
+  doc.text(`Client: ${delivery.clientName}`, 14, 42);
+  doc.text(`Date: ${formatDate(delivery.deliveryDate)}`, 14, 49);
+  doc.text(`Statut: ${delivery.status.replace('_', ' ')}`, 14, 56);
+
+  // Ligne de séparation
+  doc.setDrawColor(229, 231, 235);
+  doc.setLineWidth(0.5);
+  doc.line(14, 62, pageWidth - 14, 62);
+
+  // Tableau des produits
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(31, 41, 55);
+  doc.text('Articles', 14, 72);
+
+  const tableData = delivery.items.map(item => [
+    item.productName,
+    item.quantity.toString(),
+    formatCurrency(item.delivered > 0 ? item.delivered : item.quantity), // qté livrée ou totale
+    item.unit,
+  ]);
+
+  autoTable(doc, {
+    startY: 72,
+    head: [['Produit', 'Qté', 'Qté livrée', 'Unité']],
+    body: tableData,
+    theme: 'grid',
+    headStyles: {
+      fillColor: [37, 99, 235],
+      textColor: 255,
+      fontStyle: 'bold',
+    },
+    alternateRowStyles: {
+      fillColor: [249, 250, 251],
+    },
+    styles: {
+      fontSize: 8,
+      cellPadding: 4,
+    },
+  });
+
+  // Totaux
+  const totalExpected = delivery.items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalDelivered = delivery.items.reduce((sum, item) => sum + item.delivered, 0);
+  const finalY = (doc as jsPDF & { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 10;
+
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(107, 114, 128);
+
+  doc.text('Total attendu:', pageWidth - 70, finalY);
+  doc.text(String(totalExpected), pageWidth - 20, finalY, { align: 'right' });
+
+  doc.text('Total livré:', pageWidth - 70, finalY + 8);
+  doc.text(String(totalDelivered), pageWidth - 20, finalY + 8, { align: 'right' });
+
+  // Ligne de séparation totaux
+  doc.setDrawColor(229, 231, 235);
+  doc.line(pageWidth - 80, finalY + 12, pageWidth - 14, finalY + 12);
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(37, 99, 235);
+  doc.text('Chauffeur:', 14, finalY + 20);
+  doc.text(delivery.driverName || '-', pageWidth - 20, finalY + 20, { align: 'right' });
+
+  // Pied de page
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(156, 163, 175);
+  doc.text(
+    'Généré par TRADE LINK INTERNATIONALE - Application de Gestion des Ventes',
+    pageWidth / 2,
+    doc.internal.pageSize.getHeight() - 10,
+    { align: 'center' }
+  );
+
+  // Sauvegarder
+  doc.save(`bon-livraison-${delivery.id.slice(0, 8)}.pdf`);
 };
 
 export const exportAllInvoicesToPDF = (invoices: Invoice[]) => {

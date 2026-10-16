@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import AnimatedPage from '../components/AnimatedPage';
 import FloatingShapes from '../components/FloatingShapes';
 import { deliveryStorage, orderStorage, clientStorage, productStorage, invoiceStorage } from '../services/storage';
+import { exportDeliveryToPDF } from '../services/pdfExport';
 import { useSyncReload } from '../hooks/useSyncReload';
 import { DeliveryNote, DeliveryItem, Order, Invoice, InvoiceItem } from '../types';
 import { sanitizeInput } from '../services/sanitize';
@@ -136,35 +137,40 @@ const Deliveries: React.FC = () => {
       return;
     }
 
-    // Agréger les quantités livrées par produit
-    const itemsMap = new Map<string, InvoiceItem>();
-    let prixManquants = 0;
-    for (const d of list) {
-      for (const it of d.items) {
-        const qty = it.delivered > 0 ? it.delivered : it.quantity;
-        if (qty <= 0) continue;
-        const product = productStorage.getById(it.productId);
-        const unitPrice = product?.price ?? 0;
-        if (unitPrice === 0) prixManquants++;
-        const key = it.productId || it.productName;
-        const existing = itemsMap.get(key);
-        if (existing) {
-          existing.quantity += qty;
-          existing.total = existing.quantity * existing.unitPrice;
-        } else {
-          itemsMap.set(key, {
-            productId: it.productId,
-            productName: it.productName,
-            quantity: qty,
-            unitPrice,
-            total: qty * unitPrice,
-            unit: it.unit || 'pièce',
-          });
-        }
-      }
+// Agréger les quantités livrées par produit
+// Gestion des prix éditables par ligne
+const priceEdits = new Map<string, number>(); // productId -> prix édité par l'utilisateur
+const itemsMap = new Map<string, { item: InvoiceItem; basePrice: number }>();
+let prixManquants = 0;
+for (const d of list) {
+  for (const it of d.items) {
+    const qty = it.delivered > 0 ? it.delivered : it.quantity;
+    if (qty <= 0) continue;
+    const product = productStorage.getById(it.productId);
+    // Utiliser le prix édité si fourni, sinon le prix produit
+    const effectivePrice = priceEdits.get(it.productId) ?? (product?.price ?? 0);
+    if (effectivePrice === 0) prixManquants++;
+    const key = it.productId || it.productName;
+    const existing = itemsMap.get(key);
+    if (existing) {
+      existing.item.quantity += qty;
+      existing.item.total = existing.item.quantity * existing.item.unitPrice;
+    } else {
+      itemsMap.set(key, {
+        item: {
+          productId: it.productId,
+          productName: it.productName,
+          quantity: qty,
+          unitPrice: effectivePrice,
+          total: qty * effectivePrice,
+          unit: it.unit || 'pièce',
+        },
+        basePrice: product?.price ?? 0
+      });
     }
-
-    const items = [...itemsMap.values()];
+  }
+}
+const items = Array.from(itemsMap.values()).map(entry => entry.item);
     if (items.length === 0) {
       alert('❌ Aucune quantité livrée à facturer sur ces BL.');
       return;
@@ -325,6 +331,11 @@ const Deliveries: React.FC = () => {
           {selectedIds.length > 0 && (
             <button className="btn btn-success" onClick={() => transferToInvoice(selectedIds)}>
               🧾 Transférer {selectedIds.length} BL → Facture
+            </button>
+          )}
+          {selectedDelivery && !selectedDelivery.transferredToInvoice && (
+            <button className="btn btn-info" onClick={() => exportDeliveryToPDF(selectedDelivery)}>
+              📄 PDF
             </button>
           )}
           <button className="btn btn-primary" onClick={openModal}>+ Nouveau Bon de Livraison</button>

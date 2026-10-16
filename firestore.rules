@@ -19,15 +19,14 @@ service cloud.firestore {
     }
     
     // ============================================
-    // 🔐 USERS - Sécurisé
+    // 🔐 USERS - Admin seulement
     // ============================================
     match /tradelink_users/{userId} {
-      // Anyone authenticated can read users (for chat, etc.)
-      allow read: if isAuthenticated();
-      // Only admins can create/update/delete users
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      // Only authenticated admin can manage users
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
     
     // ============================================
@@ -39,83 +38,83 @@ service cloud.firestore {
     }
     
     // ============================================
-    // 👥 CLIENTS - Auth requis
+    // 👥 CLIENTS - Propriétaire ou admin
     // ============================================
     match /tradelink_clients/{clientId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 🧾 INVOICES - Auth requis
+    // 🧾 INVOICES - Propriétaire ou admin
     // ============================================
     match /tradelink_invoices/{invoiceId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 📄 QUOTES - Auth requis
+    // 📄 QUOTES - Propriétaire ou admin
     // ============================================
     match /tradelink_quotes/{quoteId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 📋 ORDERS - Auth requis
+    // 📋 ORDERS - Propriétaire ou admin
     // ============================================
     match /tradelink_orders/{orderId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 🚚 DELIVERIES - Auth requis
+    // 🚚 DELIVERIES - Propriétaire ou admin
     // ============================================
     match /tradelink_deliveries/{deliveryId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 💲 PRICE TIERS - Auth requis
+    // 💲 PRICE TIERS - Propriétaire ou admin
     // ============================================
     match /tradelink_price_tiers/{tierId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 🏭 SUPPLIERS - Auth requis
+    // 🏭 SUPPLIERS - Propriétaire ou admin
     // ============================================
     match /tradelink_suppliers/{supplierId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 📋 SUPPLIER ORDERS - Auth requis
+    // 📋 SUPPLIER ORDERS - Propriétaire ou admin
     // ============================================
     match /tradelink_supplier_orders/{orderId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 📄 SUPPLIER INVOICES - Auth requis
+    // 📄 SUPPLIER INVOICES - Propriétaire ou admin
     // ============================================
     match /tradelink_supplier_invoices/{invoiceId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
-    // 🚚 SUPPLIER DELIVERIES - Auth requis
+    // 🚚 SUPPLIER DELIVERIES - Propriétaire ou admin
     // ============================================
     match /tradelink_supplier_deliveries/{deliveryId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isOwnerOrAdmin(request.auth.uid);
     }
     
     // ============================================
@@ -148,7 +147,7 @@ service cloud.firestore {
     }
     
     // ============================================
-    // 📝 ACTIVITY LOGS - Auth requis
+    // 📝 ACTIVITY LOGS - Lectures uniquement
     // ============================================
     match /tradelink_activity/{activityId} {
       allow read: if isAuthenticated();
@@ -157,11 +156,11 @@ service cloud.firestore {
     }
     
     // ============================================
-    // 💾 BACKUPS - Auth requis
+    // 💾 BACKUPS - Admin seulement
     // ============================================
     match /tradelink_backups/{backupId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isAdmin();
     }
   }
 }
