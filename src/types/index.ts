@@ -160,6 +160,7 @@ export interface DeliveryNote {
   signatureReceived: boolean;
   notes: string;
   createdAt: string;
+  transferredToInvoice?: string; // id de la facture créée via le transfert BL → facture
 }
 
 // ============================================
