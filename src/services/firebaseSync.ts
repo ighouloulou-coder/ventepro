@@ -2,6 +2,7 @@
 // 🔥 FIREBASE SYNC - Service unifié pour TOUS les data
 // ============================================
 import { db, loadCollection, saveDocument, deleteDocument, COLLECTIONS } from './firebase';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { collection, onSnapshot } from 'firebase/firestore';
 
 // ============================================
@@ -67,6 +68,13 @@ async function loadCollectionFromFirestore(colName: string, storageKey: string):
     return false;
   }
   
+  // ⛔ Pas de lecture Firestore sans session Firebase : évite tout le spam
+  // « Missing or insufficient permissions » et les requêtes qui échouent en boucle.
+  const auth = getAuth();
+  if (!auth.currentUser) {
+    return false;
+  }
+  
   try {
     const data = await loadCollection<any>(colName);
     saveToStorage(storageKey, data);
@@ -91,6 +99,11 @@ export async function syncToFirestore<T extends { id: string }>(
     return;
   }
   
+  // ⛔ Pas d'écriture Firestore sans session Firebase (sinon permissions en boucle)
+  if (!getAuth().currentUser) {
+    return;
+  }
+  
   try {
     await saveDocument(collectionName, data);
     console.log(`✅ [SAVE] ${collectionName}/${data.id} sauvegardé dans Firestore`);
@@ -104,6 +117,7 @@ export async function deleteFromFirestore(
   id: string
 ): Promise<void> {
   if (!db) return;
+  if (!getAuth().currentUser) return;
   
   try {
     await deleteDocument(collectionName, id);
@@ -196,27 +210,47 @@ export function stopRealtimeSync(): void {
 }
 
 // ============================================
-// 🚀 INITIALISATION AU CHARGEMENT DU MODULE
+// 🚀 INITIALISATION PILOTÉE PAR L'ÉTAT D'AUTHENTIFICATION
 // ============================================
+// Avant : le module chargeait TOUT + un listener temps réel + un polling 30 s
+// dès l'import, même déconnecté → pluie d'erreurs « insufficient permissions »
+// et impression que « la page bug » (notamment après une déconnexion).
+// Désormais : tout démarre UNIQUEMENT quand une session Firebase existe,
+// et tout s'arrête proprement à la déconnexion (logout).
+let pollingTimer: ReturnType<typeof setInterval> | null = null;
+
+function demarrerSyncFirebase(): void {
+  if (pollingTimer) return; // déjà en route
+  console.log('🔄 [SYNC] Session Firebase active → démarrage de la synchro');
+  void loadAllCollections();
+  pollingTimer = setInterval(pollAllCollections, 30000);
+  startRealtimeSync();
+}
+
+function arreterSyncFirebase(): void {
+  if (pollingTimer) {
+    clearInterval(pollingTimer);
+    pollingTimer = null;
+    stopRealtimeSync();
+    console.log('⏹️ [SYNC] Session Firebase absente → synchro stoppée');
+  }
+}
+
 (async () => {
-  console.log('🚀 ========================================');
-  console.log('🔥 FIREBASE SYNC - Initialisation complète');
-  console.log('🚀 ========================================');
   console.log('🔥 Firebase db:', db ? 'OK' : 'NULL !');
   
-  // Chargement initial de toutes les collections
-  await loadAllCollections();
-  
-  // Polling toutes les 30 secondes
-  setInterval(pollAllCollections, 30000);
-  console.log('⏰ Polling démarré (30s) pour TOUTES les collections');
-  
-  // Démarrer la synchronisation temps réel
-  startRealtimeSync();
-  
-  console.log('🚀 ========================================');
-  console.log('✅ FIREBASE SYNC - Prêt !');
-  console.log('🚀 ========================================');
+  try {
+    const authModule = getAuth();
+    onAuthStateChanged(authModule, (user) => {
+      if (user) {
+        demarrerSyncFirebase();
+      } else {
+        arreterSyncFirebase();
+      }
+    });
+  } catch (e: any) {
+    console.error('❌ [SYNC] Firebase Auth indisponible :', e?.message || e);
+  }
 })();
 
 // ============================================

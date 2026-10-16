@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../services/authService';
 import './Login.css';
 
 // ============================================
@@ -33,6 +35,30 @@ function getUsers(): StoredUser[] {
     if (!data) return [];
     return JSON.parse(data);
   } catch { return []; }
+}
+
+// 🔑 Comptes Firebase correspondants (créés une fois via scripts/create-firebase-users.mjs).
+// Le mot de passe Firebase = mot de passe local + suffixe (Firebase exige ≥ 6 caractères).
+const FIREBASE_EMAILS: Record<string, string> = {
+  ismail: 'ismail@tradelink.app',
+  houssam: 'houssam@tradelink.app',
+};
+const FIREBASE_PWD_SUFFIX = 'TL!26';
+
+// 🔥 Ouvre une session Firebase Auth pour débloquer Firestore.
+// Best effort : en cas d'échec (offline, Firebase KO), on continue en mode local.
+async function connecterFirebase(username: string, password: string): Promise<void> {
+  const email = FIREBASE_EMAILS[username.toLowerCase()];
+  if (!email) return;
+  try {
+    await Promise.race([
+      signInWithEmailAndPassword(auth, email, password + FIREBASE_PWD_SUFFIX),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000)),
+    ]);
+    console.log('🔥 Session Firebase ouverte pour', email);
+  } catch (e: any) {
+    console.warn('⚠️ Session Firebase non ouverte (mode local) :', e?.code || e?.message || e);
+  }
 }
 
 function initDefaultAdmins(): void {
@@ -105,6 +131,9 @@ const Login: React.FC = () => {
         setLoading(false);
         return;
       }
+
+      // Open the Firebase session (Firestore) BEFORE saving the local session
+      await connecterFirebase(username, password);
 
       // Save session
       sessionStorage.removeItem('tradelink_logged_out');

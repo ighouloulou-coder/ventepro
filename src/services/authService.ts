@@ -16,6 +16,7 @@ import {
   setPersistence
 } from 'firebase/auth';
 import app from './firebase';
+import { stopRealtimeSync } from './firebaseSync';
 
 // Initialiser Firebase Auth
 const auth = getAuth(app);
@@ -107,6 +108,8 @@ export async function registerWithEmail(
 // ============================================
 export async function logout(): Promise<void> {
   try {
+    // ⏹️ Stoppe listeners + polling Firestore AVANT la révocation de la session
+    try { stopRealtimeSync(); } catch { /* noop */ }
     await signOut(auth);
     console.log('✅ Déconnexion Firebase réussie');
   } catch (error: any) {

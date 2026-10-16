@@ -11,6 +11,7 @@ const Layout: React.FC = () => {
   const [isDark, setIsDark] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -33,6 +34,8 @@ const Layout: React.FC = () => {
   }, []);
 
   const handleLogout = async () => {
+    if (loggingOut) return; // 🔒 évite un double-clic
+    setLoggingOut(true);
     // Déconnexion EN LIGNE : révoque la session Firebase (signOut côté serveur)
     // puis nettoie le localStorage — logout() n'échoue jamais (try/catch/finally)
     try {
@@ -224,8 +227,9 @@ const Layout: React.FC = () => {
           )}
           <motion.button
             onClick={handleLogout}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            disabled={loggingOut}
+            whileHover={{ scale: loggingOut ? 1 : 1.02 }}
+            whileTap={{ scale: loggingOut ? 1 : 0.98 }}
             style={{
               width: '100%',
               padding: '10px 16px',
@@ -235,14 +239,15 @@ const Layout: React.FC = () => {
               borderRadius: 10,
               fontSize: '0.85rem',
               fontWeight: 600,
-              cursor: 'pointer',
+              cursor: loggingOut ? 'wait' : 'pointer',
+              opacity: loggingOut ? 0.8 : 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
             }}
           >
-            🚪 Déconnexion
+            {loggingOut ? '⏳ Déconnexion…' : '🚪 Déconnexion'}
           </motion.button>
         </div>
 
