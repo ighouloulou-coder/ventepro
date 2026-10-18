@@ -164,7 +164,7 @@ const Dashboard: React.FC = () => {
                 </motion.button>
                 <motion.button
                   className="btn btn-small btn-danger btn-3d"
-                  onClick={() => { localStorage.removeItem('tradelink_access'); window.location.href = '/login'; }}
+                  onClick={() => { localStorage.removeItem('tradelink_access'); localStorage.removeItem('tradelink_current_user'); localStorage.removeItem('tradelink_demo'); sessionStorage.setItem('tradelink_logged_out', '1'); window.location.href = '/login'; }}
                   style={{ fontSize: '0.8rem', padding: '10px 12px' }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
