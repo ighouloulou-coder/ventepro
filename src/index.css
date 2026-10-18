@@ -2574,3 +2574,120 @@ html { scroll-behavior: smooth; }
 .login-button-demo {
   font-size: 0.9rem !important;
 }
+/* ============================================
+   Produits : tableau -> cartes sur mobile
+   ============================================ */
+@media (max-width: 768px) {
+  .products-table thead {
+    display: none;
+  }
+  .products-table,
+  .products-table tbody,
+  .products-table tr,
+  .products-table td {
+    display: block;
+    width: 100%;
+  }
+  .products-table {
+    min-width: 0;
+    background: transparent;
+  }
+  .products-table tr {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+  }
+  .products-table td {
+    border: none;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.9rem;
+  }
+  .products-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+  }
+  .products-table td[data-label="Produit"]::before,
+  .products-table td[data-label="Actions"]::before {
+    display: none;
+  }
+  .products-table td[data-label="Produit"] {
+    justify-content: flex-start;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 6px;
+  }
+  .products-table td[data-label="Actions"] {
+    justify-content: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 6px;
+  }
+  .products-table td[data-label="Actions"] .actions {
+    display: flex;
+    gap: 8px;
+  }
+  .products-table .empty-state {
+    text-align: center;
+    padding: 24px;
+  }
+  .products-table .empty-state::before {
+    display: none;
+  }
+
+  /* En-tête de page Produits : empiler sur mobile */
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .page-header > div {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .page-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Filtres catégories : défilement horizontal */
+  .category-filters {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+    gap: 8px;
+  }
+  .category-filters .filter-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+/* ============================================
+   Barre latérale masquable (bouton ☰ / ✕)
+   ============================================ */
+.app-layout-3d.sidebar-collapsed .main-content-3d {
+  margin-left: 0;
+}
+.app-layout-3d.sidebar-collapsed .sidebar-3d {
+  pointer-events: none;
+}
+/* L'overlay assombrissant ne sert que sur mobile */
+@media (min-width: 769px) {
+  .sidebar-overlay-3d.active {
+    display: none;
+  }
+}
