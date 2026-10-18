@@ -23,8 +23,7 @@ export default defineConfig({
           // jsPDF + html2canvas — PDF export, loaded on demand
           'vendor-pdf': ['jspdf', 'jspdf-autotable', 'html2canvas'],
 
-          // Three.js — 3D, only loaded on specific pages
-          'vendor-three': ['three', '@react-three/fiber', '@react-three/drei'],
+
         },
       },
     },
