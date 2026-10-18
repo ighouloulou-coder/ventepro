@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../services/authService';
+import { auth, isAuthenticated } from '../services/authService';
 import './Login.css';
 
 // ============================================
@@ -97,12 +97,11 @@ const Login: React.FC = () => {
 
   useEffect(() => {
     initDefaultAdmins();
-    // Redirect if already logged in
+    // Redirect if already logged in (vérification complète, pas juste la présence d'un user)
     // ⚠️ Sauf juste après une déconnexion : on ne renvoie PAS vers l'app,
     // même si une session Firebase persiste encore dans le navigateur.
     const loggedOut = sessionStorage.getItem('tradelink_logged_out') === '1';
-    const saved = localStorage.getItem('tradelink_current_user');
-    if (saved && !loggedOut) {
+    if (!loggedOut && isAuthenticated()) {
       window.location.href = '/';
     }
   }, []);
