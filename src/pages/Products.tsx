@@ -30,6 +30,7 @@ const Products: React.FC = () => {
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [quickFilter, setQuickFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [customCategory, setCustomCategory] = useState('');
   const [formData, setFormData] = useState({
@@ -264,9 +265,12 @@ const Products: React.FC = () => {
   const normTxt = (s: string) =>
     (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-  // Filtrer les produits (catégorie + recherche texte)
+  // Filtrer les produits (catégorie + filtres rapides + recherche texte)
   const filteredProducts = products.filter(p => {
     if (selectedCategory !== 'all' && p.category !== selectedCategory) return false;
+    if (quickFilter === 'noCode' && p.codeDouanier) return false;
+    if (quickFilter === 'noWeight' && p.weightPerUnitKg) return false;
+    if (quickFilter === 'lowStock' && p.stock >= 5) return false;
     const q = normTxt(searchQuery).trim();
     if (!q) return true;
     const hay = normTxt(p.name + ' ' + (p.description || '') + ' ' + (p.sku || '') + ' ' + (p.codeDouanier || ''));
@@ -345,6 +349,37 @@ const Products: React.FC = () => {
             {cat} ({products.filter(p => p.category === cat).length})
           </button>
         ))}
+      </div>
+
+      {/* Filtres rapides */}
+      <div className="category-filters" style={{ marginTop: 8 }}>
+        <button
+          className={`filter-btn ${quickFilter === 'all' ? 'active' : ''}`}
+          onClick={() => setQuickFilter('all')}
+        >
+          Tous
+        </button>
+        <button
+          className={`filter-btn ${quickFilter === 'noCode' ? 'active' : ''}`}
+          onClick={() => setQuickFilter(quickFilter === 'noCode' ? 'all' : 'noCode')}
+          title="Produits sans code douanier"
+        >
+          🏷️ Sans code ({products.filter(p => !p.codeDouanier).length})
+        </button>
+        <button
+          className={`filter-btn ${quickFilter === 'noWeight' ? 'active' : ''}`}
+          onClick={() => setQuickFilter(quickFilter === 'noWeight' ? 'all' : 'noWeight')}
+          title="Produits sans poids unitaire"
+        >
+          ⚖️ Sans poids ({products.filter(p => !p.weightPerUnitKg).length})
+        </button>
+        <button
+          className={`filter-btn ${quickFilter === 'lowStock' ? 'active' : ''}`}
+          onClick={() => setQuickFilter(quickFilter === 'lowStock' ? 'all' : 'lowStock')}
+          title="Produits en stock bas (moins de 5)"
+        >
+          ⚠️ Stock bas ({products.filter(p => p.stock < 5).length})
+        </button>
       </div>
 
       {/* Statistiques par catégorie */}
