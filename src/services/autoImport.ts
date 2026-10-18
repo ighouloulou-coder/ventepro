@@ -25,6 +25,41 @@ export function dedupKey(name: string): string {
   return s;
 }
 
+// JJ/MM/AAAA (ou AAAA-MM-JJ) -> AAAA-MM-JJ : comparaison de dates fiable.
+// Comparer "30/07/2026" >= "02/09/2026" en texte donne un résultat FAUX.
+export function dateISO(d: any): string {
+  const s = String(d || '').trim();
+  let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+  return '';
+}
+
+// Firestore refuse les champs "undefined" (l'écriture échoue en silence).
+// On retire les clés undefined de l'objet avant écriture.
+export function sansUndefined<T extends object>(o: T): T {
+  const r: any = {};
+  for (const [k, v] of Object.entries(o)) if (v !== undefined) r[k] = v;
+  return r as T;
+}
+
+// ID Firestore déterministe et sans collision (hash de la clé normalisée complète).
+// L'ancien système ('imp' + 16 premiers caractères) écrasait des produits différents
+// (ex: "CLE MIXE ACIER CHROME 20 SAM" et "... 19 SAM" -> même ID). 9 collisions réelles
+// constatées sur la base du 17/10/2026.
+export function idProduit(cleNormalisee: string): string {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < cleNormalisee.length; i++) {
+    const ch = cleNormalisee.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 'imp' + (h2 >>> 0).toString(36) + (h1 >>> 0).toString(36);
+}
+
 interface ProduitFusionne {
   name: string; description: string; price: number | null;
   priceMin: number | null; priceMax: number | null;
@@ -32,12 +67,10 @@ interface ProduitFusionne {
 }
 
 // ============================================
-// 📦 Fusion dédoublonnée de la base embarquée (depuis les 237 factures PDF)
+// 📦 Fusion dédoublonnée de la base embarquée
 // ============================================
 export function fusionnerBase(): Map<string, ProduitFusionne> {
   const merged = new Map<string, ProduitFusionne>();
-  
-  // Produits de la base embarquée (depuis les 237 factures PDF)
   for (const [key, p] of Object.entries(BASE_PRODUITS) as [string, any][]) {
     if (!p || p.type === 'service') continue; // frais livraison/transport exclus
     const k = dedupKey(p.designation || key);
@@ -49,10 +82,11 @@ export function fusionnerBase(): Map<string, ProduitFusionne> {
         name: p.designation, description: p.description || '',
         price: pu,
         priceMin: p.pu_min ?? null, priceMax: p.pu_max ?? null,
-        weight: p.poids_unitaire_kg ?? null, date: p.derniere_vue || '',
+        weight: p.poids_unitaire_kg ?? null, date: dateISO(p.derniere_vue),
       });
     } else {
-      if (pu && (p.derniere_vue || '') >= ex.date) { ex.price = pu; ex.date = p.derniere_vue || ex.date; }
+      const dISO = dateISO(p.derniere_vue);
+      if (pu && dISO >= ex.date) { ex.price = pu; ex.date = dISO || ex.date; }
       const mins = [ex.priceMin, p.pu_min].filter((v): v is number => v != null);
       const maxs = [ex.priceMax, p.pu_max].filter((v): v is number => v != null);
       ex.priceMin = mins.length ? Math.min(...mins) : null;
@@ -61,42 +95,6 @@ export function fusionnerBase(): Map<string, ProduitFusionne> {
       if (!ex.description && p.description) ex.description = p.description;
     }
   }
-  
-  return merged;
-}
-
-// ============================================
-// 📦 Fusion dédoublonnée des produits Excel
-// ============================================
-export async function fusionnerBaseExcel(): Promise<Map<string, ProduitFusionne>> {
-  // Lecture du fichier JSON des produits Excel
-  const res = await fetch('/base_produits_excel.json', { cache: 'no-store' });
-  if (!res.ok) {
-    console.warn('⚠️ [AUTO-IMPORT] Impossible de charger base_produits_excel.json');
-    return new Map();
-  }
-  const baseExcel = await res.json();
-  
-  const merged = new Map<string, ProduitFusionne>();
-  
-  for (const [, p] of Object.entries(baseExcel) as [string, any][]) {
-    if (!p || !p.designation) continue;
-    const k = dedupKey(p.designation);
-    if (!k) continue;
-    const poid = p.poids_unitaire_kg ?? null;
-    const ex = merged.get(k);
-    if (!ex) {
-      merged.set(k, {
-        name: p.designation, description: '',
-        price: null, priceMin: null, priceMax: null,
-        weight: poid, date: '',
-      });
-    } else {
-      // Si ce produit n'a pas encore de poids, ajoute-le depuis Excel
-      if (!ex.weight && poid) ex.weight = poid;
-    }
-  }
-  
   return merged;
 }
 
@@ -111,8 +109,7 @@ export async function autoImportProduits(_uid?: string): Promise<void> {
   try {
     if (localStorage.getItem(FLAG) === '1') return; // déjà importé ici
 
-    // Fusionne la base embarquée + les produits Excel
-    const produits = await fusionnerBaseExcel();
+    const produits = fusionnerBase();
     console.log(`📥 [AUTO-IMPORT] ${produits.size} produits uniques à synchroniser…`);
 
     // Produits déjà dans Firestore (n'importe lequel utilisateur les voit)
@@ -146,8 +143,8 @@ export async function autoImportProduits(_uid?: string): Promise<void> {
       const lot = aCreer.slice(i, i + CHUNK);
       const batch = writeBatch(db);
       for (const [k, p] of lot) {
-        const produit: Product = {
-          id: 'imp' + k.replace(/[^A-Z0-9]/g, '').slice(0, 16).padEnd(3, '0'),
+        const produit: Product = sansUndefined({
+          id: idProduit(k),
           name: p.name,
           description: p.description,
           price: p.price ?? 0,        // PU HT facturé = prix de vente
@@ -163,7 +160,7 @@ export async function autoImportProduits(_uid?: string): Promise<void> {
           priceMin: p.priceMin ?? undefined,
           priceMax: p.priceMax ?? undefined,
           createdAt: new Date().toISOString(),
-        };
+        });
         batch.set(doc(db, COLLECTION, produit.id), produit);
         crees++;
       }
@@ -193,7 +190,7 @@ export async function autoImportProduits(_uid?: string): Promise<void> {
 // ============================================
 export async function verifierImport(): Promise<{ total: number; importes: number }> {
   const snap = await getDocs(collection(db, COLLECTION));
-  const produits = await fusionnerBaseExcel();
+  const produits = fusionnerBase();
   const dansCloud = new Set(snap.docs.map(d => dedupKey((d.data() as Product)?.name || '')));
   let importes = 0;
   produits.forEach((_, k) => { if (dansCloud.has(k)) importes++; });
