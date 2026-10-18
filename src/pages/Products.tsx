@@ -31,6 +31,8 @@ const Products: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [quickFilter, setQuickFilter] = useState<string>('all');
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [searchQuery, setSearchQuery] = useState('');
   const [customCategory, setCustomCategory] = useState('');
   const [formData, setFormData] = useState({
@@ -277,6 +279,46 @@ const Products: React.FC = () => {
     return q.split(/\s+/).every(w => hay.includes(w));
   });
 
+  // Tri par colonne (clic sur l'en-tête)
+  const handleSort = (key: string) => {
+    if (sortKey === key) {
+      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
+
+  const sortVal = (p: Product, key: string): string | number => {
+    switch (key) {
+      case 'name': return (p.name || '').toLowerCase();
+      case 'purchasePrice': return p.purchasePrice || 0;
+      case 'price': return p.price || 0;
+      case 'weightPerUnitKg': return p.weightPerUnitKg || 0;
+      case 'codeDouanier': return p.codeDouanier || '';
+      case 'margin': return p.margin || 0;
+      case 'stock': return p.stock || 0;
+      case 'category': return (p.category || '').toLowerCase();
+      default: return '';
+    }
+  };
+
+  const sortedProducts = sortKey
+    ? [...filteredProducts].sort((a, b) => {
+        const va = sortVal(a, sortKey);
+        const vb = sortVal(b, sortKey);
+        const cmp = typeof va === 'number' && typeof vb === 'number'
+          ? va - vb
+          : String(va).localeCompare(String(vb), 'fr');
+        return sortDir === 'asc' ? cmp : -cmp;
+      })
+    : filteredProducts;
+
+  const sortArrow = (key: string) =>
+    sortKey !== key ? ' ↕' : sortDir === 'asc' ? ' ↑' : ' ↓';
+
+  const thStyle: React.CSSProperties = { cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap' };
+
   // Statistiques par catégorie
   const categoryStats = existingCategories.map(cat => ({
     category: cat,
@@ -398,25 +440,25 @@ const Products: React.FC = () => {
       <table className="data-table products-table">
         <thead>
           <tr>
-            <th>Nom</th>
+            <th style={thStyle} onClick={() => handleSort('name')} title="Trier par nom">Nom{sortArrow('name')}</th>
             <th>Description</th>
-            <th>Prix Achat</th>
-            <th>Prix Vente</th>
-            <th>Poids unitaire</th>
-            <th>Code douanier</th>
-            <th>Marge</th>
-            <th>Stock</th>
-            <th>Catégorie</th>
+            <th style={thStyle} onClick={() => handleSort('purchasePrice')} title="Trier par prix d'achat">Prix Achat{sortArrow('purchasePrice')}</th>
+            <th style={thStyle} onClick={() => handleSort('price')} title="Trier par prix de vente">Prix Vente{sortArrow('price')}</th>
+            <th style={thStyle} onClick={() => handleSort('weightPerUnitKg')} title="Trier par poids">Poids unitaire{sortArrow('weightPerUnitKg')}</th>
+            <th style={thStyle} onClick={() => handleSort('codeDouanier')} title="Trier par code douanier">Code douanier{sortArrow('codeDouanier')}</th>
+            <th style={thStyle} onClick={() => handleSort('margin')} title="Trier par marge">Marge{sortArrow('margin')}</th>
+            <th style={thStyle} onClick={() => handleSort('stock')} title="Trier par stock">Stock{sortArrow('stock')}</th>
+            <th style={thStyle} onClick={() => handleSort('category')} title="Trier par catégorie">Catégorie{sortArrow('category')}</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.length === 0 ? (
+          {sortedProducts.length === 0 ? (
             <tr>
               <td colSpan={10} className="empty-state">Aucun produit trouvé</td>
             </tr>
           ) : (
-            filteredProducts.map(product => (
+            sortedProducts.map(product => (
               <tr key={product.id}>
                 <td data-label="Produit">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
