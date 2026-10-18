@@ -41,6 +41,7 @@ const Products: React.FC = () => {
     category: '',
     photo: '',
     weightPerUnitKg: '',
+    codeDouanier: '',
   });
 
   useEffect(() => {
@@ -68,10 +69,11 @@ const Products: React.FC = () => {
         category: product.category,
         photo: product.photo || '',
         weightPerUnitKg: product.weightPerUnitKg?.toString() || '',
+        codeDouanier: product.codeDouanier || '',
       });
     } else {
       setEditingProduct(null);
-      setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '', weightPerUnitKg: '' });
+      setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '', weightPerUnitKg: '', codeDouanier: '' });
     }
     setCustomCategory('');
     setIsModalOpen(true);
@@ -80,7 +82,7 @@ const Products: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingProduct(null);
-    setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '', weightPerUnitKg: '' });
+    setFormData({ name: '', description: '', price: '', purchasePrice: '', stock: '', category: '', photo: '', weightPerUnitKg: '', codeDouanier: '' });
     setCustomCategory('');
   };
 
@@ -114,6 +116,7 @@ const Products: React.FC = () => {
       minStock: 5,
       photo: formData.photo,
       weightPerUnitKg: weightPerUnitKg > 0 ? weightPerUnitKg : editingProduct?.weightPerUnitKg,
+      codeDouanier: sanitizeInput(formData.codeDouanier) || editingProduct?.codeDouanier || undefined,
       createdAt: editingProduct?.createdAt || new Date().toISOString(),
     };
 
@@ -185,6 +188,7 @@ const Products: React.FC = () => {
             name: p.designation, description: p.description || '',
             price: pu, priceMin: p.pu_min ?? null, priceMax: p.pu_max ?? null,
             weight: p.poids_unitaire_kg ?? null, date: dateISO(p.derniere_vue),
+            codeDouanier: p.code_douanier || null,
           });
         } else {
           const dISO = dateISO(p.derniere_vue);
@@ -195,6 +199,7 @@ const Products: React.FC = () => {
           ex.priceMax = maxs.length ? Math.max(...maxs) : null;
           if (!ex.weight && p.poids_unitaire_kg) ex.weight = p.poids_unitaire_kg;
           if (!ex.description && p.description) ex.description = p.description;
+          if (!ex.codeDouanier && p.code_douanier) ex.codeDouanier = p.code_douanier;
         }
       }
 
@@ -210,6 +215,7 @@ const Products: React.FC = () => {
           if (p.priceMin != null && ex.priceMin == null) (upd as any).priceMin = p.priceMin;
           if (p.priceMax != null && ex.priceMax == null) (upd as any).priceMax = p.priceMax;
           if (p.weight && !ex.weightPerUnitKg) upd.weightPerUnitKg = p.weight;
+          if (p.codeDouanier && !ex.codeDouanier) upd.codeDouanier = p.codeDouanier;
           if (Object.keys(upd).length) { productStorage.update(ex.id, upd); maj++; }
         } else {
           productStorage.create(sansUndefined({
@@ -226,6 +232,7 @@ const Products: React.FC = () => {
             photo: '',
             minStock: 5,
             weightPerUnitKg: p.weight ?? undefined,
+            codeDouanier: p.codeDouanier ?? undefined,
             priceMin: p.priceMin ?? undefined,
             priceMax: p.priceMax ?? undefined,
             createdAt: new Date().toISOString(),
@@ -262,7 +269,7 @@ const Products: React.FC = () => {
     if (selectedCategory !== 'all' && p.category !== selectedCategory) return false;
     const q = normTxt(searchQuery).trim();
     if (!q) return true;
-    const hay = normTxt(p.name + ' ' + (p.description || '') + ' ' + (p.sku || ''));
+    const hay = normTxt(p.name + ' ' + (p.description || '') + ' ' + (p.sku || '') + ' ' + (p.codeDouanier || ''));
     return q.split(/\s+/).every(w => hay.includes(w));
   });
 
@@ -361,6 +368,7 @@ const Products: React.FC = () => {
             <th>Prix Achat</th>
             <th>Prix Vente</th>
             <th>Poids unitaire</th>
+            <th>Code douanier</th>
             <th>Marge</th>
             <th>Stock</th>
             <th>Catégorie</th>
@@ -370,7 +378,7 @@ const Products: React.FC = () => {
         <tbody>
           {filteredProducts.length === 0 ? (
             <tr>
-              <td colSpan={9} className="empty-state">Aucun produit trouvé</td>
+              <td colSpan={10} className="empty-state">Aucun produit trouvé</td>
             </tr>
           ) : (
             filteredProducts.map(product => (
@@ -403,6 +411,15 @@ const Products: React.FC = () => {
                       {product.weightPerUnitKg < 1
                         ? `${Math.round(product.weightPerUnitKg * 1000)} g`
                         : `${product.weightPerUnitKg.toFixed(3).replace('.', ',')} kg`}
+                    </span>
+                  ) : (
+                    <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
+                  )}
+                </td>
+                <td data-label="Code douanier">
+                  {product.codeDouanier ? (
+                    <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', color: 'var(--gray-700)' }}>
+                      {product.codeDouanier}
                     </span>
                   ) : (
                     <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
@@ -511,6 +528,15 @@ const Products: React.FC = () => {
                     placeholder="ex. 0,150 pour 150 g"
                     value={formData.weightPerUnitKg}
                     onChange={e => setFormData({ ...formData, weightPerUnitKg: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Code douanier</label>
+                  <input
+                    type="text"
+                    placeholder="ex. 7326909990"
+                    value={formData.codeDouanier}
+                    onChange={e => setFormData({ ...formData, codeDouanier: e.target.value })}
                   />
                 </div>
               </div>

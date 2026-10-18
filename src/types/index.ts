@@ -15,6 +15,7 @@ export interface Product {
   photo: string; // Base64 de la photo ou URL
   minStock: number; // Seuil de stock bas
   weightPerUnitKg?: number; // Poids unitaire net en kg (douane / logistique)
+  codeDouanier?: string; // Code douanier (nomenclature DUM / Trade Link Internationale)
   priceMin?: number; // Plus bas PU HT facturé (MAD)
   priceMax?: number; // Plus haut PU HT facturé (MAD)
   createdAt: string;
