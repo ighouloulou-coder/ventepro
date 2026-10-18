@@ -1,6 +1,7 @@
 import React from 'react';
 import UserManagement from '../components/UserManagement';
 import NotificationSettings from '../components/NotificationSettings';
+import CompanySettings from '../components/CompanySettings';
 
 const Settings: React.FC = () => {
   return (
@@ -27,6 +28,11 @@ const Settings: React.FC = () => {
           L'authentification est gérée par <strong>Firebase Authentication</strong>.<br />
           Les utilisateurs se connectent avec leur email et mot de passe.
         </div>
+      </div>
+
+      {/* Paramétrage entreprise */}
+      <div style={{ marginBottom: 30 }}>
+        <CompanySettings />
       </div>
 
       {/* User Management */}

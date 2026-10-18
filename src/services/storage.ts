@@ -1,4 +1,4 @@
-import { Product, Client, Invoice, Quote, Order, DeliveryNote, PriceTier, DashboardStats, Currency } from '../types';
+import { Product, Client, Invoice, Quote, Order, DeliveryNote, PriceTier, DashboardStats, Currency, CompanyInfo } from '../types';
 import { COLLECTIONS } from './firebase';
 import { syncToFirestore, deleteFromFirestore, getFromStorage, saveToStorage } from './firebaseSync';
 
@@ -319,4 +319,39 @@ export const getDashboardStats = (): DashboardStats => {
     totalOrdersAmount: orders.reduce((s, o) => s + o.total, 0),
     currency: 'MAD' as const,
   };
+};
+
+// ============================================
+// 🏢 Entreprise (infos société)
+// ============================================
+const COMPANY_KEY = 'tradelink_company';
+
+export const DEFAULT_COMPANY: CompanyInfo = {
+  name: 'TRADE LINK INTERNATIONALE',
+  logo: '',
+  address: 'Lots Sara Dayet Iffrah N° 13 Zohor',
+  city: 'Fès',
+  phone: '',
+  email: 'tradelinkinternationale@gmail.com',
+  ice: '003294257000084',
+  ifFiscal: '53803204',
+  rc: '76867',
+  taxePro: '13005704',
+  cnss: '',
+  website: '',
+};
+
+export const companyStorage = {
+  get: (): CompanyInfo => {
+    try {
+      const raw = localStorage.getItem(COMPANY_KEY);
+      if (raw) return { ...DEFAULT_COMPANY, ...JSON.parse(raw) };
+    } catch { /* ignore */ }
+    return { ...DEFAULT_COMPANY };
+  },
+  save: (info: CompanyInfo): void => {
+    localStorage.setItem(COMPANY_KEY, JSON.stringify(info));
+    syncToFirestore(COLLECTIONS.SETTINGS, { id: 'company', ...info }, COMPANY_KEY);
+    dispatchSyncEvent(COLLECTIONS.SETTINGS);
+  },
 };

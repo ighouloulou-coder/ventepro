@@ -22,6 +22,24 @@ export interface Product {
 }
 
 // ============================================
+// 🏢 Infos Entreprise
+// ============================================
+export interface CompanyInfo {
+  name: string; // Raison sociale
+  logo: string; // Base64 ou URL du logo
+  address: string;
+  city: string;
+  phone: string;
+  email: string;
+  ice: string; // Identifiant Commun de l'Entreprise (15 chiffres)
+  ifFiscal: string; // Identifiant Fiscal
+  rc: string; // Registre de Commerce
+  taxePro: string; // Taxe Professionnelle (ex-patente)
+  cnss: string; // CNSS
+  website: string;
+}
+
+// ============================================
 // 👥 Types Clients
 // ============================================
 export interface DeliveryAddress {
