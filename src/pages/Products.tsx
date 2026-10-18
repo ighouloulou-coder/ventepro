@@ -30,6 +30,7 @@ const Products: React.FC = () => {
   const [importing, setImporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
   const [customCategory, setCustomCategory] = useState('');
   const [formData, setFormData] = useState({
     name: '',
@@ -143,6 +144,25 @@ const Products: React.FC = () => {
     return s;
   };
 
+  // JJ/MM/AAAA (ou AAAA-MM-JJ) -> AAAA-MM-JJ : comparaison de dates fiable.
+  // Comparer "30/07/2026" >= "02/09/2026" en texte donne un résultat FAUX.
+  const dateISO = (d: any): string => {
+    const s = String(d || '').trim();
+    let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+    m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+    return '';
+  };
+
+  // Firestore refuse les champs "undefined" (erreur silencieuse -> produit perdu).
+  // On retire les clés undefined de l'objet avant création.
+  const sansUndefined = <T extends object>(o: T): T => {
+    const r: any = {};
+    for (const [k, v] of Object.entries(o)) if (v !== undefined) r[k] = v;
+    return r as T;
+  };
+
   const handleImportJson = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -153,20 +173,22 @@ const Products: React.FC = () => {
 
       // Fusion dédoublonnée (mêmes règles que le script import-produits.mjs)
       const merged = new Map<string, any>();
+      let ignores = 0;
       for (const [key, p] of entries) {
-        if (!p || p.type === 'service') continue; // frais livraison/transport exclus
+        if (!p || p.type === 'service') { ignores++; continue; } // frais livraison/transport exclus
         const k = dedupKey(p.designation || key);
-        if (!k) continue;
+        if (!k) { ignores++; continue; }
         const pu: number | null = p.pu_dernier ?? p.pu_moyen ?? null;
         const ex = merged.get(k);
         if (!ex) {
           merged.set(k, {
             name: p.designation, description: p.description || '',
             price: pu, priceMin: p.pu_min ?? null, priceMax: p.pu_max ?? null,
-            weight: p.poids_unitaire_kg ?? null, date: p.derniere_vue || '',
+            weight: p.poids_unitaire_kg ?? null, date: dateISO(p.derniere_vue),
           });
         } else {
-          if (pu && (p.derniere_vue || '') >= ex.date) { ex.price = pu; ex.date = p.derniere_vue || ex.date; }
+          const dISO = dateISO(p.derniere_vue);
+          if (pu && dISO >= ex.date) { ex.price = pu; ex.date = dISO || ex.date; }
           const mins = [ex.priceMin, p.pu_min].filter((v: any) => v != null) as number[];
           const maxs = [ex.priceMax, p.pu_max].filter((v: any) => v != null) as number[];
           ex.priceMin = mins.length ? Math.min(...mins) : null;
@@ -190,7 +212,7 @@ const Products: React.FC = () => {
           if (p.weight && !ex.weightPerUnitKg) upd.weightPerUnitKg = p.weight;
           if (Object.keys(upd).length) { productStorage.update(ex.id, upd); maj++; }
         } else {
-          productStorage.create({
+          productStorage.create(sansUndefined({
             id: uuidv4(),
             name: p.name,
             description: p.description,
@@ -207,12 +229,12 @@ const Products: React.FC = () => {
             priceMin: p.priceMin ?? undefined,
             priceMax: p.priceMax ?? undefined,
             createdAt: new Date().toISOString(),
-          });
+          }));
           crees++;
         }
       }
       loadProducts();
-      alert(`✅ Import terminé :\n• ${crees} produit(s) créé(s)\n• ${maj} produit(s) mis à jour\n• ${merged.size - crees - maj} déjà à jour\n\n(Services et doublons exclus — si tu n'es pas connecté(e), la sauvegarde cloud sera absente.)`);
+      alert(`✅ Import terminé :\n• ${crees} produit(s) créé(s)\n• ${maj} produit(s) mis à jour\n• ${merged.size - crees - maj} déjà à jour\n• ${ignores} ligne(s) ignorée(s) (services / sans nom)\n\nSi tu n'es pas connecté(e), la sauvegarde cloud sera absente.`);
     } catch (err: any) {
       alert('❌ Erreur import : ' + (err?.message || err));
     } finally {
@@ -231,10 +253,18 @@ const Products: React.FC = () => {
   // Catégories uniques existantes
   const existingCategories = [...new Set(products.map(p => p.category).filter(Boolean))];
 
-  // Filtrer les produits
-  const filteredProducts = selectedCategory === 'all'
-    ? products
-    : products.filter(p => p.category === selectedCategory);
+  // Normalisation pour recherche tolérante (accents, casse, ordre des mots)
+  const normTxt = (s: string) =>
+    (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+  // Filtrer les produits (catégorie + recherche texte)
+  const filteredProducts = products.filter(p => {
+    if (selectedCategory !== 'all' && p.category !== selectedCategory) return false;
+    const q = normTxt(searchQuery).trim();
+    if (!q) return true;
+    const hay = normTxt(p.name + ' ' + (p.description || '') + ' ' + (p.sku || ''));
+    return q.split(/\s+/).every(w => hay.includes(w));
+  });
 
   // Statistiques par catégorie
   const categoryStats = existingCategories.map(cat => ({
@@ -270,6 +300,27 @@ const Products: React.FC = () => {
         </div>
       </div>
 
+      {/* Recherche produit */}
+      <div style={{ display: 'flex', gap: 8, margin: '12px 0' }}>
+        <input
+          type="text"
+          placeholder="🔍 Chercher un produit…"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          style={{ flex: 1, padding: '10px 14px', fontSize: 16, borderRadius: 8, border: '1px solid #cbd5e1' }}
+        />
+        {searchQuery && (
+          <button className="btn btn-secondary" onClick={() => setSearchQuery('')} title="Effacer">
+            ✕
+          </button>
+        )}
+      </div>
+      {searchQuery.trim() && (
+        <div style={{ marginBottom: 8, color: '#64748b', fontSize: 14 }}>
+          {filteredProducts.length} résultat{filteredProducts.length > 1 ? 's' : ''} pour « {searchQuery.trim()} »
+        </div>
+      )}
+
       {/* Filtres par catégorie */}
       <div className="category-filters">
         <button
@@ -302,7 +353,7 @@ const Products: React.FC = () => {
         </div>
       )}
 
-      <table className="data-table">
+      <table className="data-table products-table">
         <thead>
           <tr>
             <th>Nom</th>
@@ -324,7 +375,7 @@ const Products: React.FC = () => {
           ) : (
             filteredProducts.map(product => (
               <tr key={product.id}>
-                <td>
+                <td data-label="Produit">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     {product.photo ? (
                       <img
@@ -343,10 +394,10 @@ const Products: React.FC = () => {
                     <strong>{product.name}</strong>
                   </div>
                 </td>
-                <td>{product.description}</td>
-                <td style={{ color: 'var(--gray-500)' }}>{formatCurrency(product.purchasePrice || 0)}</td>
-                <td><strong>{formatCurrency(product.price)}</strong></td>
-                <td>
+                <td data-label="Description">{product.description}</td>
+                <td data-label="Prix Achat" style={{ color: 'var(--gray-500)' }}>{formatCurrency(product.purchasePrice || 0)}</td>
+                <td data-label="Prix Vente"><strong>{formatCurrency(product.price)}</strong></td>
+                <td data-label="Poids">
                   {product.weightPerUnitKg ? (
                     <span style={{ fontSize: '0.8rem', color: 'var(--gray-600)' }}>
                       {product.weightPerUnitKg < 1
@@ -357,7 +408,7 @@ const Products: React.FC = () => {
                     <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
                   )}
                 </td>
-                <td>
+                <td data-label="Marge">
                   {product.purchasePrice > 0 ? (
                     <span style={{
                       padding: '2px 8px',
@@ -373,16 +424,16 @@ const Products: React.FC = () => {
                     <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
                   )}
                 </td>
-                <td>
+                <td data-label="Stock">
                   <span className={product.stock < 5 ? 'stock-low' : ''}>
                     {product.stock}
                     {product.stock < 5 && ' ⚠️'}
                   </span>
                 </td>
-                <td>
+                <td data-label="Catégorie">
                   <span className="category-tag">{product.category || 'Sans catégorie'}</span>
                 </td>
-                <td className="actions">
+                <td data-label="Actions" className="actions">
                   <button className="btn btn-small" onClick={() => openModal(product)}>
                     ✏️
                   </button>
