@@ -122,7 +122,14 @@ export async function autoImportProduits(_uid?: string): Promise<void> {
     console.log(`📥 [AUTO-IMPORT] ${existants.size} produit(s) déjà dans Firestore`);
 
     const batchUpdates: { id: string; upd: Partial<Product> }[] = [];
-    const aCreer = [...produits.entries()].filter(([k, p]) => {
+    // 🛡️ Sécurité (19/10/2026) : ne JAMAIS créer en masse si Firestore contient déjà
+    // des produits. Si la lecture a renvoyé 0 doc par erreur (réseau, synchro…),
+    // on compléterait sinon toute la base en doublons. Création uniquement sur base vide.
+    const baseVide = existants.size === 0;
+    if (!baseVide) {
+      console.log(`🛡️ [AUTO-IMPORT] ${existants.size} produit(s) déjà en base : création désactivée, mise à jour des champs manquants uniquement.`);
+    }
+    const aCreer = baseVide ? [...produits.entries()].filter(([k, p]) => {
       const ex = existants.get(k);
       if (!ex) return true;
       // complète uniquement les champs manquants du produit existant
@@ -135,7 +142,7 @@ export async function autoImportProduits(_uid?: string): Promise<void> {
         batchUpdates.push({ id: ex.id, upd });
       }
       return false;
-    });
+    }) : [];
 
     // --- créations (batchs de 400)
     let crees = 0;
