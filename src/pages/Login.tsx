@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, isAuthenticated } from '../services/authService';
+import { auth, isAuthenticated, FIREBASE_EMAILS, FIREBASE_PWD_SUFFIX } from '../services/authService';
 import './Login.css';
 
 // ============================================
@@ -15,6 +15,7 @@ interface StoredUser {
   passwordHash: string;
   role: 'admin' | 'user';
   permissions: string[];
+  firebaseEmail?: string; // e-mail du compte Firebase associé (optionnel)
 }
 
 const USERS_KEY = 'tradelink_users_v2';
@@ -37,18 +38,14 @@ function getUsers(): StoredUser[] {
   } catch { return []; }
 }
 
-// 🔑 Comptes Firebase correspondants (créés une fois via scripts/create-firebase-users.mjs).
-// Le mot de passe Firebase = mot de passe local + suffixe (Firebase exige ≥ 6 caractères).
-const FIREBASE_EMAILS: Record<string, string> = {
-  ismail: 'ismail@tradelink.app',
-  houssam: 'houssam@tradelink.app',
-};
-const FIREBASE_PWD_SUFFIX = 'TL!26';
+function saveUsers(users: StoredUser[]): void {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+}
 
 // 🔥 Ouvre une session Firebase Auth pour débloquer Firestore.
 // Best effort : en cas d'échec (offline, Firebase KO), on continue en mode local.
-async function connecterFirebase(username: string, password: string): Promise<void> {
-  const email = FIREBASE_EMAILS[username.toLowerCase()];
+async function connecterFirebase(user: StoredUser, password: string): Promise<void> {
+  const email = user.firebaseEmail || FIREBASE_EMAILS[user.username.toLowerCase()];
   if (!email) return;
   try {
     await Promise.race([
@@ -61,30 +58,9 @@ async function connecterFirebase(username: string, password: string): Promise<vo
   }
 }
 
-function initDefaultAdmins(): void {
-  const users = getUsers();
-  if (users.length === 0) {
-    const admins: StoredUser[] = [
-      {
-        id: 'admin_ismail',
-        username: 'ISMAIL',
-        displayName: 'Ismail',
-        passwordHash: simpleHash('2024'),
-        role: 'admin',
-        permissions: ['all'],
-      },
-      {
-        id: 'admin_houssam',
-        username: 'HOUSSAM',
-        displayName: 'Houssam',
-        passwordHash: simpleHash('2026'),
-        role: 'admin',
-        permissions: ['all'],
-      },
-    ];
-    localStorage.setItem(USERS_KEY, JSON.stringify(admins));
-  }
-}
+// 🛡️ Sécurité : aucun mot de passe en dur dans le code.
+// Au premier démarrage (aucun utilisateur), l'écran de création
+// du compte administrateur s'affiche au lieu du formulaire de login.
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -93,16 +69,27 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  // Premier démarrage : aucun utilisateur → écran de création admin
+  const [isFirstRun, setIsFirstRun] = useState(false);
+  const [setupName, setSetupName] = useState('Ismail');
+  const [setupUsername, setSetupUsername] = useState('ISMAIL');
+  const [setupPassword, setSetupPassword] = useState('');
+  const [setupConfirm, setSetupConfirm] = useState('');
+  const [setupEmail, setSetupEmail] = useState('ismail@tradelink.app');
   const cardRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    initDefaultAdmins();
     // Redirect if already logged in (vérification complète, pas juste la présence d'un user)
     // ⚠️ Sauf juste après une déconnexion : on ne renvoie PAS vers l'app,
     // même si une session Firebase persiste encore dans le navigateur.
     const loggedOut = sessionStorage.getItem('tradelink_logged_out') === '1';
     if (!loggedOut && isAuthenticated()) {
       window.location.href = '/';
+      return;
+    }
+    // Aucun utilisateur enregistré → premier démarrage
+    if (getUsers().length === 0) {
+      setIsFirstRun(true);
     }
   }, []);
 
@@ -132,7 +119,7 @@ const Login: React.FC = () => {
       }
 
       // Open the Firebase session (Firestore) BEFORE saving the local session
-      await connecterFirebase(username, password);
+      await connecterFirebase(user, password);
 
       // Save session
       sessionStorage.removeItem('tradelink_logged_out');
@@ -160,6 +147,103 @@ const Login: React.FC = () => {
     localStorage.setItem('tradelink_access', 'granted');
     window.location.href = '/';
   };
+
+  // 🛡️ Premier démarrage : création du compte administrateur.
+  // Le mot de passe est choisi par l'utilisateur, jamais écrit dans le code.
+  const handleSetup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!setupUsername.trim() || !setupName.trim() || !setupPassword) {
+      setError('Tous les champs sont requis');
+      return;
+    }
+    if (setupPassword.length < 4) {
+      setError('Le mot de passe doit contenir au moins 4 caractères');
+      return;
+    }
+    if (setupPassword !== setupConfirm) {
+      setError('Les mots de passe ne correspondent pas');
+      return;
+    }
+    setLoading(true);
+    try {
+      const admin: StoredUser = {
+        id: 'admin_' + Date.now().toString(36),
+        username: setupUsername.trim().toUpperCase(),
+        displayName: setupName.trim(),
+        passwordHash: simpleHash(setupPassword),
+        role: 'admin',
+        permissions: ['all'],
+        firebaseEmail: setupEmail.trim() || undefined,
+      };
+      saveUsers([admin]);
+
+      await connecterFirebase(admin, setupPassword);
+
+      sessionStorage.removeItem('tradelink_logged_out');
+      localStorage.setItem('tradelink_current_user', JSON.stringify({
+        id: admin.id,
+        username: admin.username,
+        displayName: admin.displayName,
+        role: admin.role,
+        permissions: admin.permissions,
+      }));
+      localStorage.setItem('tradelink_access', 'granted');
+      window.location.href = '/';
+    } catch (err: any) {
+      setError('Erreur lors de la création du compte');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ---- Écran de premier démarrage ----
+  const renderSetup = () => (
+    <>
+      <h1 className="login-title">TRADE LINK</h1>
+      <p className="login-subtitle">🛡️ Premier démarrage : créez votre compte administrateur</p>
+      {error && <div className="login-msg error">❌ {error}</div>}
+      <form onSubmit={handleSetup}>
+        <div className="login-field">
+          <label className="login-label">Votre prénom</label>
+          <input type="text" value={setupName} onChange={(e) => setSetupName(e.target.value)}
+            placeholder="Ismail" required autoComplete="given-name" autoFocus />
+        </div>
+        <div className="login-field">
+          <label className="login-label">Nom d'utilisateur</label>
+          <input type="text" value={setupUsername} onChange={(e) => setSetupUsername(e.target.value)}
+            placeholder="ISMAIL" required autoComplete="username" />
+        </div>
+        <div className="login-field">
+          <label className="login-label">E-mail du compte Firebase (synchro en ligne)</label>
+          <input type="email" value={setupEmail} onChange={(e) => setSetupEmail(e.target.value)}
+            placeholder="ismail@tradelink.app" autoComplete="email" />
+        </div>
+        <div className="login-field">
+          <label className="login-label">Mot de passe (min. 4 caractères)</label>
+          <div className="login-password-wrapper">
+            <input type={showPassword ? 'text' : 'password'} value={setupPassword}
+              onChange={(e) => setSetupPassword(e.target.value)} placeholder="••••••••"
+              required autoComplete="new-password" style={{ paddingRight: 50 }} />
+            <button type="button" className="login-password-toggle"
+              onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? '👁️' : '👁️‍🗨️'}
+            </button>
+          </div>
+        </div>
+        <div className="login-field" style={{ marginBottom: 24 }}>
+          <label className="login-label">Confirmer le mot de passe</label>
+          <input type={showPassword ? 'text' : 'password'} value={setupConfirm}
+            onChange={(e) => setSetupConfirm(e.target.value)} placeholder="••••••••"
+            required autoComplete="new-password" />
+        </div>
+        <motion.button type="submit" disabled={loading} className="login-submit primary"
+          whileHover={{ scale: loading ? 1 : 1.02 }} whileTap={{ scale: loading ? 1 : 0.98 }}>
+          {loading ? '⏳ Création...' : '✅ Créer mon compte admin'}
+        </motion.button>
+      </form>
+    </>
+  );
 
   return (
     <div className="login-wrapper">
@@ -201,6 +285,8 @@ const Login: React.FC = () => {
         </motion.div>
 
         {/* Title */}
+        {isFirstRun ? renderSetup() : (
+        <>
         <h1 className="login-title">TRADE LINK</h1>
         <p className="login-subtitle">Connectez-vous à votre compte</p>
 
@@ -266,6 +352,8 @@ const Login: React.FC = () => {
         >
           🎮 Mode démo (sans connexion)
         </motion.button>
+        </>
+        )}
       </motion.div>
     </div>
   );

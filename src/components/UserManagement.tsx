@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { auth, FIREBASE_EMAILS, FIREBASE_PWD_SUFFIX } from '../services/authService';
 
 // ============================================
 // 👥 Gestion Utilisateurs avec Permissions
@@ -13,6 +15,7 @@ interface User {
   role: 'admin' | 'user';
   permissions: string[];
   createdAt: string;
+  firebaseEmail?: string;
 }
 
 const USERS_KEY = 'tradelink_users_v2';
@@ -133,7 +136,7 @@ const UserManagement: React.FC = () => {
   // ============================================
   // Change My Password
   // ============================================
-  const handleChangeMyPassword = () => {
+  const handleChangeMyPassword = async () => {
     setErr('');
     if (!passwordForm.old || !passwordForm.nw) {
       setErr('Remplissez tous les champs');
@@ -159,13 +162,31 @@ const UserManagement: React.FC = () => {
       return;
     }
 
+    // 🔥 Garder Firebase synchronisé : le mot de passe Firebase est dérivé
+    // du mot de passe local (mot de passe + suffixe). Sans cette mise à jour,
+    // la session Firebase échouerait et la synchro Firestore s'arrêterait.
+    let firebaseWarning = '';
+    try {
+      const target = allUsers[idx];
+      const email = target.firebaseEmail || FIREBASE_EMAILS[target.username.toLowerCase()];
+      const fbUser = auth.currentUser;
+      if (email && fbUser && fbUser.email?.toLowerCase() === email.toLowerCase()) {
+        const credential = EmailAuthProvider.credential(email, passwordForm.old + FIREBASE_PWD_SUFFIX);
+        await reauthenticateWithCredential(fbUser, credential);
+        await updatePassword(fbUser, passwordForm.nw + FIREBASE_PWD_SUFFIX);
+      }
+    } catch (e: any) {
+      console.warn('⚠️ Mot de passe Firebase non mis à jour :', e?.code || e?.message);
+      firebaseWarning = " (⚠️ mot de passe Firebase non mis à jour — la synchro en ligne risque de s'arrêter, reconnectez-vous)";
+    }
+
     allUsers[idx].passwordHash = simpleHash(passwordForm.nw);
     saveUsers(allUsers);
     setUsers(allUsers);
     setShowChangeMyPassword(false);
     setPasswordForm({ old: '', nw: '', confirm: '' });
-    setOk('Mot de passe changé !');
-    setTimeout(() => setOk(''), 3000);
+    setOk('Mot de passe changé !' + firebaseWarning);
+    setTimeout(() => setOk(''), 5000);
   };
 
   // ============================================

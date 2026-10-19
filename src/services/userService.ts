@@ -38,29 +38,13 @@ function saveUsersLocal(users: User[]) {
 }
 
 export async function initDefaultAdmin(): Promise<void> {
-  const users = getUsersLocal();
-  if (users.length === 0) {
-    const admin: User = {
-      id: generateId(), username: 'admin', displayName: 'Administrateur',
-      passwordHash: simpleHash('admin123'), role: 'admin',
-      createdAt: new Date().toISOString(),
-    };
-    saveUsersLocal([admin]);
-    syncToFirestore(COLLECTIONS.USERS, admin, USERS_KEY);
-  }
+  // 🛡️ Sécurité : plus aucun compte/mot de passe en dur.
+  // La création du compte administrateur se fait au premier
+  // démarrage depuis l'écran de connexion (Login.tsx).
 }
 
 export function initDefaultAdminSync(): void {
-  const users = getUsersLocal();
-  if (users.length === 0) {
-    const admin: User = {
-      id: generateId(), username: 'admin', displayName: 'Administrateur',
-      passwordHash: simpleHash('admin123'), role: 'admin',
-      createdAt: new Date().toISOString(),
-    };
-    saveUsersLocal([admin]);
-    syncToFirestore(COLLECTIONS.USERS, admin, USERS_KEY);
-  }
+  // 🛡️ Sécurité : plus aucun compte/mot de passe en dur (voir initDefaultAdmin).
 }
 
 export function login(username: string, password: string): User | null {

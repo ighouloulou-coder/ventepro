@@ -242,3 +242,17 @@ export function getCurrentUser(): User | null {
 
 export { auth };
 export default auth;
+
+// ============================================
+// 🔑 Correspondance comptes locaux → Firebase
+// (créés une fois via scripts/create-firebase-users.mjs).
+// Le mot de passe Firebase = mot de passe local + suffixe
+// (Firebase exige ≥ 6 caractères).
+// Note : les e-mails ne sont pas des secrets. En revanche,
+// AUCUN mot de passe ne doit jamais être écrit en dur ici.
+// ============================================
+export const FIREBASE_EMAILS: Record<string, string> = {
+  ismail: 'ismail@tradelink.app',
+  houssam: 'houssam@tradelink.app',
+};
+export const FIREBASE_PWD_SUFFIX = 'TL!26';
