@@ -6,6 +6,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Quote, Client, Currency } from '../types';
+import { drawCompanyHeader, drawCompanyFooter } from './pdfCompany';
 
 const formatCurrency = (amount: number, currency: Currency = 'MAD'): string => {
   const locale = currency === 'MAD' ? 'fr-MA' : currency === 'EUR' ? 'fr-FR' : 'en-US';
@@ -47,6 +48,9 @@ export const generateQuotePDF = (quote: Quote, client?: Client): void => {
   doc.setFontSize(9);
   doc.setTextColor(255, 255, 255);
   doc.text(quote.status.toUpperCase(), pageWidth - 37.5, 22, { align: 'center' });
+
+  // Bloc entreprise (Paramètres → Paramétrage de l'entreprise)
+  drawCompanyHeader(doc);
 
   // ============================================
   // INFORMATIONS DEVIS
@@ -203,17 +207,9 @@ export const generateQuotePDF = (quote: Quote, client?: Client): void => {
   }
 
   // ============================================
-  // PIED DE PAGE
+  // PIED DE PAGE (entreprise + identifiants fiscaux)
   // ============================================
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(156, 163, 175);
-  doc.text(
-    'Généré par TRADE LINK INTERNATIONALE - Application de Gestion des Ventes',
-    pageWidth / 2,
-    doc.internal.pageSize.getHeight() - 10,
-    { align: 'center' }
-  );
+  drawCompanyFooter(doc);
 
   // ============================================
   // SAUVEGARDER
@@ -233,6 +229,9 @@ export const generateAllQuotesPDF = (quotes: Quote[]): void => {
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(37, 99, 235);
   doc.text('RÉCAPITULATIF DES DEVIS', 14, 20);
+
+  // Bloc entreprise (Paramètres → Paramétrage de l'entreprise)
+  drawCompanyHeader(doc);
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');

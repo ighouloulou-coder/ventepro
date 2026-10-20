@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Invoice, DeliveryNote } from '../types';
+import { drawCompanyHeader, drawCompanyFooter } from './pdfCompany';
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('fr-FR', {
@@ -22,6 +23,9 @@ export const exportInvoiceToPDF = (invoice: Invoice) => {
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(37, 99, 235);
   doc.text('FACTURE', 14, 25);
+
+  // Bloc entreprise (Paramètres → Paramétrage de l'entreprise)
+  drawCompanyHeader(doc);
 
   // Informations de la facture
   doc.setFontSize(10);
@@ -115,16 +119,8 @@ export const exportInvoiceToPDF = (invoice: Invoice) => {
   doc.text('TOTAL:', pageWidth - 70, finalY + 22);
   doc.text(formatCurrency(invoice.total), pageWidth - 20, finalY + 22, { align: 'right' });
 
-  // Pied de page
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(156, 163, 175);
-  doc.text(
-    'Généré par TRADE LINK INTERNATIONALE - Application de Gestion des Ventes',
-    pageWidth / 2,
-    doc.internal.pageSize.getHeight() - 10,
-    { align: 'center' }
-  );
+  // Pied de page (entreprise + identifiants fiscaux)
+  drawCompanyFooter(doc);
 
   // Sauvegarder
   doc.save(`facture-${invoice.id.slice(0, 8)}.pdf`);
@@ -139,6 +135,9 @@ export const exportDeliveryToPDF = (delivery: DeliveryNote) => {
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(37, 99, 235);
   doc.text('BON DE LIVRAISON', 14, 25);
+
+  // Bloc entreprise (Paramètres → Paramétrage de l'entreprise)
+  drawCompanyHeader(doc);
 
   // Informations du bon
   doc.setFontSize(10);
@@ -212,16 +211,8 @@ export const exportDeliveryToPDF = (delivery: DeliveryNote) => {
   doc.text('Chauffeur:', 14, finalY + 20);
   doc.text(delivery.driverName || '-', pageWidth - 20, finalY + 20, { align: 'right' });
 
-  // Pied de page
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(156, 163, 175);
-  doc.text(
-    'Généré par TRADE LINK INTERNATIONALE - Application de Gestion des Ventes',
-    pageWidth / 2,
-    doc.internal.pageSize.getHeight() - 10,
-    { align: 'center' }
-  );
+  // Pied de page (entreprise + identifiants fiscaux)
+  drawCompanyFooter(doc);
 
   // Sauvegarder
   doc.save(`bon-livraison-${delivery.id.slice(0, 8)}.pdf`);
@@ -229,13 +220,15 @@ export const exportDeliveryToPDF = (delivery: DeliveryNote) => {
 
 export const exportAllInvoicesToPDF = (invoices: Invoice[]) => {
   const doc = new jsPDF('landscape');
-  const pageWidth = doc.internal.pageSize.getWidth();
 
   // En-tête
   doc.setFontSize(20);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(37, 99, 235);
   doc.text('RÉCAPITULATIF DES FACTURES', 14, 20);
+
+  // Bloc entreprise (Paramètres → Paramétrage de l'entreprise)
+  drawCompanyHeader(doc);
 
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -282,16 +275,8 @@ export const exportAllInvoicesToPDF = (invoices: Invoice[]) => {
     },
   });
 
-  // Pied de page
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(156, 163, 175);
-  doc.text(
-    'Généré par TRADE LINK INTERNATIONALE - Application de Gestion des Ventes',
-    pageWidth / 2,
-    doc.internal.pageSize.getHeight() - 10,
-    { align: 'center' }
-  );
+  // Pied de page (entreprise + identifiants fiscaux)
+  drawCompanyFooter(doc);
 
   doc.save(`recapitulatif-factures-${formatDate(new Date().toISOString())}.pdf`);
 };
