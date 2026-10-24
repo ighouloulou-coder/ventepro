@@ -79,7 +79,7 @@ const ClientPortal: React.FC = () => {
           {/* En-tête du client */}
           <div style={{ background: 'white', borderRadius: 12, padding: 24, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-              <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#2563eb', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 700 }}>
+              <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#12A150', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 700 }}>
                 {selectedClient.name.charAt(0).toUpperCase()}
               </div>
               <div>

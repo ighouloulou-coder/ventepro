@@ -190,7 +190,7 @@ const Layout: React.FC = () => {
                 width: 40,
                 height: 40,
                 borderRadius: 12,
-                background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                background: 'linear-gradient(135deg, #12A150 0%, #0B3B2C 100%)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

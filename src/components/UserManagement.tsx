@@ -279,7 +279,7 @@ const UserManagement: React.FC = () => {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setShowChangeMyPassword(true)}
-              style={btnStyle('#6366f1')}
+              style={btnStyle('#0B3B2C')}
             >
               🔑 Changer mon MDP
             </motion.button>
@@ -289,7 +289,7 @@ const UserManagement: React.FC = () => {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setShowCreate(true)}
-              style={btnStyle('#2563eb')}
+              style={btnStyle('#12A150')}
             >
               + Ajouter
             </motion.button>
@@ -312,7 +312,7 @@ const UserManagement: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 200 }}>
               <div style={{
                 width: 40, height: 40, borderRadius: 10,
-                background: u.role === 'admin' ? '#8b5cf6' : '#3b82f6',
+                background: u.role === 'admin' ? '#0B3B2C' : '#12A150',
                 color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
                 fontWeight: 700, fontSize: '0.9rem',
               }}>
@@ -426,9 +426,9 @@ const UserManagement: React.FC = () => {
                           style={{
                             padding: '8px 10px',
                             borderRadius: 8,
-                            border: `2px solid ${hasPermission ? '#2563eb' : '#e5e7eb'}`,
+                            border: `2px solid ${hasPermission ? '#12A150' : '#e5e7eb'}`,
                             background: hasPermission ? '#eff6ff' : 'white',
-                            color: hasPermission ? '#1d4ed8' : '#6b7280',
+                            color: hasPermission ? '#0B3B2C' : '#6b7280',
                             fontSize: '0.8rem',
                             fontWeight: 600,
                             cursor: 'pointer',

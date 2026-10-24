@@ -163,7 +163,7 @@ const SignaturePage: React.FC = () => {
     <div style={{ minHeight: '100vh', background: '#f9fafb', padding: 20 }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         {/* Header */}
-        <div style={{ background: '#2563eb', color: 'white', borderRadius: '12px 12px 0 0', padding: 30, textAlign: 'center' }}>
+        <div style={{ background: '#0B3B2C', color: 'white', borderRadius: '12px 12px 0 0', padding: 30, textAlign: 'center' }}>
           <h1>📄 Devis #{quote.id.slice(0, 8).toUpperCase()}</h1>
           <p style={{ opacity: 0.9, marginTop: 8 }}>Signez pour accepter ce devis</p>
         </div>

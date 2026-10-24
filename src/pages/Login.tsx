@@ -255,9 +255,9 @@ const Login: React.FC = () => {
             borderRadius: '50%',
             filter: 'blur(80px)',
             opacity: 0.3,
-            ...(i === 1 ? { width: 400, height: 400, background: 'radial-gradient(circle, rgba(59,130,246,0.4) 0%, transparent 70%)', top: '10%', left: '10%' } :
-              i === 2 ? { width: 350, height: 350, background: 'radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%)', top: '60%', right: '10%' } :
-              { width: 300, height: 300, background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%)', bottom: '10%', left: '40%' })
+            ...(i === 1 ? { width: 400, height: 400, background: 'radial-gradient(circle, rgba(18,161,80,0.4) 0%, transparent 70%)', top: '10%', left: '10%' } :
+              i === 2 ? { width: 350, height: 350, background: 'radial-gradient(circle, rgba(11,59,44,0.3) 0%, transparent 70%)', top: '60%', right: '10%' } :
+              { width: 300, height: 300, background: 'radial-gradient(circle, rgba(198,244,50,0.2) 0%, transparent 70%)', bottom: '10%', left: '40%' })
           }} />
         ))}
       </div>
