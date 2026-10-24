@@ -252,7 +252,7 @@ export default auth;
 // AUCUN mot de passe ne doit jamais être écrit en dur ici.
 // ============================================
 export const FIREBASE_EMAILS: Record<string, string> = {
-  ismail: 'ismail@tradelink.app',
+  ismail: 'ighouloulou@gmail.com',
   houssam: 'houssam@tradelink.app',
 };
 export const FIREBASE_PWD_SUFFIX = 'TL!26';
