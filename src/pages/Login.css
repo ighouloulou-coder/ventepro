@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+  background: linear-gradient(135deg, #0B3B2C 0%, #123F31 50%, #0B3B2C 100%);
   position: relative;
   overflow: hidden;
   padding: 20px;
@@ -30,12 +30,12 @@
   width: 72px;
   height: 72px;
   border-radius: 18px;
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #12A150 0%, #0B3B2C 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  box-shadow: 0 10px 30px -5px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 10px 30px -5px rgba(18, 161, 80, 0.5);
   font-size: 2.5rem;
 }
 
@@ -132,7 +132,7 @@
 }
 
 .login-field input:focus {
-  border-color: #3b82f6;
+  border-color: #12A150;
 }
 
 .login-submit {
@@ -149,8 +149,8 @@
 }
 
 .login-submit.primary {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #12A150 0%, #0B3B2C 100%);
+  box-shadow: 0 10px 20px -5px rgba(18, 161, 80, 0.4);
 }
 
 .login-submit:disabled {
