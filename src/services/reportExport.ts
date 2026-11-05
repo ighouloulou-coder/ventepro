@@ -23,7 +23,7 @@ export function exportDashboardPDF() {
   
   const dateStr = new Date().toLocaleDateString('fr-FR');
   const rows = invoices.slice(0, 20).map(i =>
-    `<tr><td>#${i.id.slice(0,8)}</td><td>${i.clientName}</td><td>${fmt(i.total)}</td><td>${i.status}</td><td>${new Date(i.createdAt).toLocaleDateString('fr-FR')}</td></tr>`
+    `<tr><td>#${i.id}</td><td>${i.clientName}</td><td>${fmt(i.total)}</td><td>${i.status}</td><td>${new Date(i.createdAt).toLocaleDateString('fr-FR')}</td></tr>`
   ).join('');
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Rapport Dashboard</title>
@@ -46,7 +46,7 @@ export function exportDashboardPDF() {
 export function exportInvoicesCSV() {
   const invoices = invoiceStorage.getAll();
   const rows = [['ID', 'Client', 'Montant', 'Statut', 'Date', 'Devise']];
-  invoices.forEach(i => rows.push([i.id.slice(0,8), i.clientName, String(i.total), i.status, new Date(i.createdAt).toLocaleDateString('fr-FR'), i.currency || 'MAD']));
+  invoices.forEach(i => rows.push([i.id, i.clientName, String(i.total), i.status, new Date(i.createdAt).toLocaleDateString('fr-FR'), i.currency || 'MAD']));
   const csv = rows.map(r => r.map(c => '"' + c.replace(/"/g, '""') + '"').join(',')).join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
   downloadFile(blob, 'factures-' + Date.now() + '.csv');

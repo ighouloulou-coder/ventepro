@@ -72,7 +72,7 @@ export const fiscalLine = (company: CompanyInfo): string => {
   return parts.join(' · ');
 };
 
-/** Pied de page : nom de l'entreprise + identifiants fiscaux, centré en bas de page. */
+/** Pied de page : siège + identifiants fiscaux + mention, centrés en bas de page. */
 export const drawCompanyFooter = (doc: jsPDF): void => {
   const company: CompanyInfo = companyStorage.get();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -82,14 +82,20 @@ export const drawCompanyFooter = (doc: jsPDF): void => {
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(156, 163, 175);
 
-  const fisc = fiscalLine(company);
-  if (fisc) {
-    doc.text(fisc, pageWidth / 2, pageHeight - 15, { align: 'center' });
-  }
+  let y = pageHeight - 10;
   doc.text(
     `Généré par ${company.name || 'TRADE LINK INTERNATIONALE'} - Application de Gestion des Ventes`,
     pageWidth / 2,
-    pageHeight - 10,
-    { align: 'center' }
+    y,
+    { align: 'center' },
   );
+  const fisc = fiscalLine(company);
+  if (fisc) {
+    y -= 5;
+    doc.text(fisc, pageWidth / 2, y, { align: 'center' });
+  }
+  if (company.headOffice) {
+    y -= 5;
+    doc.text(`Siège : ${company.headOffice}`, pageWidth / 2, y, { align: 'center' });
+  }
 };

@@ -329,9 +329,10 @@ const COMPANY_KEY = 'tradelink_company';
 export const DEFAULT_COMPANY: CompanyInfo = {
   name: 'TRADE LINK INTERNATIONALE',
   logo: '',
-  address: 'Lots Sara Dayet Iffrah N° 13 Zohor',
-  city: 'Fès',
-  phone: '',
+  address: 'B20 Zone Activités Indus et Eco',
+  city: 'Tanger',
+  headOffice: 'Lots Sara Dayet Iffrah N° 13 Zohor, Fès',
+  phone: '06 81 87 00 67',
   email: 'tradelinkinternationale@gmail.com',
   ice: '003294257000084',
   ifFiscal: '53803204',

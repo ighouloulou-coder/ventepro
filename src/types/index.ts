@@ -27,8 +27,9 @@ export interface Product {
 export interface CompanyInfo {
   name: string; // Raison sociale
   logo: string; // Base64 ou URL du logo
-  address: string;
+  address: string; // Adresse d'exploitation (sur les factures)
   city: string;
+  headOffice?: string; // Siège social (si différent de l'adresse d'exploitation)
   phone: string;
   email: string;
   ice: string; // Identifiant Commun de l'Entreprise (15 chiffres)
