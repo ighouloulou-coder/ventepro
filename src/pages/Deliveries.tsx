@@ -179,12 +179,12 @@ const Deliveries: React.FC = () => {
     const paymentTerms = client?.paymentTerms || 30;
 
     const confirmMsg = list.length === 1
-      ? `Transférer le BL #${list[0].id.slice(0, 8)} vers une facture de ${total.toFixed(2)} MAD ?`
+      ? `Transférer le BL #${list[0].id} vers une facture de ${total.toFixed(2)} MAD ?`
       : `Fusionner ${list.length} BL du client ${client?.name || 'inconnu'} en une facture de ${total.toFixed(2)} MAD ?`;
     if (!window.confirm(confirmMsg)) return;
 
     // Prix inconnus → on laisse la facture en brouillon pour vérification
-    const notes = `Transféré depuis ${list.length === 1 ? 'le BL' : 'les BL'} ${list.map(d => '#' + d.id.slice(0, 8)).join(', ')}${prixManquants > 0 ? ` — ⚠️ ${prixManquants} ligne(s) sans prix de vente, à vérifier` : ''}`;
+    const notes = `Transféré depuis ${list.length === 1 ? 'le BL' : 'les BL'} ${list.map(d => '#' + d.id).join(', ')}${prixManquants > 0 ? ` — ⚠️ ${prixManquants} ligne(s) sans prix de vente, à vérifier` : ''}`;
 
     // orderId : Firestore refuse la valeur undefined → n'assigner que si présent
     const linkedOrderId = list.find(d => d.orderId)?.orderId;
@@ -360,14 +360,14 @@ const Deliveries: React.FC = () => {
               <tr key={delivery.id} style={selectedIds.includes(delivery.id) ? { background: 'rgba(59,130,246,0.08)' } : undefined}>
                 <td>
                   {delivery.transferredToInvoice ? (
-                    <span title={`Facturé → facture ${delivery.transferredToInvoice.slice(0, 8)}`}>✅</span>
+                    <span title={`Facturé → facture ${delivery.transferredToInvoice}`}>✅</span>
                   ) : (
                     <input type="checkbox" checked={selectedIds.includes(delivery.id)} onChange={() => toggleSelect(delivery.id)} />
                   )}
                 </td>
-                <td><strong>#{delivery.id.slice(0, 8)}</strong>{delivery.transferredToInvoice && <span className="status-badge status-sent" style={{ marginLeft: 6 }}>Facturé</span>}</td>
+                <td><strong>#{delivery.id}</strong>{delivery.transferredToInvoice && <span className="status-badge status-sent" style={{ marginLeft: 6 }}>Facturé</span>}</td>
                 <td>{delivery.clientName}</td>
-                <td>{delivery.orderId ? `#${delivery.orderId.slice(0, 8)}` : '—'}</td>
+                <td>{delivery.orderId ? `#${delivery.orderId}` : '—'}</td>
                 <td>{delivery.driverName || '-'}</td>
                 <td>{delivery.vehiclePlate || '-'}</td>
                 <td>
@@ -434,7 +434,7 @@ const Deliveries: React.FC = () => {
                   <select value={formData.orderId} onChange={e => handleOrderChange(e.target.value)} required>
                     <option value="">Sélectionner une commande</option>
                     {orders.filter(o => o.status !== 'annulée' && o.status !== 'livrée').map(o => (
-                      <option key={o.id} value={o.id}>#{o.id.slice(0, 8)} - {o.clientName} ({o.items.length} produits)</option>
+                      <option key={o.id} value={o.id}>#{o.id} - {o.clientName} ({o.items.length} produits)</option>
                     ))}
                   </select>
                 </div>
@@ -552,14 +552,14 @@ const Deliveries: React.FC = () => {
         <div className="modal-overlay" onClick={closeDetail}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="detail-header">
-              <h3>Bon de Livraison #{selectedDelivery.id.slice(0, 8)}</h3>
+              <h3>Bon de Livraison #{selectedDelivery.id}</h3>
               <span className={`status-badge ${getStatusColor(selectedDelivery.status)}`}>{selectedDelivery.status.replace('_', ' ')}</span>
             </div>
             <div className="invoice-detail">
               <div className="detail-row"><span>Client:</span><strong>{selectedDelivery.clientName}</strong></div>
-              <div className="detail-row"><span>Commande:</span><strong>{selectedDelivery.orderId ? `#${selectedDelivery.orderId.slice(0, 8)}` : 'Direct (sans commande)'}</strong></div>
+              <div className="detail-row"><span>Commande:</span><strong>{selectedDelivery.orderId ? `#${selectedDelivery.orderId}` : 'Direct (sans commande)'}</strong></div>
               {selectedDelivery.transferredToInvoice && (
-                <div className="detail-row"><span>Facture:</span><strong>#{selectedDelivery.transferredToInvoice.slice(0, 8)}</strong></div>
+                <div className="detail-row"><span>Facture:</span><strong>#{selectedDelivery.transferredToInvoice}</strong></div>
               )}
               <div className="detail-row"><span>Chauffeur:</span><strong>{selectedDelivery.driverName || '-'}</strong></div>
               <div className="detail-row"><span>Véhicule:</span><strong>{selectedDelivery.vehiclePlate || '-'}</strong></div>

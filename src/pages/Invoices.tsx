@@ -285,7 +285,7 @@ const Invoices: React.FC = () => {
                 <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '10px 16px', borderRadius: 8 }}>
                   <div>
                     <strong>{getReminderTypeLabel(type)}</strong>
-                    <span style={{ marginLeft: 8, color: 'var(--text-muted)' }}>Facture #{invoice.id.slice(0, 8)} - {client.name}</span>
+                    <span style={{ marginLeft: 8, color: 'var(--text-muted)' }}>Facture #{invoice.id} - {client.name}</span>
                   </div>
                   <button className="btn btn-small btn-success" onClick={() => {
                     sendInvoiceReminder(invoice, client);
@@ -329,7 +329,7 @@ const Invoices: React.FC = () => {
           ) : (
             filteredInvoices.map(invoice => (
               <tr key={invoice.id}>
-                <td><strong>#{invoice.id.slice(0, 8)}</strong></td>
+                <td><strong>#{invoice.id}</strong></td>
                 <td>{invoice.clientName}</td>
                 <td>{formatCurrency(invoice.subtotal)}</td>
                 <td>{invoice.taxRate}%</td>
@@ -350,7 +350,7 @@ const Invoices: React.FC = () => {
                   <button className="btn btn-small" onClick={() => {
                     const client = clients.find(c => c.id === invoice.clientId);
                     if (client?.phone) {
-                      sendWhatsAppMessage(client.phone, `Facture #${invoice.id.slice(0, 8)} - Montant: ${formatCurrency(invoice.total)} - Échéance: ${formatDate(invoice.dueDate)}`);
+                      sendWhatsAppMessage(client.phone, `Facture #${invoice.id} - Montant: ${formatCurrency(invoice.total)} - Échéance: ${formatDate(invoice.dueDate)}`);
                     } else {
                       alert('Pas de téléphone pour ce client');
                     }
@@ -361,7 +361,7 @@ const Invoices: React.FC = () => {
                     const client = clients.find(c => c.id === invoice.clientId);
                     if (client?.email) {
                       sendInvoiceReminderEmail(invoice, client).then(result => {
-                        logEmail({ to: client.email, subject: `Relance #${invoice.id.slice(0, 8)}`, type: 'reminder', invoiceId: invoice.id, status: result.success ? 'sent' : 'failed' });
+                        logEmail({ to: client.email, subject: `Relance #${invoice.id}`, type: 'reminder', invoiceId: invoice.id, status: result.success ? 'sent' : 'failed' });
                         alert(result.success ? 'Email envoyé !' : `Erreur: ${result.error}`);
                       });
                     } else alert('Pas d\'email pour ce client');
@@ -523,7 +523,7 @@ const Invoices: React.FC = () => {
         <div className="modal-overlay" onClick={closeDetail}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="detail-header">
-              <h3>Facture #{selectedInvoice.id.slice(0, 8)}</h3>
+              <h3>Facture #{selectedInvoice.id}</h3>
               <button
                 className="btn btn-small"
                 onClick={() => handleExportPDF(selectedInvoice)}

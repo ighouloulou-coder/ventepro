@@ -18,7 +18,7 @@ export const generateReminderMessage = (invoice: Invoice, client: Client): strin
   ));
 
   const baseMessage = `Bonjour ${client.name},\n\n` +
-    `Je me permets de vous contacter au sujet de la facture #${invoice.id.slice(0, 8)}.\n\n` +
+    `Je me permets de vous contacter au sujet de la facture #${invoice.id}.\n\n` +
     `📋 Détails :\n` +
     `- Montant : ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)}\n` +
     `- Date d'échéance : ${new Date(invoice.dueDate).toLocaleDateString('fr-FR')}\n`;
@@ -41,7 +41,7 @@ export const generateReminderMessage = (invoice: Invoice, client: Client): strin
  */
 export const generatePaymentConfirmation = (invoice: Invoice): string => {
   return `Bonjour ${invoice.clientName},\n\n` +
-    `✅ Paiement confirmé pour la facture #${invoice.id.slice(0, 8)}.\n` +
+    `✅ Paiement confirmé pour la facture #${invoice.id}.\n` +
     `Montant : ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)}\n\n` +
     `Merci pour votre confiance !\n\n` +
     `TRADE LINK INTERNATIONALE`;
@@ -177,18 +177,18 @@ export const getReminderTypeLabel = (type: Reminder['type']): string => {
 export const getReminderMessage = (type: Reminder['type'], invoice: Invoice, client: Client): string => {
   switch (type) {
     case '3_days_before':
-      return `Bonjour ${client.name}, rappel : la facture #${invoice.id.slice(0, 8)} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est due dans 3 jours. Merci !`;
+      return `Bonjour ${client.name}, rappel : la facture #${invoice.id} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est due dans 3 jours. Merci !`;
     case 'on_due_date':
-      return `Bonjour ${client.name}, la facture #${invoice.id.slice(0, 8)} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} arrive à échéance aujourd'hui. Merci de votre règlement.`;
+      return `Bonjour ${client.name}, la facture #${invoice.id} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} arrive à échéance aujourd'hui. Merci de votre règlement.`;
     case 'overdue_1':
-      return `Bonjour ${client.name}, la facture #${invoice.id.slice(0, 8)} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est en retard d'1 jour. Merci de procéder au paiement.`;
+      return `Bonjour ${client.name}, la facture #${invoice.id} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est en retard d'1 jour. Merci de procéder au paiement.`;
     case 'overdue_7':
-      return `Bonjour ${client.name}, la facture #${invoice.id.slice(0, 8)} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est en retard de 7 jours. Merci de régulariser.`;
+      return `Bonjour ${client.name}, la facture #${invoice.id} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est en retard de 7 jours. Merci de régulariser.`;
     case 'overdue_15':
-      return `Bonjour ${client.name}, la facture #${invoice.id.slice(0, 8)} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est en retard de 15 jours. Contactez-nous pour un arrangement.`;
+      return `Bonjour ${client.name}, la facture #${invoice.id} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est en retard de 15 jours. Contactez-nous pour un arrangement.`;
     case 'overdue_30':
-      return `Bonjour ${client.name}, la facture #${invoice.id.slice(0, 8)} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est en retard de 30 jours. Merci de régulariser dans les meilleurs délais.`;
+      return `Bonjour ${client.name}, la facture #${invoice.id} de ${new Intl.NumberFormat('fr-MA', { style: 'currency', currency: invoice.currency || 'MAD' }).format(invoice.total)} est en retard de 30 jours. Merci de régulariser dans les meilleurs délais.`;
     default:
-      return `Bonjour ${client.name}, rappel pour la facture #${invoice.id.slice(0, 8)}.`;
+      return `Bonjour ${client.name}, rappel pour la facture #${invoice.id}.`;
   }
 };

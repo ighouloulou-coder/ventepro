@@ -223,7 +223,7 @@ const Quotes: React.FC = () => {
           ) : (
             filteredQuotes.map(quote => (
               <tr key={quote.id}>
-                <td><strong>#{quote.id.slice(0, 8)}</strong></td>
+                <td><strong>#{quote.id}</strong></td>
                 <td>{quote.clientName}</td>
                 <td><strong>{formatCurrencyAmount(quote.total, quote.currency)}</strong></td>
                 <td>{quote.currency}</td>
@@ -237,7 +237,7 @@ const Quotes: React.FC = () => {
                     const client = clients.find(c => c.id === quote.clientId);
                     if (client?.email) {
                       sendQuoteByEmail(quote, client).then(result => {
-                        logEmail({ to: client.email, subject: `Devis #${quote.id.slice(0, 8)}`, type: 'quote', quoteId: quote.id, status: result.success ? 'sent' : 'failed' });
+                        logEmail({ to: client.email, subject: `Devis #${quote.id}`, type: 'quote', quoteId: quote.id, status: result.success ? 'sent' : 'failed' });
                         alert(result.success ? 'Email envoyé !' : `Erreur: ${result.error}`);
                       });
                     } else alert('Pas d\'email pour ce client');
@@ -358,7 +358,7 @@ const Quotes: React.FC = () => {
         <div className="modal-overlay" onClick={closeDetail}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="detail-header">
-              <h3>Devis #{selectedQuote.id.slice(0, 8)}</h3>
+              <h3>Devis #{selectedQuote.id}</h3>
               <span className={`status-badge ${getStatusColor(selectedQuote.status)}`}>{selectedQuote.status}</span>
             </div>
             <div className="invoice-detail">

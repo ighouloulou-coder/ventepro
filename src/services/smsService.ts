@@ -42,22 +42,22 @@ export const generateReminderSMS = (invoice: Invoice, _client: Client): string =
   ));
 
   if (daysOverdue > 0) {
-    return `TRADE LINK: Retard ${daysOverdue}j - Facture #${invoice.id.slice(0, 8)} - ${formatAmount(invoice.total, invoice.currency)} due le ${new Date(invoice.dueDate).toLocaleDateString('fr-FR')}. Merci de régulariser.`;
+    return `TRADE LINK: Retard ${daysOverdue}j - Facture #${invoice.id} - ${formatAmount(invoice.total, invoice.currency)} due le ${new Date(invoice.dueDate).toLocaleDateString('fr-FR')}. Merci de régulariser.`;
   }
 
-  return `TRADE LINK: Rappel - Facture #${invoice.id.slice(0, 8)} - ${formatAmount(invoice.total, invoice.currency)} due le ${new Date(invoice.dueDate).toLocaleDateString('fr-FR')}. Merci !`;
+  return `TRADE LINK: Rappel - Facture #${invoice.id} - ${formatAmount(invoice.total, invoice.currency)} due le ${new Date(invoice.dueDate).toLocaleDateString('fr-FR')}. Merci !`;
 };
 
 export const generatePaymentSMS = (invoice: Invoice): string => {
-  return `TRADE LINK: Paiement confirmé - Facture #${invoice.id.slice(0, 8)} - ${formatAmount(invoice.total, invoice.currency)}. Merci !`;
+  return `TRADE LINK: Paiement confirmé - Facture #${invoice.id} - ${formatAmount(invoice.total, invoice.currency)}. Merci !`;
 };
 
 export const generateOrderConfirmationSMS = (orderId: string, total: number, currency: string): string => {
-  return `TRADE LINK: Commande #${orderId.slice(0, 8)} confirmée - Total: ${formatAmount(total, currency)}. Livraison prévue prochainement.`;
+  return `TRADE LINK: Commande #${orderId} confirmée - Total: ${formatAmount(total, currency)}. Livraison prévue prochainement.`;
 };
 
 export const generateDeliverySMS = (orderId: string, status: string): string => {
-  return `TRADE LINK: Commande #${orderId.slice(0, 8)} - ${status}. Merci de votre confiance !`;
+  return `TRADE LINK: Commande #${orderId} - ${status}. Merci de votre confiance !`;
 };
 
 export const generateGenericReminderSMS = (clientName: string, message: string): string => {

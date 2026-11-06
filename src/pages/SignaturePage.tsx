@@ -152,7 +152,7 @@ const SignaturePage: React.FC = () => {
           <div style={{ fontSize: '4rem', marginBottom: 16 }}>✅</div>
           <h2 style={{ color: 'var(--text-success)', marginBottom: 8 }}>Devis Signé !</h2>
           <p style={{ color: 'var(--text-muted)' }}>Merci {signerName}, votre signature a été enregistrée.</p>
-          <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Devis #{quote.id.slice(0, 8).toUpperCase()}</p>
+          <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Devis #{quote.id.toUpperCase()}</p>
           <p style={{ color: 'var(--text-muted)', marginTop: 4 }}>{formatCurrencyAmount(quote.total, quote.currency)}</p>
         </div>
       </div>
@@ -164,7 +164,7 @@ const SignaturePage: React.FC = () => {
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         {/* Header */}
         <div style={{ background: '#0B3B2C', color: 'white', borderRadius: '12px 12px 0 0', padding: 30, textAlign: 'center' }}>
-          <h1>📄 Devis #{quote.id.slice(0, 8).toUpperCase()}</h1>
+          <h1>📄 Devis #{quote.id.toUpperCase()}</h1>
           <p style={{ opacity: 0.9, marginTop: 8 }}>Signez pour accepter ce devis</p>
         </div>
 

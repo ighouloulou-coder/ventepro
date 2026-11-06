@@ -115,7 +115,7 @@ const OverdueDashboard: React.FC = () => {
     const result = await sendInvoiceReminderSMS(invoice, client);
     logSMS({
       to: client.phone,
-      message: `Relance facture #${invoice.id.slice(0, 8)}`,
+      message: `Relance facture #${invoice.id}`,
       type: 'reminder',
       invoiceId: invoice.id,
       status: result.success ? 'sent' : 'failed',
@@ -282,7 +282,7 @@ const OverdueDashboard: React.FC = () => {
 
                   return (
                     <tr key={invoice.id}>
-                      <td><strong>#{invoice.id.slice(0, 8)}</strong></td>
+                      <td><strong>#{invoice.id}</strong></td>
                       <td>{invoice.clientName}</td>
                       <td><strong style={{ color: 'var(--text-danger)' }}>{formatCurrencyAmount(invoice.total, invoice.currency)}</strong></td>
                       <td>{invoice.currency}</td>

@@ -80,7 +80,7 @@ export const exportInvoicesToExcel = (invoices: Invoice[]): void => {
     const daysRemaining = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
     return [
-      invoice.id.slice(0, 8).toUpperCase(),
+      invoice.id.toUpperCase(),
       invoice.clientName,
       invoice.subtotal.toFixed(2),
       invoice.taxRate,
@@ -132,7 +132,7 @@ export const exportSingleInvoice = (invoice: Invoice): void => {
   rows.push(['', '', 'TOTAL:', invoice.total.toFixed(2)]);
 
   const csv = toCSV(headers, rows);
-  downloadCSV(csv, `facture-${invoice.id.slice(0, 8)}-${new Date().toISOString().split('T')[0]}.csv`);
+  downloadCSV(csv, `facture-${invoice.id}-${new Date().toISOString().split('T')[0]}.csv`);
 };
 
 // ============================================
@@ -154,7 +154,7 @@ export const exportOrdersToExcel = (orders: Order[]): void => {
   ];
 
   const rows = orders.map(order => [
-    order.id.slice(0, 8).toUpperCase(),
+    order.id.toUpperCase(),
     order.clientName,
     order.subtotal.toFixed(2),
     order.total.toFixed(2),
@@ -193,7 +193,7 @@ export const exportQuotesToExcel = (quotes: Quote[]): void => {
   ];
 
   const rows = quotes.map(quote => [
-    quote.id.slice(0, 8).toUpperCase(),
+    quote.id.toUpperCase(),
     quote.clientName,
     quote.subtotal.toFixed(2),
     quote.total.toFixed(2),

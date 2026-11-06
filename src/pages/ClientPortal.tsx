@@ -138,7 +138,7 @@ const ClientPortal: React.FC = () => {
                   <tbody>
                     {invoices.map(inv => (
                       <tr key={inv.id}>
-                        <td><strong>#{inv.id.slice(0, 8)}</strong></td>
+                        <td><strong>#{inv.id}</strong></td>
                         <td><strong>{formatCurrencyAmount(inv.total, inv.currency)}</strong></td>
                         <td><span className={`status-badge ${getStatusColor(inv.status)}`}>{inv.status}</span></td>
                         <td>{new Date(inv.dueDate).toLocaleDateString('fr-FR')}</td>
@@ -164,7 +164,7 @@ const ClientPortal: React.FC = () => {
                   <tbody>
                     {quotes.map(q => (
                       <tr key={q.id}>
-                        <td><strong>#{q.id.slice(0, 8)}</strong></td>
+                        <td><strong>#{q.id}</strong></td>
                         <td><strong>{formatCurrencyAmount(q.total, q.currency)}</strong></td>
                         <td><span className={`status-badge ${getStatusColor(q.status)}`}>{q.status}</span></td>
                         <td>{new Date(q.validUntil).toLocaleDateString('fr-FR')}</td>
@@ -190,7 +190,7 @@ const ClientPortal: React.FC = () => {
                   <tbody>
                     {orders.map(o => (
                       <tr key={o.id}>
-                        <td><strong>#{o.id.slice(0, 8)}</strong></td>
+                        <td><strong>#{o.id}</strong></td>
                         <td><strong>{formatCurrencyAmount(o.total, o.currency)}</strong></td>
                         <td><span className={`status-badge ${getStatusColor(o.status)}`}>{o.status.replace('_', ' ')}</span></td>
                         <td>{new Date(o.deliveryDate).toLocaleDateString('fr-FR')}</td>
@@ -218,7 +218,7 @@ const ClientPortal: React.FC = () => {
 
                       return (
                         <tr key={d.id}>
-                          <td><strong>#{d.id.slice(0, 8)}</strong></td>
+                          <td><strong>#{d.id}</strong></td>
                           <td><span className={`status-badge ${getStatusColor(d.status)}`}>{d.status.replace('_', ' ')}</span></td>
                           <td>{new Date(d.deliveryDate).toLocaleDateString('fr-FR')}</td>
                           <td>

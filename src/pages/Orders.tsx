@@ -60,7 +60,7 @@ const Orders: React.FC = () => {
       currency: quote.currency,
       deliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       deliveryAddress: client?.deliveryAddresses?.[0]?.address || '',
-      notes: `Converti depuis devis #${quote.id.slice(0, 8)}`,
+      notes: `Converti depuis devis #${quote.id}`,
     });
     setOrderItems(quote.items.map((item: any) => ({
       ...item,
@@ -211,7 +211,7 @@ const Orders: React.FC = () => {
           ) : (
             filteredOrders.map(order => (
               <tr key={order.id}>
-                <td><strong>#{order.id.slice(0, 8)}</strong></td>
+                <td><strong>#{order.id}</strong></td>
                 <td>{order.clientName}</td>
                 <td><strong>{formatCurrencyAmount(order.total, order.currency)}</strong></td>
                 <td>{order.currency}</td>
@@ -350,7 +350,7 @@ const Orders: React.FC = () => {
         <div className="modal-overlay" onClick={closeDetail}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="detail-header">
-              <h3>Commande #{selectedOrder.id.slice(0, 8)}</h3>
+              <h3>Commande #{selectedOrder.id}</h3>
               <span className={`status-badge ${getStatusColor(selectedOrder.status)}`}>{selectedOrder.status.replace('_', ' ')}</span>
             </div>
             <div className="invoice-detail">

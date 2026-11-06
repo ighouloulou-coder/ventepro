@@ -89,7 +89,7 @@ export const generateSignaturePageHTML = (quote: Quote): string => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Signature Devis #${quote.id.slice(0, 8)}</title>
+      <title>Signature Devis #${quote.id}</title>
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', sans-serif; background: #f9fafb; padding: 20px; }
@@ -108,7 +108,7 @@ export const generateSignaturePageHTML = (quote: Quote): string => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>📄 Devis #${quote.id.slice(0, 8).toUpperCase()}</h1>
+          <h1>📄 Devis #${quote.id.toUpperCase()}</h1>
           <p style="opacity:0.9;margin-top:8px">Veuillez signer pour accepter ce devis</p>
         </div>
         <div class="content">

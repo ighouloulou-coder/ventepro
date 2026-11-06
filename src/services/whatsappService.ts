@@ -28,7 +28,7 @@ export function sendInvoiceWhatsApp(invoiceId: string): void {
   
   let msg = '*Facture TRADE LINK*\n';
   msg += '-------------------\n';
-  msg += 'N°: #' + invoice.id.slice(0, 8) + '\n';
+  msg += 'N°: #' + invoice.id + '\n';
   msg += 'Client: ' + invoice.clientName + '\n';
   msg += 'Date: ' + new Date(invoice.createdAt).toLocaleDateString('fr-FR') + '\n';
   msg += '-------------------\n';
@@ -52,7 +52,7 @@ export function sendQuoteWhatsApp(quoteId: string): void {
   
   let msg = '*Devis TRADE LINK*\n';
   msg += '-------------------\n';
-  msg += 'N°: #' + quote.id.slice(0, 8) + '\n';
+  msg += 'N°: #' + quote.id + '\n';
   msg += 'Client: ' + quote.clientName + '\n';
   msg += 'Date: ' + new Date(quote.createdAt).toLocaleDateString('fr-FR') + '\n';
   msg += '-------------------\n';
@@ -75,7 +75,7 @@ export function sendOrderWhatsApp(orderId: string): void {
   
   let msg = '*Commande TRADE LINK*\n';
   msg += '-------------------\n';
-  msg += 'N°: #' + order.id.slice(0, 8) + '\n';
+  msg += 'N°: #' + order.id + '\n';
   msg += 'Client: ' + order.clientName + '\n';
   msg += 'Statut: ' + order.status + '\n';
   msg += 'Total: ' + fmt(order.total || 0) + '\n';
@@ -90,6 +90,6 @@ export function sendDeliveryReminder(phone: string, clientName: string, delivery
 }
 
 export function sendPaymentReminder(phone: string, clientName: string, amount: number, invoiceId: string): void {
-  const msg = '*Rappel Paiement*\n\nBonjour ' + clientName + ',\n\nNous vous rappelons le reglement de la facture #' + invoiceId.slice(0, 8) + ' d un montant de ' + fmt(amount) + '.\n\nMerci,\nTRADE LINK';
+  const msg = '*Rappel Paiement*\n\nBonjour ' + clientName + ',\n\nNous vous rappelons le reglement de la facture #' + invoiceId + ' d un montant de ' + fmt(amount) + '.\n\nMerci,\nTRADE LINK';
   sendWhatsAppMessage(phone, msg);
 }

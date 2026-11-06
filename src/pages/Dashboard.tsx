@@ -285,7 +285,7 @@ const Dashboard: React.FC = () => {
                   <tbody>
                     {stats.recentInvoices.map(inv => (
                       <tr key={inv.id}>
-                        <td><strong>#{inv.id.slice(0, 8)}</strong></td>
+                        <td><strong>#{inv.id}</strong></td>
                         <td>{inv.clientName}</td>
                         <td><strong>{fmt(inv.total)}</strong></td>
                         <td><span className={"status-badge " + statusColor(inv.status)}>{inv.status}</span></td>

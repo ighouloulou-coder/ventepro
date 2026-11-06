@@ -61,7 +61,7 @@ const generateInvoiceReminderHTML = (invoice: Invoice, client: Client): string =
             <table style="width: 100%; border-collapse: collapse;">
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Facture #</td>
-                <td style="padding: 8px 0; font-weight: 600; text-align: right;">${invoice.id.slice(0, 8).toUpperCase()}</td>
+                <td style="padding: 8px 0; font-weight: 600; text-align: right;">${invoice.id.toUpperCase()}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Montant</td>
@@ -81,7 +81,7 @@ const generateInvoiceReminderHTML = (invoice: Invoice, client: Client): string =
           <p>Merci de procéder au règlement dans les meilleurs délais.</p>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="mailto:${getConfig().fromEmail}?subject=Règlement facture ${invoice.id.slice(0, 8)}" 
+            <a href="mailto:${getConfig().fromEmail}?subject=Règlement facture ${invoice.id}" 
                style="background: #2563eb; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: 600;">
               Contacter nous
             </a>
@@ -114,7 +114,7 @@ const generatePaymentConfirmationHTML = (invoice: Invoice): string => {
             <table style="width: 100%;">
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Facture #</td>
-                <td style="padding: 8px 0; font-weight: 600; text-align: right;">${invoice.id.slice(0, 8).toUpperCase()}</td>
+                <td style="padding: 8px 0; font-weight: 600; text-align: right;">${invoice.id.toUpperCase()}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Montant payé</td>
@@ -143,7 +143,7 @@ const generateQuoteEmailHTML = (quote: Quote, client: Client): string => {
       <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
         <div style="background: #2563eb; color: white; padding: 20px; text-align: center;">
           <h1 style="margin: 0; font-size: 24px;">📄 Nouveau Devis</h1>
-          <p style="margin: 8px 0 0 0; opacity: 0.9;">Devis #${quote.id.slice(0, 8).toUpperCase()}</p>
+          <p style="margin: 8px 0 0 0; opacity: 0.9;">Devis #${quote.id.toUpperCase()}</p>
         </div>
         <div style="padding: 30px;">
           <p>Bonjour <strong>${client.name}</strong>,</p>
@@ -153,7 +153,7 @@ const generateQuoteEmailHTML = (quote: Quote, client: Client): string => {
             <table style="width: 100%;">
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Devis #</td>
-                <td style="padding: 8px 0; font-weight: 600; text-align: right;">${quote.id.slice(0, 8).toUpperCase()}</td>
+                <td style="padding: 8px 0; font-weight: 600; text-align: right;">${quote.id.toUpperCase()}</td>
               </tr>
               <tr>
                 <td style="padding: 8px 0; color: #6b7280;">Montant Total</td>
@@ -169,7 +169,7 @@ const generateQuoteEmailHTML = (quote: Quote, client: Client): string => {
           <p>Pour accepter ce devis, merci de nous contacter.</p>
           
           <div style="text-align: center; margin: 30px 0;">
-            <a href="mailto:${getConfig().fromEmail}?subject=Acceptation devis ${quote.id.slice(0, 8)}" 
+            <a href="mailto:${getConfig().fromEmail}?subject=Acceptation devis ${quote.id}" 
                style="background: #16a34a; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: 600;">
               ✅ Accepter le devis
             </a>
@@ -243,8 +243,8 @@ export const sendInvoiceReminderEmail = async (invoice: Invoice, client: Client)
     (Date.now() - new Date(invoice.dueDate).getTime()) / (1000 * 60 * 60 * 24)
   ));
   const subject = daysOverdue > 0
-    ? `⚠️ Retard ${daysOverdue}j - Facture #${invoice.id.slice(0, 8)}`
-    : `📄 Rappel - Facture #${invoice.id.slice(0, 8)}`;
+    ? `⚠️ Retard ${daysOverdue}j - Facture #${invoice.id}`
+    : `📄 Rappel - Facture #${invoice.id}`;
 
   return sendEmail(client.email, subject, html);
 };
@@ -258,7 +258,7 @@ export const sendQuoteByEmail = async (quote: Quote, client: Client): Promise<Em
   }
 
   const html = generateQuoteEmailHTML(quote, client);
-  const subject = `📄 Devis #${quote.id.slice(0, 8).toUpperCase()} - ${formatAmount(quote.total, quote.currency)}`;
+  const subject = `📄 Devis #${quote.id.toUpperCase()} - ${formatAmount(quote.total, quote.currency)}`;
 
   return sendEmail(client.email, subject, html);
 };
@@ -272,7 +272,7 @@ export const sendPaymentConfirmationEmail = async (invoice: Invoice, client: Cli
   }
 
   const html = generatePaymentConfirmationHTML(invoice);
-  const subject = `✅ Paiement confirmé - Facture #${invoice.id.slice(0, 8)}`;
+  const subject = `✅ Paiement confirmé - Facture #${invoice.id}`;
 
   return sendEmail(client.email, subject, html);
 };
