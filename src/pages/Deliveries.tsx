@@ -581,7 +581,7 @@ const Deliveries: React.FC = () => {
                 ))}
               </tbody>
             </table>
-            {selectedDelivery.notes && <p style={{ marginTop: 16, fontStyle: 'italic', color: 'var(--text-muted)' }}>📝 {selectedDelivery.notes}</p>}
+            {selectedDelivery.notes && <p style={{ marginTop: 16, color: 'var(--text-muted)' }}>📝 {selectedDelivery.notes}</p>}
             <div className="modal-actions">
               {!selectedDelivery.transferredToInvoice && (
                 <button
