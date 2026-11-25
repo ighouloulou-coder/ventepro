@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '../components/Toast';
 
 const Deliveries: React.FC = () => {
-  const { showToast } = useToast();
+  const { error, success, warning } = useToast();
   const [deliveries, setDeliveries] = useState<DeliveryNote[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [clients, setClients] = useState<any[]>([]);
@@ -131,11 +131,11 @@ const Deliveries: React.FC = () => {
   // ================== Transfert BL → Facture ==================
   const transferToInvoice = (ids: string[]) => {
     const list = deliveries.filter(d => ids.includes(d.id) && !d.transferredToInvoice);
-    if (list.length === 0) { showToast('Aucun BL à transférer (déjà facturé ?)', 'warning'); return; }
+    if (list.length === 0) { warning('Aucun BL à transférer (déjà facturé ?)'); return; }
 
     const clientIds = [...new Set(list.map(d => d.clientId))];
     if (clientIds.length !== 1) {
-      showToast('La facture regroupe plusieurs BL du MÊME client. Vos BL sélectionnés concernent plusieurs clients — sélectionnez-les séparément.', 'error');
+      error('La facture regroupe plusieurs BL du MÊME client. Vos BL sélectionnés concernent plusieurs clients — sélectionnez-les séparément.');
       return;
     }
 
@@ -169,7 +169,7 @@ const Deliveries: React.FC = () => {
 
     const items = [...itemsMap.values()];
     if (items.length === 0) {
-      showToast('Aucune quantité livrée à facturer sur ces BL.', 'error');
+      error('Aucune quantité livrée à facturer sur ces BL.');
       return;
     }
 
@@ -214,7 +214,7 @@ const Deliveries: React.FC = () => {
       deliveryStorage.update(d.id, { transferredToInvoice: invoice.id });
     }
     loadData();
-    showToast(`Facture créée pour ${client?.name || ''} (${list.length} BL, ${total.toFixed(2)} MAD). Elle est dans la page Factures en brouillon.`, 'success');
+    success(`Facture créée pour ${client?.name || ''} (${list.length} BL, ${total.toFixed(2)} MAD). Elle est dans la page Factures en brouillon.`);
   };
 
   const toggleSelect = (id: string) => {
@@ -234,8 +234,8 @@ const Deliveries: React.FC = () => {
     e.preventDefault();
 
     if (modeBL === 'commande') {
-      if (!formData.orderId) { showToast('Sélectionnez une commande', 'warning'); return; }
-      if (deliveryItems.length === 0) { showToast('Ajoutez des produits', 'warning'); return; }
+      if (!formData.orderId) { warning('Sélectionnez une commande'); return; }
+      if (deliveryItems.length === 0) { warning('Ajoutez des produits'); return; }
 
       const order = orders.find(o => o.id === formData.orderId);
       const client = clients.find(c => c.id === order?.clientId);
@@ -263,9 +263,9 @@ const Deliveries: React.FC = () => {
     }
 
     // Mode direct : client + produits
-    if (!directClientId) { showToast('Sélectionnez un client', 'warning'); return; }
+    if (!directClientId) { warning('Sélectionnez un client'); return; }
     const validItems = directItems.filter(it => it.productId && it.quantity > 0);
-    if (validItems.length === 0) { showToast('Ajoutez au moins un produit avec une quantité', 'warning'); return; }
+    if (validItems.length === 0) { warning('Ajoutez au moins un produit avec une quantité'); return; }
 
     const client = clientStorage.getById(directClientId);
     const delivery: DeliveryNote = {

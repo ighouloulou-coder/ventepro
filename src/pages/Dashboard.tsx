@@ -18,7 +18,7 @@ import { useToast } from '../components/Toast';
 const COLORS = ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#8b5cf6', '#ec4899'];
 
 const Dashboard: React.FC = () => {
-  const { showToast } = useToast();
+  const { error } = useToast();
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -56,7 +56,7 @@ const Dashboard: React.FC = () => {
       loadData();
       setLastSync(new Date().toLocaleTimeString('fr-FR'));
     } catch (e) {
-      showToast('Erreur de synchronisation.', 'error');
+      error('Erreur de synchronisation.');
     } finally {
       setSyncing(false);
     }

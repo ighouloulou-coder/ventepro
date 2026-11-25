@@ -9,7 +9,7 @@ import { sanitizeInput, sanitizeEmail, sanitizePhone, isValidString } from '../s
 import { useToast } from '../components/Toast';
 
 const Clients: React.FC = () => {
-  const { showToast } = useToast();
+  const { error } = useToast();
   const [clients, setClients] = useState<Client[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -63,12 +63,12 @@ const Clients: React.FC = () => {
 
     // Validation et sanitization
     if (!isValidString(formData.name, 1)) {
-      showToast('Le nom du client est requis', 'error');
+      error('Le nom du client est requis');
       return;
     }
 
     if (formData.email && !sanitizeEmail(formData.email)) {
-      showToast('Adresse email invalide', 'error');
+      error('Adresse email invalide');
       return;
     }
 
