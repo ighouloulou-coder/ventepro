@@ -104,7 +104,7 @@ const FirebaseTest: React.FC = () => {
         <h2>🔧 Test de Synchronisation Firebase</h2>
       </div>
 
-      <div style={{ background: 'var(--bg-secondary)', borderRadius: 12, padding: 24, marginBottom: 20 }}>
+      <div style={{ background: 'var(--bg-secondary)', borderRadius: 12, padding: 24, marginBottom: 16 }}>
         <h3>Ce que fait ce test :</h3>
         <ol style={{ lineHeight: 2 }}>
           <li><strong>Écriture</strong> — Envoie un produit test vers Firestore (le cloud)</li>
@@ -113,12 +113,12 @@ const FirebaseTest: React.FC = () => {
         </ol>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
         <button
           className="btn btn-primary"
           onClick={runTest}
           disabled={testRunning}
-          style={{ fontSize: '1.1rem', padding: '12px 24px' }}
+          style={{ fontSize: '1rem', padding: '12px 24px' }}
         >
           {testRunning ? '⏳ Test en cours...' : '🚀 Lancer le test'}
         </button>
@@ -136,13 +136,13 @@ const FirebaseTest: React.FC = () => {
           background: '#1a1a2e',
           color: '#e0e0e0',
           borderRadius: 12,
-          padding: 20,
+          padding: 16,
           fontFamily: 'monospace',
-          fontSize: '0.9rem',
+          fontSize: '0.875rem',
           maxHeight: 400,
           overflow: 'auto',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
             <strong style={{ color: '#4ade80' }}>📋 Résultats du test</strong>
             <button
               onClick={clearLogs}

@@ -138,7 +138,7 @@ const SignaturePage: React.FC = () => {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f9fafb' }}>
         <div className="empty-state">
-          <p style={{ fontSize: '1.2rem' }}>❌ Devis introuvable</p>
+          <p style={{ fontSize: '1.125rem' }}>❌ Devis introuvable</p>
           <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Lien invalide ou devis inexistant</p>
         </div>
       </div>
@@ -149,7 +149,7 @@ const SignaturePage: React.FC = () => {
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#f0fdf4' }}>
         <div style={{ textAlign: 'center', background: 'white', padding: 40, borderRadius: 12, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-          <div style={{ fontSize: '4rem', marginBottom: 16 }}>✅</div>
+          <div style={{ fontSize: '3.75rem', marginBottom: 16 }}>✅</div>
           <h2 style={{ color: 'var(--text-success)', marginBottom: 8 }}>Devis Signé !</h2>
           <p style={{ color: 'var(--text-muted)' }}>Merci {signerName}, votre signature a été enregistrée.</p>
           <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Devis #{quote.id.toUpperCase()}</p>
@@ -160,30 +160,30 @@ const SignaturePage: React.FC = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f9fafb', padding: 20 }}>
+    <div style={{ minHeight: '100vh', background: '#f9fafb', padding: 16 }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         {/* Header */}
-        <div style={{ background: '#0B3B2C', color: 'white', borderRadius: '12px 12px 0 0', padding: 30, textAlign: 'center' }}>
+        <div style={{ background: '#0B3B2C', color: 'white', borderRadius: '12px 12px 0 0', padding: 32, textAlign: 'center' }}>
           <h1>📄 Devis #{quote.id.toUpperCase()}</h1>
           <p style={{ opacity: 0.9, marginTop: 8 }}>Signez pour accepter ce devis</p>
         </div>
 
         {/* Contenu */}
-        <div style={{ background: 'white', borderRadius: '0 0 12px 12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', padding: 30 }}>
+        <div style={{ background: 'white', borderRadius: '0 0 12px 12px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', padding: 32 }}>
           {/* Infos devis */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
             <div>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Client</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Client</p>
               <p style={{ fontWeight: 600 }}>{quote.clientName}</p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Total</p>
-              <p style={{ fontWeight: 700, fontSize: '1.3rem', color: 'var(--text-primary-brand)' }}>{formatCurrencyAmount(quote.total, quote.currency)}</p>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>Total</p>
+              <p style={{ fontWeight: 700, fontSize: '1.25rem', color: 'var(--text-primary-brand)' }}>{formatCurrencyAmount(quote.total, quote.currency)}</p>
             </div>
           </div>
 
           {/* Tableau */}
-          <table className="detail-table" style={{ marginBottom: 20 }}>
+          <table className="detail-table" style={{ marginBottom: 16 }}>
             <thead>
               <tr><th>Produit</th><th>Qté</th><th>Prix</th><th>Total</th></tr>
             </thead>
@@ -204,12 +204,12 @@ const SignaturePage: React.FC = () => {
             </tfoot>
           </table>
 
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: 30 }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: 32 }}>
             Valide jusqu'au {new Date(quote.validUntil).toLocaleDateString('fr-FR')}
           </p>
 
           {/* Formulaire de signature */}
-          <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 30 }}>
+          <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: 32 }}>
             <h3 style={{ marginBottom: 16 }}>✍️ Votre Signature</h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
@@ -240,7 +240,7 @@ const SignaturePage: React.FC = () => {
               <button
                 type="button"
                 onClick={clearCanvas}
-                style={{ marginTop: 8, padding: '6px 12px', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 6, cursor: 'pointer', fontSize: '0.85rem' }}
+                style={{ marginTop: 8, padding: '4px 12px', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 6, cursor: 'pointer', fontSize: '0.75rem' }}
               >
                 🗑️ Effacer la signature
               </button>
@@ -252,13 +252,13 @@ const SignaturePage: React.FC = () => {
                 className="btn btn-success"
                 onClick={handleSign}
                 disabled={!signerName || !signerEmail}
-                style={{ padding: '15px 40px', fontSize: '1.1rem', fontWeight: 600 }}
+                style={{ padding: '16px 40px', fontSize: '1rem', fontWeight: 600 }}
               >
                 ✅ Signer le devis
               </button>
             </div>
 
-            <p style={{ color: '#9ca3af', fontSize: '0.8rem', textAlign: 'center', marginTop: 16 }}>
+            <p style={{ color: '#9ca3af', fontSize: '0.75rem', textAlign: 'center', marginTop: 16 }}>
               En signant, vous confirmez l'acceptation de ce devis.
             </p>
           </div>

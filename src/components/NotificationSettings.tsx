@@ -24,7 +24,7 @@ const NotificationSettings: React.FC = () => {
   return (
     <div style={{
       background: 'var(--bg-primary)',
-      borderRadius: 14,
+      borderRadius: 12,
       padding: 16,
       border: '1px solid var(--border-color)',
       marginBottom: 16,
@@ -32,13 +32,13 @@ const NotificationSettings: React.FC = () => {
       alignItems: 'center',
       justifyContent: 'space-between',
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <span style={{ fontSize: '1.3rem' }}>🔔</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: '1.25rem' }}>🔔</span>
         <div>
-          <p style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+          <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)' }}>
             Notifications
           </p>
-          <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
             {enabled ? 'Activées' : 'Désactivées'} — Nouvelles commandes, factures, livraisons
           </p>
         </div>
@@ -51,10 +51,10 @@ const NotificationSettings: React.FC = () => {
           background: enabled ? 'var(--success)' : 'var(--bg-tertiary)',
           color: enabled ? 'white' : 'var(--text-primary)',
           border: 'none',
-          borderRadius: 10,
+          borderRadius: 8,
           padding: '8px 16px',
           fontWeight: 600,
-          fontSize: '0.78rem',
+          fontSize: '0.75rem',
           cursor: 'pointer',
         }}
       >

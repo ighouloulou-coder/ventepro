@@ -240,7 +240,7 @@ const OverdueDashboard: React.FC = () => {
         {Object.keys(currencyData).length > 0 && (
           <div className="chart-card">
             <h3>💱 Répartition par Devise</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 20 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 16 }}>
               {Object.entries(currencyData).map(([currency, data]) => (
                 <div key={currency} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: '#f9fafb', borderRadius: 8 }}>
                   <div>
@@ -291,7 +291,7 @@ const OverdueDashboard: React.FC = () => {
                         <span style={{
                           padding: '2px 8px',
                           borderRadius: 12,
-                          fontSize: '0.8rem',
+                          fontSize: '0.75rem',
                           fontWeight: 600,
                           background: daysOverdue > 30 ? '#fee2e2' : daysOverdue > 7 ? '#fef3c7' : '#dbeafe',
                           color: daysOverdue > 30 ? '#991b1b' : daysOverdue > 7 ? '#92400e' : '#1e40af',
@@ -324,8 +324,8 @@ const OverdueDashboard: React.FC = () => {
       )}
 
       {unpaidInvoices.length === 0 && (
-        <div className="empty-state" style={{ padding: 60 }}>
-          <p style={{ fontSize: '1.2rem' }}>🎉 Aucun impayé !</p>
+        <div className="empty-state" style={{ padding: 64 }}>
+          <p style={{ fontSize: '1.125rem' }}>🎉 Aucun impayé !</p>
           <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Toutes vos factures sont payées.</p>
         </div>
       )}

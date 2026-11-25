@@ -332,7 +332,7 @@ const Products: React.FC = () => {
       <FloatingShapes />
       <div className="page-header">
         <h2>📦 Gestion des Produits</h2>
-        <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ display: 'flex', gap: 8 }}>
           <input
             ref={fileInputRef}
             type="file"
@@ -360,7 +360,7 @@ const Products: React.FC = () => {
           placeholder="🔍 Chercher un produit…"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          style={{ flex: 1, padding: '10px 14px', fontSize: 16, borderRadius: 8, border: '1px solid #cbd5e1' }}
+          style={{ flex: 1, padding: '8px 12px', fontSize: 16, borderRadius: 8, border: '1px solid #cbd5e1' }}
         />
         {searchQuery && (
           <button className="btn btn-secondary" onClick={() => setSearchQuery('')} title="Effacer">
@@ -461,7 +461,7 @@ const Products: React.FC = () => {
             sortedProducts.map(product => (
               <tr key={product.id}>
                 <td data-label="Produit">
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     {product.photo ? (
                       <img
                         src={product.photo}
@@ -473,7 +473,7 @@ const Products: React.FC = () => {
                         width: 40, height: 40, borderRadius: 8,
                         background: 'var(--bg-tertiary)',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '1.2rem',
+                        fontSize: '1.125rem',
                       }}>📦</div>
                     )}
                     <strong>{product.name}</strong>
@@ -484,22 +484,22 @@ const Products: React.FC = () => {
                 <td data-label="Prix Vente"><strong>{formatCurrency(product.price)}</strong></td>
                 <td data-label="Poids">
                   {product.weightPerUnitKg ? (
-                    <span style={{ fontSize: '0.8rem', color: 'var(--gray-600)' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--gray-600)' }}>
                       {product.weightPerUnitKg < 1
                         ? `${Math.round(product.weightPerUnitKg * 1000)} g`
                         : `${product.weightPerUnitKg.toFixed(3).replace('.', ',')} kg`}
                     </span>
                   ) : (
-                    <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
+                    <span style={{ color: 'var(--gray-400)', fontSize: '0.75rem' }}>-</span>
                   )}
                 </td>
                 <td data-label="Code douanier">
                   {product.codeDouanier ? (
-                    <span style={{ fontSize: '0.8rem', fontFamily: 'monospace', color: 'var(--gray-700)' }}>
+                    <span style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--gray-700)' }}>
                       {product.codeDouanier}
                     </span>
                   ) : (
-                    <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
+                    <span style={{ color: 'var(--gray-400)', fontSize: '0.75rem' }}>-</span>
                   )}
                 </td>
                 <td data-label="Marge">
@@ -515,7 +515,7 @@ const Products: React.FC = () => {
                       +{product.margin}%
                     </span>
                   ) : (
-                    <span style={{ color: 'var(--gray-400)', fontSize: '0.8rem' }}>-</span>
+                    <span style={{ color: 'var(--gray-400)', fontSize: '0.75rem' }}>-</span>
                   )}
                 </td>
                 <td data-label="Stock">
@@ -547,7 +547,7 @@ const Products: React.FC = () => {
             <h3>{editingProduct ? 'Modifier le Produit' : 'Ajouter un Produit'}</h3>
             <form onSubmit={handleSubmit}>
               {/* Photo */}
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
                 <PhotoUpload
                   currentPhoto={formData.photo}
                   onPhotoChange={(photo) => setFormData({ ...formData, photo })}
@@ -623,13 +623,13 @@ const Products: React.FC = () => {
                   background: 'var(--bg-info)',
                   border: '1px solid var(--border-info)',
                   borderRadius: 8,
-                  padding: '10px 16px',
+                  padding: '8px 16px',
                   marginBottom: 16,
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                 }}>
-                  <span style={{ fontSize: '0.85rem', color: 'var(--text-info)' }}>Marge calculée :</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-info)' }}>Marge calculée :</span>
                   <span style={{
                     fontWeight: 700,
                     fontSize: '1rem',

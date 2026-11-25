@@ -45,7 +45,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 9999,
-            padding: 20,
+            padding: 16,
           }}
           onClick={onCancel}
         >
@@ -57,14 +57,14 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             onClick={(e) => e.stopPropagation()}
             style={{
               background: 'white',
-              borderRadius: 20,
-              padding: 28,
+              borderRadius: 16,
+              padding: 24,
               maxWidth: 400,
               width: '100%',
               boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
             }}
           >
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <div style={{ textAlign: 'center', marginBottom: 16 }}>
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
@@ -78,7 +78,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '2rem',
+                  fontSize: '1.875rem',
                   margin: '0 auto 16px',
                 }}
               >
@@ -86,7 +86,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               </motion.div>
               
               <h3 style={{
-                fontSize: '1.2rem',
+                fontSize: '1.125rem',
                 fontWeight: 700,
                 color: '#1f2937',
                 marginBottom: 8,
@@ -95,7 +95,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
               </h3>
               
               <p style={{
-                fontSize: '0.9rem',
+                fontSize: '0.875rem',
                 color: '#6b7280',
                 lineHeight: 1.5,
               }}>
@@ -115,7 +115,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                   color: '#374151',
                   border: 'none',
                   borderRadius: 12,
-                  fontSize: '0.9rem',
+                  fontSize: '0.875rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}
@@ -134,7 +134,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                   color: 'white',
                   border: 'none',
                   borderRadius: 12,
-                  fontSize: '0.9rem',
+                  fontSize: '0.875rem',
                   fontWeight: 600,
                   cursor: 'pointer',
                 }}

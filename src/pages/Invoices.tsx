@@ -278,11 +278,11 @@ const Invoices: React.FC = () => {
         const remindersNeeded = getInvoicesNeedingReminder(invoices, clients);
         if (remindersNeeded.length === 0) return null;
         return (
-          <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 12, padding: 20, marginBottom: 20 }}>
-            <h3 style={{ margin: '0 0 12px 0', fontSize: '1.1rem' }}>📱 Relances WhatsApp à envoyer ({remindersNeeded.length})</h3>
+          <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', borderRadius: 12, padding: 16, marginBottom: 16 }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '1rem' }}>📱 Relances WhatsApp à envoyer ({remindersNeeded.length})</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {remindersNeeded.slice(0, 5).map(({ invoice, client, type }, index) => (
-                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '10px 16px', borderRadius: 8 }}>
+                <div key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'white', padding: '8px 16px', borderRadius: 8 }}>
                   <div>
                     <strong>{getReminderTypeLabel(type)}</strong>
                     <span style={{ marginLeft: 8, color: 'var(--text-muted)' }}>Facture #{invoice.id} - {client.name}</span>

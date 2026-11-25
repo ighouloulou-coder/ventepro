@@ -114,7 +114,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
                 opacity: 0,
                 transition: 'opacity 0.2s',
                 color: 'white',
-                fontSize: '0.8rem',
+                fontSize: '0.75rem',
                 gap: 4,
               }}
               className="photo-overlay"
@@ -127,7 +127,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
                   color: 'white',
                   border: 'none',
                   borderRadius: 6,
-                  padding: '4px 10px',
+                  padding: '4px 8px',
                   fontSize: '0.75rem',
                   cursor: 'pointer',
                 }}
@@ -138,9 +138,9 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
           </>
         ) : (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 8 }}>
-            <div style={{ fontSize: '2rem', marginBottom: 4 }}>📷</div>
+            <div style={{ fontSize: '1.875rem', marginBottom: 4 }}>📷</div>
             <div style={{ fontSize: '0.75rem' }}>Ajouter une photo</div>
-            <div style={{ fontSize: '0.65rem', marginTop: 2 }}>ou glisser-déposer</div>
+            <div style={{ fontSize: '0.75rem', marginTop: 2 }}>ou glisser-déposer</div>
           </div>
         )}
       </div>
@@ -152,7 +152,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             className="btn btn-small"
-            style={{ fontSize: '0.8rem' }}
+            style={{ fontSize: '0.75rem' }}
           >
             📷 Changer
           </button>
@@ -160,7 +160,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({
             type="button"
             onClick={handleRemove}
             className="btn btn-small btn-danger"
-            style={{ fontSize: '0.8rem' }}
+            style={{ fontSize: '0.75rem' }}
           >
             🗑️ Supprimer
           </button>

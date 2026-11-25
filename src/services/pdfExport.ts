@@ -123,7 +123,7 @@ export const exportInvoiceToPDF = (invoice: Invoice) => {
       fillColor: [249, 250, 251],
     },
     styles: {
-      fontSize: 9,
+      fontSize: 12,
       cellPadding: 2,
     },
     columnStyles: {
@@ -256,7 +256,7 @@ export const exportDeliveryToPDF = (delivery: DeliveryNote) => {
       fillColor: [249, 250, 251],
     },
     styles: {
-      fontSize: 8,
+      fontSize: 12,
       cellPadding: 2,
     },
     columnStyles: {
@@ -365,7 +365,7 @@ export const exportAllInvoicesToPDF = (invoices: Invoice[]) => {
       fillColor: [249, 250, 251],
     },
     styles: {
-      fontSize: 8,
+      fontSize: 12,
       cellPadding: 3,
     },
     columnStyles: {

@@ -6,8 +6,10 @@ import { useSyncReload } from '../hooks/useSyncReload';
 import { Client } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, sanitizeEmail, sanitizePhone, isValidString } from '../services/sanitize';
+import { useToast } from '../components/Toast';
 
 const Clients: React.FC = () => {
+  const { showToast } = useToast();
   const [clients, setClients] = useState<Client[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -61,12 +63,12 @@ const Clients: React.FC = () => {
 
     // Validation et sanitization
     if (!isValidString(formData.name, 1)) {
-      alert('Le nom du client est requis');
+      showToast('Le nom du client est requis', 'error');
       return;
     }
 
     if (formData.email && !sanitizeEmail(formData.email)) {
-      alert('Adresse email invalide');
+      showToast('Adresse email invalide', 'error');
       return;
     }
 

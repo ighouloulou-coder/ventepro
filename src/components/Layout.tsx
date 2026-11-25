@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { ChartBar, Package, Users, FileText, ClipboardText, Truck, Tag, Receipt, Warning, User, Gauge, Factory, ChartLine, Pulse, Gear } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initTheme, toggleTheme } from '../services/theme';
 import { getCurrentUser, logout } from '../services/authService';
@@ -58,27 +59,27 @@ const Layout: React.FC = () => {
   }, [sidebarOpen]);
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: '📊' },
-    { path: '/products', label: 'Produits', icon: '📦' },
-    { path: '/clients', label: 'Clients', icon: '👥' },
+    { path: '/', label: 'Dashboard', icon: <ChartBar size={20} weight="regular" /> },
+    { path: '/products', label: 'Produits', icon: <Package size={20} weight="regular" /> },
+    { path: '/clients', label: 'Clients', icon: <Users size={20} weight="regular" /> },
     { divider: true },
-    { path: '/quotes', label: 'Devis', icon: '📄' },
-    { path: '/orders', label: 'Commandes', icon: '📋' },
-    { path: '/deliveries', label: 'Livraisons', icon: '🚚' },
-    { path: '/pricing', label: 'Tarifs', icon: '💲' },
+    { path: '/quotes', label: 'Devis', icon: <FileText size={20} weight="regular" /> },
+    { path: '/orders', label: 'Commandes', icon: <ClipboardText size={20} weight="regular" /> },
+    { path: '/deliveries', label: 'Livraisons', icon: <Truck size={20} weight="regular" /> },
+    { path: '/pricing', label: 'Tarifs', icon: <Tag size={20} weight="regular" /> },
     { divider: true },
-    { path: '/invoices', label: 'Factures', icon: '🧾' },
-    { path: '/overdue', label: 'Impayés', icon: '🚨' },
-    { path: '/portal', label: 'Portail Client', icon: '👤' },
+    { path: '/invoices', label: 'Factures', icon: <Receipt size={20} weight="regular" /> },
+    { path: '/overdue', label: 'Impayés', icon: <Warning size={20} weight="regular" /> },
+    { path: '/portal', label: 'Portail Client', icon: <User size={20} weight="regular" /> },
     { divider: true },
-    { path: '/supplier-dashboard', label: 'Dashboard Fourn.', icon: '🏭' },
-    { path: '/suppliers', label: 'Fournisseurs', icon: '🏭' },
-    { path: '/supplier-orders', label: 'Cmd Fournisseurs', icon: '📋' },
+    { path: '/supplier-dashboard', label: 'Dashboard Fourn.', icon: <Gauge size={20} weight="regular" /> },
+    { path: '/suppliers', label: 'Fournisseurs', icon: <Factory size={20} weight="regular" /> },
+    { path: '/supplier-orders', label: 'Cmd Fournisseurs', icon: <ClipboardText size={20} weight="regular" /> },
     { divider: true },
-    { path: '/analytics', label: 'Analytics', icon: '📊' },
-    { path: '/monitoring', label: 'Monitoring', icon: '📈' },
+    { path: '/analytics', label: 'Analytics', icon: <ChartLine size={20} weight="regular" /> },
+    { path: '/monitoring', label: 'Monitoring', icon: <Pulse size={20} weight="regular" /> },
     { divider: true },
-    { path: '/settings', label: 'Paramètres', icon: '⚙️' },
+    { path: '/settings', label: 'Paramètres', icon: <Gear size={20} weight="regular" /> },
   ];
 
   return (
@@ -175,7 +176,7 @@ const Layout: React.FC = () => {
 
         {/* User Info & Logout */}
         <div style={{
-          padding: '16px 20px',
+          padding: '16px 16px',
           borderTop: '1px solid var(--border-color)',
           marginTop: 'auto',
         }}>
@@ -203,7 +204,7 @@ const Layout: React.FC = () => {
               <div style={{ flex: 1, overflow: 'hidden' }}>
                 <p style={{
                   fontWeight: 600,
-                  fontSize: '0.85rem',
+                  fontSize: '0.75rem',
                   color: 'var(--text-primary)',
                   margin: 0,
                   whiteSpace: 'nowrap',
@@ -213,7 +214,7 @@ const Layout: React.FC = () => {
                   {user.displayName || 'Utilisateur'}
                 </p>
                 <p style={{
-                  fontSize: '0.7rem',
+                  fontSize: '0.75rem',
                   color: 'var(--text-muted)',
                   margin: 0,
                   whiteSpace: 'nowrap',
@@ -232,12 +233,12 @@ const Layout: React.FC = () => {
             whileTap={{ scale: loggingOut ? 1 : 0.98 }}
             style={{
               width: '100%',
-              padding: '10px 16px',
+              padding: '8px 16px',
               background: 'var(--danger)',
               color: 'white',
               border: 'none',
-              borderRadius: 10,
-              fontSize: '0.85rem',
+              borderRadius: 8,
+              fontSize: '0.75rem',
               fontWeight: 600,
               cursor: loggingOut ? 'wait' : 'pointer',
               opacity: loggingOut ? 0.8 : 1,
@@ -283,7 +284,7 @@ const Layout: React.FC = () => {
               background: '#10b981',
               color: 'white',
               border: 'none',
-              fontSize: '1.1rem',
+              fontSize: '1rem',
               cursor: 'pointer',
               boxShadow: '0 4px 15px rgba(16, 185, 129, 0.4)',
               display: 'flex',

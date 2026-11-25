@@ -164,8 +164,8 @@ const Pricing: React.FC = () => {
       </div>
 
       {tiers.length === 0 ? (
-        <div className="empty-state" style={{ padding: '60px 20px' }}>
-          <p style={{ fontSize: '1.2rem', marginBottom: 8 }}>💲 Aucun tarif configuré</p>
+        <div className="empty-state" style={{ padding: '64px 16px' }}>
+          <p style={{ fontSize: '1.125rem', marginBottom: 8 }}>💲 Aucun tarif configuré</p>
           <p style={{ color: 'var(--text-muted)' }}>Ajoutez des tarifs spéciaux pour vos clients industriels</p>
         </div>
       ) : (
@@ -195,7 +195,7 @@ const Pricing: React.FC = () => {
                     <span style={{
                       padding: '2px 8px',
                       borderRadius: 12,
-                      fontSize: '0.8rem',
+                      fontSize: '0.75rem',
                       fontWeight: 600,
                       background: discount > 0 ? '#dcfce7' : '#f3f4f6',
                       color: discount > 0 ? '#166534' : '#6b7280',

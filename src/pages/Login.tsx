@@ -224,7 +224,7 @@ const Login: React.FC = () => {
           <div className="login-password-wrapper">
             <input type={showPassword ? 'text' : 'password'} value={setupPassword}
               onChange={(e) => setSetupPassword(e.target.value)} placeholder="••••••••"
-              required autoComplete="new-password" style={{ paddingRight: 50 }} />
+              required autoComplete="new-password" style={{ paddingRight: 48 }} />
             <button type="button" className="login-password-toggle"
               onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? '👁️' : '👁️‍🗨️'}
@@ -320,7 +320,7 @@ const Login: React.FC = () => {
                 placeholder="••••••••"
                 required
                 autoComplete="current-password"
-                style={{ paddingRight: 50 }}
+                style={{ paddingRight: 48 }}
               />
               <button
                 type="button"

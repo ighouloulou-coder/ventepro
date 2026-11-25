@@ -102,7 +102,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
           transition={{ duration: 0.3 }}
         >
           <div className="splash-progress-track">
-            <motion.div className="splash-progress-bar" style={{ width: progress + '%' }} />
+            <motion.div className="splash-progress-bar" style={{ transform: `scaleX(${progress / 100})` }} />
           </div>
           <motion.span className="splash-progress-text" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {progress < 100 ? 'Chargement...' : 'Pret !'}

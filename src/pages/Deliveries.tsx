@@ -7,8 +7,10 @@ import { useSyncReload } from '../hooks/useSyncReload';
 import { DeliveryNote, DeliveryItem, Order, Invoice, InvoiceItem } from '../types';
 import { sanitizeInput } from '../services/sanitize';
 import { v4 as uuidv4 } from 'uuid';
+import { useToast } from '../components/Toast';
 
 const Deliveries: React.FC = () => {
+  const { showToast } = useToast();
   const [deliveries, setDeliveries] = useState<DeliveryNote[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [clients, setClients] = useState<any[]>([]);
@@ -129,11 +131,11 @@ const Deliveries: React.FC = () => {
   // ================== Transfert BL → Facture ==================
   const transferToInvoice = (ids: string[]) => {
     const list = deliveries.filter(d => ids.includes(d.id) && !d.transferredToInvoice);
-    if (list.length === 0) { alert('Aucun BL à transférer (déjà facturé ?)'); return; }
+    if (list.length === 0) { showToast('Aucun BL à transférer (déjà facturé ?)', 'warning'); return; }
 
     const clientIds = [...new Set(list.map(d => d.clientId))];
     if (clientIds.length !== 1) {
-      alert('❌ La facture regroupe plusieurs BL du MÊME client. Vos BL sélectionnés concernent plusieurs clients — sélectionnez-les séparément.');
+      showToast('La facture regroupe plusieurs BL du MÊME client. Vos BL sélectionnés concernent plusieurs clients — sélectionnez-les séparément.', 'error');
       return;
     }
 
@@ -167,7 +169,7 @@ const Deliveries: React.FC = () => {
 
     const items = [...itemsMap.values()];
     if (items.length === 0) {
-      alert('❌ Aucune quantité livrée à facturer sur ces BL.');
+      showToast('Aucune quantité livrée à facturer sur ces BL.', 'error');
       return;
     }
 
@@ -212,7 +214,7 @@ const Deliveries: React.FC = () => {
       deliveryStorage.update(d.id, { transferredToInvoice: invoice.id });
     }
     loadData();
-    alert(`✅ Facture créée pour ${client?.name || ''} (${list.length} BL, ${total.toFixed(2)} MAD). Elle est dans la page Factures en brouillon.`);
+    showToast(`Facture créée pour ${client?.name || ''} (${list.length} BL, ${total.toFixed(2)} MAD). Elle est dans la page Factures en brouillon.`, 'success');
   };
 
   const toggleSelect = (id: string) => {
@@ -232,8 +234,8 @@ const Deliveries: React.FC = () => {
     e.preventDefault();
 
     if (modeBL === 'commande') {
-      if (!formData.orderId) { alert('Sélectionnez une commande'); return; }
-      if (deliveryItems.length === 0) { alert('Ajoutez des produits'); return; }
+      if (!formData.orderId) { showToast('Sélectionnez une commande', 'warning'); return; }
+      if (deliveryItems.length === 0) { showToast('Ajoutez des produits', 'warning'); return; }
 
       const order = orders.find(o => o.id === formData.orderId);
       const client = clients.find(c => c.id === order?.clientId);
@@ -261,9 +263,9 @@ const Deliveries: React.FC = () => {
     }
 
     // Mode direct : client + produits
-    if (!directClientId) { alert('Sélectionnez un client'); return; }
+    if (!directClientId) { showToast('Sélectionnez un client', 'warning'); return; }
     const validItems = directItems.filter(it => it.productId && it.quantity > 0);
-    if (validItems.length === 0) { alert('Ajoutez au moins un produit avec une quantité'); return; }
+    if (validItems.length === 0) { showToast('Ajoutez au moins un produit avec une quantité', 'warning'); return; }
 
     const client = clientStorage.getById(directClientId);
     const delivery: DeliveryNote = {
@@ -365,7 +367,7 @@ const Deliveries: React.FC = () => {
                     <input type="checkbox" checked={selectedIds.includes(delivery.id)} onChange={() => toggleSelect(delivery.id)} />
                   )}
                 </td>
-                <td><strong>#{delivery.id}</strong>{delivery.transferredToInvoice && <span className="status-badge status-sent" style={{ marginLeft: 6 }}>Facturé</span>}</td>
+                <td><strong>#{delivery.id}</strong>{delivery.transferredToInvoice && <span className="status-badge status-sent" style={{ marginLeft: 4 }}>Facturé</span>}</td>
                 <td>{delivery.clientName}</td>
                 <td>{delivery.orderId ? `#${delivery.orderId}` : '—'}</td>
                 <td>{delivery.driverName || '-'}</td>
@@ -375,7 +377,7 @@ const Deliveries: React.FC = () => {
                     <div style={{ flex: 1, background: '#e5e7eb', borderRadius: 4, height: 8 }}>
                       <div style={{ width: `${getCompletionRate(delivery)}%`, background: delivery.status === 'livré' ? '#16a34a' : '#2563eb', borderRadius: 4, height: 8 }} />
                     </div>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{getCompletionRate(delivery)}%</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{getCompletionRate(delivery)}%</span>
                   </div>
                 </td>
                 <td><span className={`status-badge ${getStatusColor(delivery.status)}`}>{delivery.status.replace('_', ' ')}</span></td>
@@ -417,11 +419,11 @@ const Deliveries: React.FC = () => {
               <div className="form-group">
                 <label>Mode de création</label>
                 <div style={{ display: 'flex', gap: 12 }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
                     <input type="radio" checked={modeBL === 'direct'} onChange={() => setModeBL('direct')} />
                     Direct (sélection client + produits)
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer' }}>
                     <input type="radio" checked={modeBL === 'commande'} onChange={() => setModeBL('commande')} />
                     Depuis une commande
                   </label>
@@ -456,7 +458,7 @@ const Deliveries: React.FC = () => {
                       <button type="button" className="btn btn-small btn-secondary" onClick={addDirectItem}>+ Ajouter un produit</button>
                     </div>
                     {directItems.length === 0 ? (
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Aucun produit — cliquez sur « Ajouter un produit ».</p>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Aucun produit — cliquez sur « Ajouter un produit ».</p>
                     ) : (
                       <table className="detail-table" style={{ marginTop: 8 }}>
                         <thead><tr><th>Produit</th><th>Quantité</th><th>Unité</th><th></th></tr></thead>

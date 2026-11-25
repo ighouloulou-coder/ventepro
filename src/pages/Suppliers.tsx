@@ -267,7 +267,7 @@ const Suppliers: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="card" style={{ marginBottom: 20 }}>
+      <div className="card" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
           <input
             type="text"
@@ -303,7 +303,7 @@ const Suppliers: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="stats-grid" style={{ marginBottom: 20 }}>
+      <div className="stats-grid" style={{ marginBottom: 16 }}>
         <div className="stat-card">
           <div className="stat-label">Total Fournisseurs</div>
           <div className="stat-value">{suppliers.length}</div>
@@ -433,7 +433,7 @@ const Suppliers: React.FC = () => {
             </div>
             <div className="modal-body">
               {/* Tabs */}
-              <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
                 {(['contacts', 'addresses', 'bank', 'documents'] as const).map(tab => (
                   <button
                     key={tab}
@@ -449,7 +449,7 @@ const Suppliers: React.FC = () => {
               </div>
 
               {/* General Info */}
-              <div className="form-grid" style={{ marginBottom: 20 }}>
+              <div className="form-grid" style={{ marginBottom: 16 }}>
                 <div className="form-group">
                   <label>Raison Sociale *</label>
                   <input
@@ -698,7 +698,7 @@ const Suppliers: React.FC = () => {
                     Ajoutez les contrats, certifications et documents importants du fournisseur.
                   </p>
                   {(formData.documents || []).length === 0 ? (
-                    <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-secondary)', borderRadius: 8 }}>
+                    <div style={{ padding: 16, textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-secondary)', borderRadius: 8 }}>
                       Aucun document ajouté
                     </div>
                   ) : (
@@ -715,7 +715,7 @@ const Suppliers: React.FC = () => {
               )}
 
               {/* Notes */}
-              <div className="form-group" style={{ marginTop: 20 }}>
+              <div className="form-group" style={{ marginTop: 16 }}>
                 <label>Notes</label>
                 <textarea
                   className="form-input"
@@ -747,7 +747,7 @@ const Suppliers: React.FC = () => {
               <button className="btn-close" onClick={() => setShowDetailModal(false)}>✕</button>
             </div>
             <div className="modal-body">
-              <div className="form-grid" style={{ marginBottom: 20 }}>
+              <div className="form-grid" style={{ marginBottom: 16 }}>
                 <div>
                   <strong>Nom Commercial:</strong>
                   <div>{selectedSupplier.tradeName}</div>

@@ -57,7 +57,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         padding: '0 16px',
         transition: 'border-color 0.2s',
       }}>
-        <span style={{ fontSize: '1.1rem', marginRight: 10, opacity: 0.5 }}>🔍</span>
+        <span style={{ fontSize: '1rem', marginRight: 8, opacity: 0.5 }}>🔍</span>
         <input
           ref={inputRef}
           type="text"
@@ -66,10 +66,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           placeholder={placeholder}
           style={{
             flex: 1,
-            padding: '14px 0',
+            padding: '12px 0',
             border: 'none',
             background: 'transparent',
-            fontSize: '0.95rem',
+            fontSize: '0.875rem',
             outline: 'none',
             color: 'var(--text-primary)',
           }}
@@ -91,7 +91,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                fontSize: '0.8rem',
+                fontSize: '0.75rem',
                 color: 'var(--text-muted)',
               }}
             >

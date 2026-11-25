@@ -29,20 +29,20 @@ const Analytics: React.FC = () => {
     <AnimatedPage>
       <FloatingShapes />
       <div className="page" style={{ position: 'relative', zIndex: 1 }}>
-        <h2 style={{ fontSize: '1.2rem', marginBottom: 20 }}>📊 Analytics Avance</h2>
+        <h2 style={{ fontSize: '1.125rem', marginBottom: 16 }}>📊 Analytics Avance</h2>
 
         {/* KPIs Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 12, marginBottom: 24 }}>
           {kpis.map((kpi, i) => (
             <TiltCard key={i}>
-              <div style={{ padding: 16, background: 'var(--bg-primary)', borderRadius: 14, border: '1px solid var(--border-color)' }}>
+              <div style={{ padding: 16, background: 'var(--bg-primary)', borderRadius: 12, border: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: '1.4rem' }}>{kpi.icon}</span>
-                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 500 }}>{kpi.label}</span>
+                  <span style={{ fontSize: '1.25rem' }}>{kpi.icon}</span>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>{kpi.label}</span>
                 </div>
-                <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-primary)' }}>{kpi.value}</p>
+                <p style={{ fontSize: '1.125rem', fontWeight: 700, color: 'var(--text-primary)' }}>{kpi.value}</p>
                 {kpi.trend !== 0 && (
-                  <p style={{ fontSize: '0.68rem', color: kpi.trend > 0 ? 'var(--success)' : 'var(--danger)', marginTop: 4 }}>
+                  <p style={{ fontSize: '0.75rem', color: kpi.trend > 0 ? 'var(--success)' : 'var(--danger)', marginTop: 4 }}>
                     {kpi.trend > 0 ? '📈' : '📉'} {kpi.trend.toFixed(1)}% vs mois dernier
                   </p>
                 )}
@@ -55,8 +55,8 @@ const Analytics: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 16, marginBottom: 24 }}>
           {/* Sales Forecast */}
           <TiltCard>
-            <div style={{ padding: 20, background: 'var(--bg-primary)', borderRadius: 14, border: '1px solid var(--border-color)' }}>
-              <h3 style={{ fontSize: '0.95rem', marginBottom: 14 }}>🔮 Previsions de Ventes (6 mois)</h3>
+            <div style={{ padding: 16, background: 'var(--bg-primary)', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+              <h3 style={{ fontSize: '0.875rem', marginBottom: 12 }}>🔮 Previsions de Ventes (6 mois)</h3>
               <ResponsiveContainer width="100%" height={280}>
                 <AreaChart data={forecast}>
                   <defs>
@@ -80,8 +80,8 @@ const Analytics: React.FC = () => {
 
           {/* Cash Flow */}
           <TiltCard>
-            <div style={{ padding: 20, background: 'var(--bg-primary)', borderRadius: 14, border: '1px solid var(--border-color)' }}>
-              <h3 style={{ fontSize: '0.95rem', marginBottom: 14 }}>💵 Flux de Tresorerie</h3>
+            <div style={{ padding: 16, background: 'var(--bg-primary)', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+              <h3 style={{ fontSize: '0.875rem', marginBottom: 12 }}>💵 Flux de Tresorerie</h3>
               <ResponsiveContainer width="100%" height={280}>
                 <BarChart data={cashFlow}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -100,8 +100,8 @@ const Analytics: React.FC = () => {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 16, marginBottom: 24 }}>
           {/* Product Performance */}
           <TiltCard>
-            <div style={{ padding: 20, background: 'var(--bg-primary)', borderRadius: 14, border: '1px solid var(--border-color)' }}>
-              <h3 style={{ fontSize: '0.95rem', marginBottom: 14 }}>🏆 Performance Produits</h3>
+            <div style={{ padding: 16, background: 'var(--bg-primary)', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+              <h3 style={{ fontSize: '0.875rem', marginBottom: 12 }}>🏆 Performance Produits</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={products.map(p => ({ name: p.name.length > 15 ? p.name.slice(0, 15) + '...' : p.name, ca: p.revenue, qte: p.quantity }))} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -118,8 +118,8 @@ const Analytics: React.FC = () => {
 
           {/* Top Clients */}
           <TiltCard>
-            <div style={{ padding: 20, background: 'var(--bg-primary)', borderRadius: 14, border: '1px solid var(--border-color)' }}>
-              <h3 style={{ fontSize: '0.95rem', marginBottom: 14 }}>👑 Top Clients (CA)</h3>
+            <div style={{ padding: 16, background: 'var(--bg-primary)', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+              <h3 style={{ fontSize: '0.875rem', marginBottom: 12 }}>👑 Top Clients (CA)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie data={clients.slice(0, 6).map(c => ({ name: c.name.length > 12 ? c.name.slice(0, 12) + '...' : c.name, value: c.total }))} cx="50%" cy="50%" outerRadius={90} innerRadius={40} dataKey="value" label={({ name, percent }) => name + ' ' + (percent * 100).toFixed(0) + '%'} labelLine={false}>
@@ -134,8 +134,8 @@ const Analytics: React.FC = () => {
 
         {/* Client Details Table */}
         <TiltCard>
-          <div style={{ padding: 20, background: 'var(--bg-primary)', borderRadius: 14, border: '1px solid var(--border-color)' }}>
-            <h3 style={{ fontSize: '0.95rem', marginBottom: 14 }}>📋 Detail Clients</h3>
+          <div style={{ padding: 16, background: 'var(--bg-primary)', borderRadius: 12, border: '1px solid var(--border-color)' }}>
+            <h3 style={{ fontSize: '0.875rem', marginBottom: 12 }}>📋 Detail Clients</h3>
             <div style={{ overflowX: 'auto' }}>
               <table className="data-table" style={{ minWidth: 500 }}>
                 <thead><tr><th>Client</th><th>CA Total</th><th>Commandes</th><th>Panier Moyen</th><th>Derniere Cmd</th></tr></thead>

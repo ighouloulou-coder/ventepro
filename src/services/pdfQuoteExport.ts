@@ -130,7 +130,7 @@ export const generateQuotePDF = (quote: Quote, client?: Client): void => {
       fillColor: [249, 250, 251],
     },
     styles: {
-      fontSize: 9,
+      fontSize: 12,
       cellPadding: 3,
     },
     columnStyles: {
@@ -284,7 +284,7 @@ export const generateAllQuotesPDF = (quotes: Quote[]): void => {
     theme: 'grid',
     headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
     alternateRowStyles: { fillColor: [249, 250, 251] },
-    styles: { fontSize: 8, cellPadding: 3 },
+    styles: { fontSize: 12, cellPadding: 3 },
     columnStyles: {
       0: { cellWidth: 34 },
       1: { cellWidth: 'auto' },

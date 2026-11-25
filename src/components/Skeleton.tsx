@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 
 interface SkeletonProps {
   width?: string | number;
@@ -9,11 +9,12 @@ interface SkeletonProps {
   variant?: 'text' | 'circular' | 'rectangular' | 'card';
 }
 
-const shimmer = {
-  initial: { backgroundPosition: '-200% 0' },
-  animate: { 
-    backgroundPosition: '200% 0',
-    transition: { duration: 1.5, repeat: Infinity, ease: 'linear' as const }
+// AI Design Skills (Partie B) : pas de dégradé animé — pulsation d'opacité sur fond plat.
+const pulse: Variants = {
+  initial: { opacity: 0.6 },
+  animate: {
+    opacity: [0.6, 1, 0.6],
+    transition: { duration: 1.5, repeat: Infinity, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
@@ -28,15 +29,14 @@ export const Skeleton: React.FC<SkeletonProps> = ({
     width,
     height,
     borderRadius: variant === 'circular' ? '50%' : borderRadius,
-    background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
-    backgroundSize: '200% 100%',
+    background: 'var(--bg-tertiary)',
     ...style,
   };
 
   return (
     <motion.div
       style={baseStyle}
-      variants={shimmer}
+      variants={pulse}
       initial="initial"
       animate="animate"
     />
@@ -48,7 +48,7 @@ export const SkeletonCard: React.FC<{ style?: React.CSSProperties }> = ({ style 
   <div style={{
     background: 'var(--bg-primary)',
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
     border: '1px solid var(--border-color)',
     ...style,
   }}>
@@ -80,7 +80,7 @@ export const SkeletonList: React.FC<{ count?: number }> = ({ count = 5 }) => (
       }}>
         <Skeleton variant="circular" width={40} height={40} />
         <div style={{ flex: 1 }}>
-          <Skeleton width="70%" height={14} style={{ marginBottom: 6 }} />
+          <Skeleton width="70%" height={14} style={{ marginBottom: 4 }} />
           <Skeleton width="50%" height={10} />
         </div>
         <Skeleton width={60} height={24} borderRadius={12} />
@@ -91,7 +91,7 @@ export const SkeletonList: React.FC<{ count?: number }> = ({ count = 5 }) => (
 
 // Skeleton pour un tableau de bord
 export const SkeletonDashboard: React.FC = () => (
-  <div style={{ padding: 20 }}>
+  <div style={{ padding: 16 }}>
     {/* Stats cards */}
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
       {[1, 2, 3, 4].map(i => (
@@ -107,7 +107,7 @@ export const SkeletonDashboard: React.FC = () => (
       border: '1px solid var(--border-color)',
       marginBottom: 24,
     }}>
-      <Skeleton width="30%" height={20} style={{ marginBottom: 20 }} />
+      <Skeleton width="30%" height={20} style={{ marginBottom: 16 }} />
       <Skeleton width="100%" height={200} borderRadius={8} />
     </div>
     
@@ -118,7 +118,7 @@ export const SkeletonDashboard: React.FC = () => (
       padding: 24,
       border: '1px solid var(--border-color)',
     }}>
-      <Skeleton width="25%" height={20} style={{ marginBottom: 20 }} />
+      <Skeleton width="25%" height={20} style={{ marginBottom: 16 }} />
       <SkeletonList count={5} />
     </div>
   </div>
@@ -126,7 +126,7 @@ export const SkeletonDashboard: React.FC = () => (
 
 // Skeleton pour une page entière
 export const SkeletonPage: React.FC = () => (
-  <div style={{ padding: 20, maxWidth: 1200, margin: '0 auto' }}>
+  <div style={{ padding: 16, maxWidth: 1200, margin: '0 auto' }}>
     {/* Header */}
     <div style={{ marginBottom: 24 }}>
       <Skeleton width="40%" height={28} style={{ marginBottom: 8 }} />

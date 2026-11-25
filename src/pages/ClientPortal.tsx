@@ -78,13 +78,13 @@ const ClientPortal: React.FC = () => {
         <>
           {/* En-tête du client */}
           <div style={{ background: 'white', borderRadius: 12, padding: 24, marginBottom: 24, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 16 }}>
               <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#12A150', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 700 }}>
                 {selectedClient.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: '1.3rem' }}>{selectedClient.name}</h3>
-                <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                <h3 style={{ margin: 0, fontSize: '1.25rem' }}>{selectedClient.name}</h3>
+                <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '0.875rem' }}>
                   {selectedClient.email} | {selectedClient.phone}
                 </p>
               </div>
@@ -93,16 +93,16 @@ const ClientPortal: React.FC = () => {
             {/* Stats client */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
               <div style={{ textAlign: 'center', padding: 16, background: '#f0fdf4', borderRadius: 8 }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>Total facturé payé</p>
-                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-success)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalInvoiced, selectedClient.currency || 'MAD')}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 0 }}>Total facturé payé</p>
+                <p style={{ fontWeight: 700, fontSize: '1.125rem', color: 'var(--text-success)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalInvoiced, selectedClient.currency || 'MAD')}</p>
               </div>
               <div style={{ textAlign: 'center', padding: 16, background: '#fef3c7', borderRadius: 8 }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>En attente</p>
-                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-warning)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalPending, selectedClient.currency || 'MAD')}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 0 }}>En attente</p>
+                <p style={{ fontWeight: 700, fontSize: '1.125rem', color: 'var(--text-warning)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalPending, selectedClient.currency || 'MAD')}</p>
               </div>
               <div style={{ textAlign: 'center', padding: 16, background: 'var(--bg-info)', borderRadius: 8 }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>Commandes totales</p>
-                <p style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary-brand)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalOrders, selectedClient.currency || 'MAD')}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.75rem', margin: 0 }}>Commandes totales</p>
+                <p style={{ fontWeight: 700, fontSize: '1.125rem', color: 'var(--text-primary-brand)', margin: '4px 0 0 0' }}>{formatCurrencyAmount(totalOrders, selectedClient.currency || 'MAD')}</p>
               </div>
             </div>
           </div>
@@ -125,7 +125,7 @@ const ClientPortal: React.FC = () => {
             ))}
           </div>
 
-          <div style={{ background: 'white', borderRadius: '0 0 12px 12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: 20, marginTop: -1 }}>
+          <div style={{ background: 'white', borderRadius: '0 0 12px 12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', padding: 16, marginTop: -1 }}>
             {/* Factures */}
             {activeTab === 'invoices' && (
               invoices.length === 0 ? (
@@ -226,7 +226,7 @@ const ClientPortal: React.FC = () => {
                               <div style={{ flex: 1, background: '#e5e7eb', borderRadius: 4, height: 8 }}>
                                 <div style={{ width: `${progress}%`, background: progress === 100 ? '#16a34a' : '#2563eb', borderRadius: 4, height: 8 }} />
                               </div>
-                              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{progress}%</span>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{progress}%</span>
                             </div>
                           </td>
                         </tr>
@@ -239,8 +239,8 @@ const ClientPortal: React.FC = () => {
           </div>
         </>
       ) : (
-        <div className="empty-state" style={{ padding: 60 }}>
-          <p style={{ fontSize: '1.2rem' }}>👤 Sélectionnez un client</p>
+        <div className="empty-state" style={{ padding: 64 }}>
+          <p style={{ fontSize: '1.125rem' }}>👤 Sélectionnez un client</p>
           <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Choisissez un client pour voir ses données</p>
         </div>
       )}

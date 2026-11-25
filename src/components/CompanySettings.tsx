@@ -26,16 +26,16 @@ const CompanySettings: React.FC = () => {
   };
 
   const inputStyle: React.CSSProperties = {
-    width: '100%', padding: '10px 12px', fontSize: 15,
+    width: '100%', padding: '8px 12px', fontSize: 14,
     borderRadius: 8, border: '1px solid #cbd5e1', boxSizing: 'border-box',
   };
   const labelStyle: React.CSSProperties = {
-    display: 'block', fontSize: '0.85rem', fontWeight: 600,
-    color: '#475569', marginBottom: 6,
+    display: 'block', fontSize: '0.75rem', fontWeight: 600,
+    color: '#475569', marginBottom: 4,
   };
 
   const field = (label: string, key: keyof CompanyInfo, placeholder = '') => (
-    <div style={{ marginBottom: 14 }}>
+    <div style={{ marginBottom: 12 }}>
       <label style={labelStyle}>{label}</label>
       <input
         style={inputStyle}
@@ -49,16 +49,16 @@ const CompanySettings: React.FC = () => {
   return (
     <div style={{
       background: '#fff', border: '1px solid #e2e8f0',
-      borderRadius: 12, padding: 20, marginBottom: 24,
+      borderRadius: 12, padding: 16, marginBottom: 24,
     }}>
       <div style={{ fontSize: '1rem', fontWeight: 700, color: '#1f2937', marginBottom: 4 }}>
         🏢 Paramétrage de l'entreprise
       </div>
-      <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: 20 }}>
+      <p style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: 16 }}>
         Ces informations apparaîtront sur vos devis, factures et bons de livraison.
       </p>
 
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
         <PhotoUpload
           currentPhoto={info.logo}
           onPhotoChange={(photo) => set('logo', photo)}
@@ -78,8 +78,8 @@ const CompanySettings: React.FC = () => {
       </div>
 
       <div style={{
-        fontSize: '0.85rem', fontWeight: 700, color: '#475569',
-        margin: '18px 0 12px', paddingTop: 12, borderTop: '1px solid #f1f5f9',
+        fontSize: '0.75rem', fontWeight: 700, color: '#475569',
+        margin: '16px 0 12px', paddingTop: 12, borderTop: '1px solid #f1f5f9',
       }}>
         Identifiants fiscaux (Maroc)
       </div>
@@ -93,7 +93,7 @@ const CompanySettings: React.FC = () => {
       </div>
       {field('CNSS', 'cnss', '')}
 
-      <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+      <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
         <button className="btn btn-primary" onClick={handleSave} style={{ flex: 1 }}>
           💾 Enregistrer
         </button>
@@ -102,7 +102,7 @@ const CompanySettings: React.FC = () => {
         </button>
       </div>
       {saved && (
-        <div style={{ marginTop: 12, color: '#166534', fontSize: '0.9rem', textAlign: 'center' }}>
+        <div style={{ marginTop: 12, color: '#166534', fontSize: '0.875rem', textAlign: 'center' }}>
           ✅ Informations enregistrées
         </div>
       )}

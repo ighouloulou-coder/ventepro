@@ -241,10 +241,10 @@ const UserManagement: React.FC = () => {
   // ============================================
   const inputStyle: React.CSSProperties = {
     width: '100%',
-    padding: '12px 14px',
+    padding: '12px 12px',
     border: '2px solid #e5e7eb',
-    borderRadius: 10,
-    fontSize: '0.95rem',
+    borderRadius: 8,
+    fontSize: '0.875rem',
     outline: 'none',
     boxSizing: 'border-box',
     fontFamily: 'inherit',
@@ -252,9 +252,9 @@ const UserManagement: React.FC = () => {
 
   const labelStyle: React.CSSProperties = {
     display: 'block',
-    marginBottom: 6,
+    marginBottom: 4,
     fontWeight: 600,
-    fontSize: '0.85rem',
+    fontSize: '0.75rem',
     color: '#374151',
   };
 
@@ -264,13 +264,13 @@ const UserManagement: React.FC = () => {
     color: 'white',
     border: 'none',
     borderRadius: 8,
-    fontSize: '0.8rem',
+    fontSize: '0.75rem',
     fontWeight: 600,
     cursor: 'pointer',
   });
 
   return (
-    <div style={{ background: 'var(--bg-primary)', borderRadius: 18, padding: 20, border: '1px solid var(--border-color)' }}>
+    <div style={{ background: 'var(--bg-primary)', borderRadius: 16, padding: 16, border: '1px solid var(--border-color)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>👤 Gestion des Utilisateurs</h3>
         <div style={{ display: 'flex', gap: 8 }}>
@@ -298,40 +298,40 @@ const UserManagement: React.FC = () => {
       </div>
 
       {/* Messages */}
-      {err && <div style={{ background: '#fef2f2', color: '#991b1b', padding: '10px 14px', borderRadius: 10, marginBottom: 12, fontSize: '0.85rem' }}>❌ {err}</div>}
-      {ok && <div style={{ background: '#f0fdf4', color: '#166534', padding: '10px 14px', borderRadius: 10, marginBottom: 12, fontSize: '0.85rem' }}>✅ {ok}</div>}
+      {err && <div style={{ background: '#fef2f2', color: '#991b1b', padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: '0.75rem' }}>❌ {err}</div>}
+      {ok && <div style={{ background: '#f0fdf4', color: '#166534', padding: '8px 12px', borderRadius: 8, marginBottom: 12, fontSize: '0.75rem' }}>✅ {ok}</div>}
 
       {/* Users List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {users.map(u => (
           <div key={u.id} style={{
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '12px 14px', background: 'var(--bg-secondary)', borderRadius: 12,
+            padding: '12px 12px', background: 'var(--bg-secondary)', borderRadius: 12,
             border: '1px solid var(--border-color)', flexWrap: 'wrap', gap: 8,
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 200 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 1, minWidth: 200 }}>
               <div style={{
-                width: 40, height: 40, borderRadius: 10,
+                width: 40, height: 40, borderRadius: 8,
                 background: u.role === 'admin' ? '#0B3B2C' : '#12A150',
                 color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 700, fontSize: '0.9rem',
+                fontWeight: 700, fontSize: '0.875rem',
               }}>
                 {u.displayName.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p style={{ fontWeight: 600, fontSize: '0.9rem', margin: 0 }}>{u.displayName}</p>
+                <p style={{ fontWeight: 600, fontSize: '0.875rem', margin: 0 }}>{u.displayName}</p>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
                   @{u.username} • {u.role === 'admin' ? '🔑 Admin' : '👤 Utilisateur'}
                 </p>
                 {u.role === 'user' && u.permissions.length > 0 && u.permissions[0] !== 'all' && (
                   <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginTop: 4 }}>
                     {u.permissions.slice(0, 3).map(p => (
-                      <span key={p} style={{ fontSize: '0.65rem', background: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: 6 }}>
+                      <span key={p} style={{ fontSize: '0.75rem', background: 'var(--bg-tertiary)', padding: '2px 4px', borderRadius: 6 }}>
                         {SECTIONS.find(s => s.id === p)?.icon} {p}
                       </span>
                     ))}
                     {u.permissions.length > 3 && (
-                      <span style={{ fontSize: '0.65rem', background: 'var(--bg-tertiary)', padding: '2px 6px', borderRadius: 6 }}>
+                      <span style={{ fontSize: '0.75rem', background: 'var(--bg-tertiary)', padding: '2px 4px', borderRadius: 6 }}>
                         +{u.permissions.length - 3}
                       </span>
                     )}
@@ -339,7 +339,7 @@ const UserManagement: React.FC = () => {
                 )}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {currentUser?.role === 'admin' && currentUser?.id !== u.id && (
                 <>
                   <motion.button
@@ -372,7 +372,7 @@ const UserManagement: React.FC = () => {
         {showCreate && (
           <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCreate(false)}>
             <motion.div className="modal" onClick={e => e.stopPropagation()} initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }} style={{ maxWidth: 500 }}>
-              <h3 style={{ marginBottom: 20 }}>👤 Nouvel Utilisateur</h3>
+              <h3 style={{ marginBottom: 16 }}>👤 Nouvel Utilisateur</h3>
 
               <div style={{ marginBottom: 12 }}>
                 <label style={labelStyle}>Nom d'utilisateur</label>
@@ -412,7 +412,7 @@ const UserManagement: React.FC = () => {
                     marginTop: 8,
                     padding: 12,
                     background: 'var(--bg-secondary)',
-                    borderRadius: 10,
+                    borderRadius: 8,
                     border: '1px solid var(--border-color)',
                   }}>
                     {SECTIONS.map(section => {
@@ -424,18 +424,18 @@ const UserManagement: React.FC = () => {
                           whileTap={{ scale: 0.98 }}
                           onClick={() => togglePermission(section.id)}
                           style={{
-                            padding: '8px 10px',
+                            padding: '8px 8px',
                             borderRadius: 8,
                             border: `2px solid ${hasPermission ? '#12A150' : '#e5e7eb'}`,
                             background: hasPermission ? '#eff6ff' : 'white',
                             color: hasPermission ? '#0B3B2C' : '#6b7280',
-                            fontSize: '0.8rem',
+                            fontSize: '0.75rem',
                             fontWeight: 600,
                             cursor: 'pointer',
                             textAlign: 'left',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 6,
+                            gap: 4,
                           }}
                         >
                           <span>{hasPermission ? '✅' : '⬜'}</span>
@@ -444,7 +444,7 @@ const UserManagement: React.FC = () => {
                       );
                     })}
                   </div>
-                  <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 6 }}>
+                  <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 4 }}>
                     Cochez les sections auxquelles l'utilisateur aura accès
                   </p>
                 </div>
@@ -496,7 +496,7 @@ const UserManagement: React.FC = () => {
           <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowEditPassword(null)}>
             <motion.div className="modal" onClick={e => e.stopPropagation()} initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 50, opacity: 0 }}>
               <h3>🔄 Réinitialiser le mot de passe</h3>
-              <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: 16 }}>
+              <p style={{ color: '#6b7280', fontSize: '0.75rem', marginBottom: 16 }}>
                 Utilisateur : <strong>{users.find(u => u.id === showEditPassword)?.displayName}</strong>
               </p>
               <div style={{ marginBottom: 16 }}>

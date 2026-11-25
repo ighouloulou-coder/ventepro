@@ -24,7 +24,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
     <div style={{ marginBottom: 16 }}>
       {label && (
         <p style={{
-          fontSize: '0.8rem',
+          fontSize: '0.75rem',
           fontWeight: 600,
           color: 'var(--text-muted)',
           marginBottom: 8,
@@ -47,16 +47,16 @@ const FilterBar: React.FC<FilterBarProps> = ({
               whileTap={{ scale: 0.95 }}
               style={{
                 padding: '8px 16px',
-                borderRadius: 20,
+                borderRadius: 16,
                 border: isActive ? '2px solid var(--primary)' : '2px solid var(--border-color)',
                 background: isActive ? 'var(--primary)' : 'var(--bg-secondary)',
                 color: isActive ? 'white' : 'var(--text-primary)',
-                fontSize: '0.85rem',
+                fontSize: '0.75rem',
                 fontWeight: 600,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6,
+                gap: 4,
                 transition: 'all 0.2s',
               }}
             >
@@ -65,7 +65,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                 <span style={{
                   background: isActive ? 'rgba(255,255,255,0.3)' : 'var(--bg-tertiary)',
                   padding: '2px 8px',
-                  borderRadius: 10,
+                  borderRadius: 8,
                   fontSize: '0.75rem',
                 }}>
                   {filter.count}

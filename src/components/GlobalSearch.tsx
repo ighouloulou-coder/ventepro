@@ -116,7 +116,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
           onClick={(e) => e.stopPropagation()}
           style={{
             background: 'var(--bg-primary)',
-            borderRadius: 20,
+            borderRadius: 16,
             width: '100%',
             maxWidth: 560,
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
@@ -128,11 +128,11 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            padding: '16px 20px',
+            padding: '16px 16px',
             borderBottom: '1px solid var(--border-color)',
             gap: 12,
           }}>
-            <span style={{ fontSize: '1.2rem', opacity: 0.5 }}>🔍</span>
+            <span style={{ fontSize: '1.125rem', opacity: 0.5 }}>🔍</span>
             <input
               ref={inputRef}
               type="text"
@@ -151,7 +151,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
             <button
               onClick={onClose}
               style={{
-                padding: '4px 10px',
+                padding: '4px 8px',
                 background: 'var(--bg-secondary)',
                 border: '1px solid var(--border-color)',
                 borderRadius: 8,
@@ -178,7 +178,7 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 12,
-                    padding: '12px 20px',
+                    padding: '12px 16px',
                     cursor: 'pointer',
                     borderBottom: '1px solid var(--border-color)',
                     transition: 'background 0.15s',
@@ -186,18 +186,18 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
                   onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-secondary)')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <span style={{ fontSize: '1.3rem' }}>{result.icon}</span>
+                  <span style={{ fontSize: '1.25rem' }}>{result.icon}</span>
                   <div style={{ flex: 1 }}>
-                    <p style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)', margin: 0 }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--text-primary)', margin: 0 }}>
                       {result.label}
                     </p>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>
                       {result.sublabel}
                     </p>
                   </div>
                   <span style={{
-                    fontSize: '0.7rem',
-                    padding: '3px 8px',
+                    fontSize: '0.75rem',
+                    padding: '2px 8px',
                     borderRadius: 8,
                     background: 'var(--bg-tertiary)',
                     color: 'var(--text-muted)',
@@ -208,12 +208,12 @@ const GlobalSearch: React.FC<GlobalSearchProps> = ({ isOpen, onClose }) => {
               ))
             ) : query.trim() ? (
               <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p style={{ fontSize: '2rem', marginBottom: 8 }}>🔍</p>
+                <p style={{ fontSize: '1.875rem', marginBottom: 8 }}>🔍</p>
                 <p>Aucun résultat pour "{query}"</p>
               </div>
             ) : (
               <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-                <p style={{ fontSize: '2rem', marginBottom: 8 }}>⌨️</p>
+                <p style={{ fontSize: '1.875rem', marginBottom: 8 }}>⌨️</p>
                 <p>Commencez à taper pour rechercher</p>
               </div>
             )}

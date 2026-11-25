@@ -33,21 +33,21 @@ class ErrorBoundary extends React.Component<Props, State> {
           justifyContent: 'center',
           background: '#1f2937',
           color: 'white',
-          padding: 20,
+          padding: 16,
           fontFamily: 'monospace',
         }}>
           <div style={{ maxWidth: 600, textAlign: 'center' }}>
-            <h1 style={{ fontSize: '2rem', marginBottom: 20 }}>⚠️ Erreur</h1>
-            <p style={{ marginBottom: 20, color: '#9ca3af' }}>
+            <h1 style={{ fontSize: '1.875rem', marginBottom: 16 }}>⚠️ Erreur</h1>
+            <p style={{ marginBottom: 16, color: '#9ca3af' }}>
               Une erreur est survenue au chargement de l'application.
             </p>
             <div style={{
               background: '#111827',
               padding: 16,
               borderRadius: 8,
-              marginBottom: 20,
+              marginBottom: 16,
               textAlign: 'left',
-              fontSize: '0.8rem',
+              fontSize: '0.75rem',
               overflow: 'auto',
               maxHeight: 200,
             }}>

@@ -31,10 +31,10 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '60px 40px',
+        padding: '64px 40px',
         textAlign: 'center',
         background: 'var(--bg-primary)',
-        borderRadius: 20,
+        borderRadius: 16,
         border: '2px dashed var(--border-color)',
       }}
     >
@@ -43,15 +43,15 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
         style={{
-          fontSize: '4rem',
-          marginBottom: 20,
+          fontSize: '3.75rem',
+          marginBottom: 16,
         }}
       >
         {icon}
       </motion.div>
       
       <h3 style={{
-        fontSize: '1.3rem',
+        fontSize: '1.25rem',
         fontWeight: 700,
         color: 'var(--text-primary)',
         marginBottom: 8,
@@ -61,7 +61,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
       
       {description && (
         <p style={{
-          fontSize: '0.95rem',
+          fontSize: '0.875rem',
           color: 'var(--text-muted)',
           marginBottom: 24,
           maxWidth: 400,
@@ -82,7 +82,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
               color: 'white',
               border: 'none',
               borderRadius: 12,
-              fontSize: '0.95rem',
+              fontSize: '0.875rem',
               fontWeight: 600,
               cursor: 'pointer',
             }}
@@ -102,7 +102,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
               color: 'var(--text-primary)',
               border: '1px solid var(--border-color)',
               borderRadius: 12,
-              fontSize: '0.95rem',
+              fontSize: '0.875rem',
               fontWeight: 600,
               cursor: 'pointer',
             }}

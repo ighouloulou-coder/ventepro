@@ -73,18 +73,18 @@ const SupplierDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 16 }}>
         {/* Top Fournisseurs */}
         <div className="card">
           <h3 style={{ marginBottom: 12 }}>🏆 Top Fournisseurs (par montant)</h3>
           {stats.topSuppliers.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Aucune donnée</p>
+            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>Aucune donnée</p>
           ) : (
             <div>
               {stats.topSuppliers.map((supplier, index) => (
                 <div key={index} style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '10px 12px', marginBottom: 8, background: 'var(--bg-secondary)', borderRadius: 8,
+                  padding: '8px 12px', marginBottom: 8, background: 'var(--bg-secondary)', borderRadius: 8,
                 }}>
                   <div>
                     <div style={{ fontWeight: 600 }}>
@@ -107,13 +107,13 @@ const SupplierDashboard: React.FC = () => {
         <div className="card">
           <h3 style={{ marginBottom: 12 }}>📋 Commandes Récentes</h3>
           {stats.recentOrders.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Aucune commande</p>
+            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>Aucune commande</p>
           ) : (
             <div>
               {stats.recentOrders.map(order => (
                 <div key={order.id} style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                  padding: '10px 12px', marginBottom: 8, background: 'var(--bg-secondary)', borderRadius: 8,
+                  padding: '8px 12px', marginBottom: 8, background: 'var(--bg-secondary)', borderRadius: 8,
                 }}>
                   <div>
                     <div style={{ fontWeight: 600 }}>{order.id}</div>

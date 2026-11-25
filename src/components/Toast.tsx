@@ -84,7 +84,7 @@ const ToastContainer: React.FC<{ toasts: Toast[]; removeToast: (id: string) => v
       zIndex: 9999,
       display: 'flex',
       flexDirection: 'column',
-      gap: 10,
+      gap: 8,
       maxWidth: 400,
     }}>
       <AnimatePresence>
@@ -122,7 +122,7 @@ const ToastItem: React.FC<{ toast: Toast; onClose: () => void }> = ({ toast, onC
         background: color.bg,
         border: `1px solid ${color.border}`,
         borderRadius: 12,
-        padding: '14px 16px',
+        padding: '12px 16px',
         display: 'flex',
         alignItems: 'flex-start',
         gap: 12,
@@ -131,13 +131,13 @@ const ToastItem: React.FC<{ toast: Toast; onClose: () => void }> = ({ toast, onC
       }}
       onClick={onClose}
     >
-      <span style={{ fontSize: '1.2rem' }}>{icons[toast.type]}</span>
+      <span style={{ fontSize: '1.125rem' }}>{icons[toast.type]}</span>
       <div style={{ flex: 1 }}>
-        <p style={{ fontWeight: 600, color: color.text, fontSize: '0.9rem', margin: 0 }}>
+        <p style={{ fontWeight: 600, color: color.text, fontSize: '0.875rem', margin: 0 }}>
           {toast.title}
         </p>
         {toast.message && (
-          <p style={{ color: color.text, fontSize: '0.8rem', margin: '4px 0 0', opacity: 0.8 }}>
+          <p style={{ color: color.text, fontSize: '0.75rem', margin: '4px 0 0', opacity: 0.8 }}>
             {toast.message}
           </p>
         )}

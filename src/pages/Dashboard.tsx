@@ -13,10 +13,12 @@ import { DashboardStats, Invoice, Product } from '../types';
 import TiltCard from '../components/TiltCard';
 import AnimatedPage, { AnimatedItem } from '../components/AnimatedPage';
 import FloatingShapes from '../components/FloatingShapes';
+import { useToast } from '../components/Toast';
 
 const COLORS = ['#2563eb', '#16a34a', '#f59e0b', '#dc2626', '#8b5cf6', '#ec4899'];
 
 const Dashboard: React.FC = () => {
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -54,7 +56,7 @@ const Dashboard: React.FC = () => {
       loadData();
       setLastSync(new Date().toLocaleTimeString('fr-FR'));
     } catch (e) {
-      alert('Erreur de synchronisation.');
+      showToast('Erreur de synchronisation.', 'error');
     } finally {
       setSyncing(false);
     }
@@ -143,11 +145,11 @@ const Dashboard: React.FC = () => {
       <FloatingShapes />
       <div className="page" style={{ position: 'relative', zIndex: 1 }}>
         <AnimatedItem>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 20 }}>
-            <h2 style={{ fontSize: '1.2rem' }}>📊 Tableau de Bord</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 16 }}>
+            <h2 style={{ fontSize: '1.125rem' }}>📊 Tableau de Bord</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {lastSync && (
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                   Dernière sync: {lastSync}
                 </span>
               )}
@@ -156,7 +158,7 @@ const Dashboard: React.FC = () => {
                   className="btn btn-secondary btn-3d"
                   onClick={forceSync}
                   disabled={syncing}
-                  style={{ flex: 1, minWidth: 0, fontSize: '0.8rem', padding: '10px 12px' }}
+                  style={{ flex: 1, minWidth: 0, fontSize: '0.75rem', padding: '8px 12px' }}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
                 >
@@ -165,7 +167,7 @@ const Dashboard: React.FC = () => {
                 <motion.button
                   className="btn btn-small btn-danger btn-3d"
                   onClick={() => { localStorage.removeItem('tradelink_access'); localStorage.removeItem('tradelink_current_user'); localStorage.removeItem('tradelink_demo'); sessionStorage.setItem('tradelink_logged_out', '1'); window.location.href = '/login'; }}
-                  style={{ fontSize: '0.8rem', padding: '10px 12px' }}
+                  style={{ fontSize: '0.75rem', padding: '8px 12px' }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -267,7 +269,7 @@ const Dashboard: React.FC = () => {
 
         <AnimatedItem>
           <TiltCard className="recent-section-3d" onClick={() => navigate("/invoices")} style={{ cursor: "pointer" }}>
-            <h3 style={{ fontSize: "0.95rem", marginBottom: 10 }}>📋 Factures Récentes</h3>
+            <h3 style={{ fontSize: "0.875rem", marginBottom: 8 }}>📋 Factures Récentes</h3>
             {stats.recentInvoices.length === 0 ? (
               <p className="empty-state">Aucune facture</p>
             ) : (

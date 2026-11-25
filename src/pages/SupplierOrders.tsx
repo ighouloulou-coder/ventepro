@@ -202,7 +202,7 @@ const SupplierOrders: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="card" style={{ marginBottom: 20 }}>
+      <div className="card" style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           <input
             type="text"
@@ -227,7 +227,7 @@ const SupplierOrders: React.FC = () => {
       </div>
 
       {/* Stats */}
-      <div className="stats-grid" style={{ marginBottom: 20 }}>
+      <div className="stats-grid" style={{ marginBottom: 16 }}>
         <div className="stat-card">
           <div className="stat-label">Total Commandes</div>
           <div className="stat-value">{orders.length}</div>
@@ -381,13 +381,13 @@ const SupplierOrders: React.FC = () => {
               </div>
 
               {/* Items */}
-              <div style={{ marginTop: 20 }}>
+              <div style={{ marginTop: 16 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
                   <h4>📦 Articles</h4>
                   <button className="btn btn-primary btn-small" onClick={addItem}>+ Ajouter un article</button>
                 </div>
                 {orderItems.length === 0 ? (
-                  <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-secondary)', borderRadius: 8 }}>
+                  <div style={{ padding: 16, textAlign: 'center', color: 'var(--text-muted)', background: 'var(--bg-secondary)', borderRadius: 8 }}>
                     Aucun article ajouté
                   </div>
                 ) : (
@@ -432,7 +432,7 @@ const SupplierOrders: React.FC = () => {
                 )}
               </div>
 
-              <div className="form-group" style={{ marginTop: 20 }}>
+              <div className="form-group" style={{ marginTop: 16 }}>
                 <label>Notes</label>
                 <textarea
                   className="form-input"
